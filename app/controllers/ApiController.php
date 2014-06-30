@@ -1,6 +1,6 @@
 <?php
 
-class UserController extends \BaseController {
+class ApiController extends \BaseController {
 
 	/**
 	 * Display a listing of the resource.
@@ -10,7 +10,9 @@ class UserController extends \BaseController {
 	public function index()
 	{
 		//
-        return $this->_createResponse("index");
+        return Response::json(array(
+            'data' => 'hello'
+        ));
 	}
 
 
@@ -22,7 +24,6 @@ class UserController extends \BaseController {
 	public function create()
 	{
 		//
-        return $this->_createResponse("create");
 	}
 
 
@@ -34,7 +35,6 @@ class UserController extends \BaseController {
 	public function store()
 	{
 		//
-        return $this->_createResponse("store");
 	}
 
 
@@ -47,7 +47,6 @@ class UserController extends \BaseController {
 	public function show($id)
 	{
 		//
-        return $this->_createResponse("show");
 	}
 
 
@@ -60,7 +59,6 @@ class UserController extends \BaseController {
 	public function edit($id)
 	{
 		//
-        return $this->_createResponse("edit");
 	}
 
 
@@ -73,7 +71,6 @@ class UserController extends \BaseController {
 	public function update($id)
 	{
 		//
-        return $this->_createResponse("update");
 	}
 
 
@@ -86,24 +83,7 @@ class UserController extends \BaseController {
 	public function destroy($id)
 	{
 		//
-        return $this->_createResponse("destroy");
 	}
 
-
-    private function _createResponse($action) {
-        return Response::json(array(
-            'data' => array(
-                'fromAction' => $action,
-                'method' => Request::method(),
-                'header' => Request::header(),
-                'uri' => Request::path(),
-                'body' => Input::all(),
-            ),
-        ));
-    }
-
-    public function register() {
-        return null;
-    }
 
 }

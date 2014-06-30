@@ -20,5 +20,10 @@ Route::get('/', function()
 // Route group for API versioning
 Route::group(array('prefix' => 'api'), function()
 {
+    Route::post('register', 'UserController@register');
+    Route::post('login', 'UserController@login');
+    Route::get('forgot_password', 'UserController@forgot_password');
     Route::resource('user', 'UserController');
 });
+
+
