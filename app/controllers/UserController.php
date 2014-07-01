@@ -106,4 +106,8 @@ class UserController extends \BaseController {
         return null;
     }
 
+    public function login() {
+        return null;
+    }
+
 }

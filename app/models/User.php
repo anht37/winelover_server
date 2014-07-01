@@ -23,6 +23,9 @@ class User extends Eloquent {
         parent::boot();
         self::creating(function($user) {
            $user->user_id = Crypt::encrypt($user->email);
+           if(!empty($user->password)) {
+               $user->password = Hash::make($user->password);
+           }
         });
     }
 }
