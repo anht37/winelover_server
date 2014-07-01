@@ -10,4 +10,5 @@ class Device extends Eloquent {
     protected $table = 'devices';
     const IOS = 1;
     const ANDROID = 0;
+    protected $fillable = array('auth_key', 'device_id', 'platform');
 }

@@ -13,17 +13,18 @@ class UserTest extends TestCase {
     public function testRegisterSucess() {
         $params = array('auth_key' => '123','device_id' => '123', 'platform' => Device::IOS);
         $response = $this->call('POST', 'api/register', $params);
-        $device = new Device();
-        $device->auth_key = $params['auth_key'];
-        $device->device_id = $params['123'];
-        $device->platform = $params['platform'];
-        $this->assertTrue($device->save());
+        $device = Device::where('auth_key', $params['auth_key'])
+            ->where('device_id',$params['device_id'])
+            ->where('platform', $params['platform'])->first();
+        $this->assertNotNull($device);
         $this->assertTrue($this->client->getResponse()->isOk());
         $this->assertEquals(json_encode(array("code" => "000","data" => "Register Push notification Successful")), $response->getContent());
     }
 
     public function testRegisterDeviceExisted() {
         $params = array('auth_key' => '123','device_id' => '123', 'platform' => Device::IOS);
+        $device = new Device($params);
+        $device->save();
         $response = $this->call('POST', 'api/register', $params) ;
         $this->assertTrue($this->client->getResponse()->isOk());
         $this->assertEquals(json_encode(array("code" => "106","data" => "Device id has existed")), $response->getContent());
