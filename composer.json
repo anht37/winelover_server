@@ -4,7 +4,8 @@
 	"keywords": ["framework", "laravel"],
 	"license": "MIT",
 	"require": {
-		"laravel/framework": "4.2.*"
+		"laravel/framework": "4.2.*",
+        "webpatser/laravel-uuid": "1.2"
 	},
 	"autoload": {
 		"classmap": [
@@ -16,7 +17,8 @@
 			"app/tests/TestCase.php"
 		]
 	},
-	"scripts": {
+
+    "scripts": {
 		"post-install-cmd": [
 			"php artisan clear-compiled",
 			"php artisan optimize"

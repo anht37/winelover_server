@@ -1,7 +1,5 @@
 <?php
 
-use Illuminate\Auth\UserTrait;
-use Illuminate\Auth\Reminders\RemindableTrait;
 
 class User extends Eloquent {
 
@@ -22,10 +20,10 @@ class User extends Eloquent {
     public static function boot() {
         parent::boot();
         self::creating(function($user) {
-           $user->user_id = Crypt::encrypt($user->email);
-           if(!empty($user->password)) {
-               $user->password = Hash::make($user->password);
-           }
+            $user->user_id = Uuid::generate(4);
+            if(!empty($user->password)) {
+                $user->password = Hash::make($user->password);
+            }
         });
     }
 }

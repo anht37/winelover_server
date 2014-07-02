@@ -20,6 +20,29 @@ class LoginTest extends TestCase
         );
     }
 
+    public function setUp()
+    {
+        parent::setUp();
+        $this->resetEvents();
+    }
+
+    private function resetEvents()
+    {
+        // Define the models that have event listeners.
+        $models = array('User');
+
+        // Reset their event listeners.
+        foreach ($models as $model) {
+
+            // Flush any existing listeners.
+            call_user_func(array($model, 'flushEventListeners'));
+
+            // Reregister them.
+            call_user_func(array($model, 'boot'));
+        }
+    }
+
+
     //test cases for Login by email - password successfully
     public function testLoginByEmailSuccess()
     {
@@ -39,7 +62,8 @@ class LoginTest extends TestCase
         )), $response->getContent());
     }
 
-    public function testLoginByFacebookExistedUserSuccess() {
+    public function testLoginByFacebookExistedUserSuccess()
+    {
         $_params = $this->params;
         $_params['fb_id'] = '123456';
         $user = new User();
@@ -59,7 +83,8 @@ class LoginTest extends TestCase
         )), $response->getContent());
     }
 
-    public function testLoginByFacebookNewUserSuccess() {
+    public function testLoginByFacebookNewUserSuccess()
+    {
         $_params = $this->params;
         $_params['fb_id'] = '123456';
         $response = $this->call('POST', 'api/login', $this->params);
@@ -74,7 +99,8 @@ class LoginTest extends TestCase
         )), $response->getContent());
     }
 
-    public function testLoginByEmailErrorWrongPassword() {
+    public function testLoginByEmailErrorWrongPassword()
+    {
         $user = new User();
         $user->email = $this->params['email'];
         $user->password = $this->params['password'];
@@ -87,7 +113,8 @@ class LoginTest extends TestCase
         $this->assertEquals(json_encode(array("code" => "107", "data" => "Email or password is wrong")), $response->getContent());
     }
 
-    public function testLoginByEmailErrorWrongEmail() {
+    public function testLoginByEmailErrorWrongEmail()
+    {
         $user = new User();
         $user->email = $this->params['email'];
         $user->password = $this->params['password'];
@@ -100,7 +127,8 @@ class LoginTest extends TestCase
         $this->assertEquals(json_encode(array("code" => "107", "data" => "Email or password is wrong")), $response->getContent());
     }
 
-    public function testLoginByEmailErrorNoEmail() {
+    public function testLoginByEmailErrorNoEmail()
+    {
         $user = new User();
         $user->email = $this->params['email'];
         $user->password = $this->params['password'];
@@ -118,7 +146,8 @@ class LoginTest extends TestCase
         )), $response->getContent());
     }
 
-    public function testLoginByEmailErrorNoPassword() {
+    public function testLoginByEmailErrorNoPassword()
+    {
         $user = new User();
         $user->email = $this->params['email'];
         $user->password = $this->params['password'];

@@ -78,7 +78,7 @@ return array(
 	|
 	*/
 
-	'key' => 'YourSecretKey!!!',
+	'key' => 'cp3veVEbjzYknTXOBJeG5aJWUgYpPbLj',
 
 	'cipher' => MCRYPT_RIJNDAEL_128,
 
@@ -188,7 +188,7 @@ return array(
 		'URL'             => 'Illuminate\Support\Facades\URL',
 		'Validator'       => 'Illuminate\Support\Facades\Validator',
 		'View'            => 'Illuminate\Support\Facades\View',
-
+        'Uuid'            => 'Webpatser\Uuid\Uuid',
 	),
 
 );
