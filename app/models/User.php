@@ -21,6 +21,8 @@ class User extends Eloquent {
         parent::boot();
         self::creating(function($user) {
             $user->user_id = Uuid::generate(4);
+        });
+        self::saving(function($user) {
             if(!empty($user->password)) {
                 $user->password = Hash::make($user->password);
             }

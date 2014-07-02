@@ -11,19 +11,42 @@ class LoginTest extends TestCase
 
     protected $params;
 
+    protected $_params;
+
+    protected $_method;
+    protected $_uri;
     public function __construct()
     {
         parent::__construct();
-        $this->params = array(
+        $this->_params = array(
             'email' => 'test@gmail.com',
             'password' => '123456',
+            'fb_id' => '123456'
         );
+        $this->_method = 'POST';
+        $this->_uri = 'api/login';
+    }
+
+
+    private function _getResponse($params = null) {
+        if($params) {
+            $response = $this->call($this->_method, $this->_uri, $params);
+        }else {
+            $response = $this->call($this->_method, $this->_uri, $this->_params);
+        }
+        $this->assertTrue($this->client->getResponse()->isOk());
+        return $response;
     }
 
     public function setUp()
     {
         parent::setUp();
         $this->resetEvents();
+        $user = new User();
+        $user->email = $this->_params['email'];
+        $user->password = $this->_params['password'];
+        $user->fb_id = $this->_params['fb_id'];
+        $user->save();
     }
 
     private function resetEvents()
@@ -46,13 +69,9 @@ class LoginTest extends TestCase
     //test cases for Login by email - password successfully
     public function testLoginByEmailSuccess()
     {
-        $user = new User();
-        $user->email = $this->params['email'];
-        $user->password = $this->params['password'];
-        $user->save();
-        $response = $this->call('POST', 'api/login', $this->params);
-        $this->assertTrue($this->client->getResponse()->isOk());
-        $login_infor = Login::where('user_id', $user->user_id)->first();
+        $response = $this->_getResponse();
+        //get created login information
+        $login_infor = Login::all()->last();
         $this->assertNotNull($login_infor);
         $this->assertEquals(json_encode(array("code" => "000", "data" =>
             array(
@@ -62,18 +81,13 @@ class LoginTest extends TestCase
         )), $response->getContent());
     }
 
+    //test case for Login by Facebook ID successfully
     public function testLoginByFacebookExistedUserSuccess()
     {
-        $_params = $this->params;
-        $_params['fb_id'] = '123456';
-        $user = new User();
-        $user->email = $_params['email'];
-        $user->password = $_params['password'];
-        $user->fb_id = $_params['fb_id'];
-        $user->save();
-        $response = $this->call('POST', 'api/login', $this->params);
-        $this->assertTrue($this->client->getResponse()->isOk());
-        $login_infor = Login::where('user_id', $user->user_id)->first();
+        $response = $this->_getResponse();
+
+        //get created login information
+        $login_infor = Login::all()->last();
         $this->assertNotNull($login_infor);
         $this->assertEquals(json_encode(array("code" => "000", "data" =>
             array(
@@ -85,10 +99,10 @@ class LoginTest extends TestCase
 
     public function testLoginByFacebookNewUserSuccess()
     {
-        $_params = $this->params;
-        $_params['fb_id'] = '123456';
-        $response = $this->call('POST', 'api/login', $this->params);
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $_params = $this->_params;
+        $_params['fb_id'] = '1234567';
+        $response = $this->_getResponse();
+
         $login_infor = Login::where('fb_id', $_params['fb_id'])->first();
         $this->assertNotNull($login_infor);
         $this->assertEquals(json_encode(array("code" => "000", "data" =>
@@ -101,42 +115,29 @@ class LoginTest extends TestCase
 
     public function testLoginByEmailErrorWrongPassword()
     {
-        $user = new User();
-        $user->email = $this->params['email'];
-        $user->password = $this->params['password'];
-        $user->save();
-        $response = $this->call('POST', 'api/login', array(
-            'email' => $this->params['email'],
-            'password' => 'wrongpassword'
-        ));
+        $_params = $this->_params;
+        $_params['password'] = 'wrong_password';
+        $response = $this->_getResponse();
         $this->assertTrue($this->client->getResponse()->isOk());
         $this->assertEquals(json_encode(array("code" => "107", "data" => "Email or password is wrong")), $response->getContent());
     }
 
     public function testLoginByEmailErrorWrongEmail()
     {
-        $user = new User();
-        $user->email = $this->params['email'];
-        $user->password = $this->params['password'];
-        $user->save();
-        $response = $this->call('POST', 'api/login', array(
-            'email' => 'wrongemail@gmail.com',
-            'password' => $this->params['password']
-        ));
+        $_params = $this->_params;
+        $_params['email'] = 'wrong_email';
+        $response = $this->_getResponse();
+
         $this->assertTrue($this->client->getResponse()->isOk());
         $this->assertEquals(json_encode(array("code" => "107", "data" => "Email or password is wrong")), $response->getContent());
     }
 
     public function testLoginByEmailErrorNoEmail()
     {
-        $user = new User();
-        $user->email = $this->params['email'];
-        $user->password = $this->params['password'];
-        $user->save();
-        $response = $this->call('POST', 'api/login', array(
-            'email' => '',
-            'password' => $this->params['password']
-        ));
+        $_params = $this->_params;
+        $_params['email'] = '';
+        $response = $this->_getResponse();
+
         $this->assertTrue($this->client->getResponse()->isOk());
         $this->assertEquals(json_encode(array("code" => "102", "data" =>
             array(
@@ -148,14 +149,10 @@ class LoginTest extends TestCase
 
     public function testLoginByEmailErrorNoPassword()
     {
-        $user = new User();
-        $user->email = $this->params['email'];
-        $user->password = $this->params['password'];
-        $user->save();
-        $response = $this->call('POST', 'api/login', array(
-            'email' => '',
-            'password' => $this->params['password']
-        ));
+        $_params = $this->_params;
+        $_params['password'] = '';
+        $response = $this->_getResponse();
+
         $this->assertTrue($this->client->getResponse()->isOk());
         $this->assertEquals(json_encode(array("code" => "102", "data" =>
             array(
