@@ -9,12 +9,11 @@
 class LoginTest extends TestCase
 {
 
-    protected $params;
-
     protected $_params;
 
     protected $_method;
     protected $_uri;
+
     public function __construct()
     {
         parent::__construct();
@@ -28,10 +27,11 @@ class LoginTest extends TestCase
     }
 
 
-    private function _getResponse($params = null) {
-        if($params) {
+    private function _getResponse($params = null)
+    {
+        if ($params) {
             $response = $this->call($this->_method, $this->_uri, $params);
-        }else {
+        } else {
             $response = $this->call($this->_method, $this->_uri, $this->_params);
         }
         $this->assertTrue($this->client->getResponse()->isOk());
@@ -47,6 +47,11 @@ class LoginTest extends TestCase
         $user->password = $this->_params['password'];
         $user->fb_id = $this->_params['fb_id'];
         $user->save();
+    }
+
+    public function tearDown()
+    {
+        User::truncate();
     }
 
     private function resetEvents()
@@ -142,7 +147,7 @@ class LoginTest extends TestCase
         $this->assertEquals(json_encode(array("code" => "102", "data" =>
             array(
                 'email' => '',
-                'password' => $this->params['password']
+                'password' => $this->_params['password'],
             )
         )), $response->getContent());
     }
@@ -156,8 +161,8 @@ class LoginTest extends TestCase
         $this->assertTrue($this->client->getResponse()->isOk());
         $this->assertEquals(json_encode(array("code" => "102", "data" =>
             array(
-                'email' => $this->params['email'],
-                'password' => ''
+                'email' => $this->_params['email'],
+                'password' => '',
             )
         )), $response->getContent());
     }

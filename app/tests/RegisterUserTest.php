@@ -82,12 +82,27 @@ class RegisterUserTest extends TestCase
         $this->assertEquals(json_encode(array("code" => "102", "data" => $params)), $response->getContent());
     }
 
-    //test case for Register with no password
+    //test case for Register with no DeviceID
     public function testRegisterErrorNoDeviceID()
     {
         $params = $this->_params;
         $params['device_id'] = "";
         $response = $this->_getResponse($params);
         $this->assertEquals(json_encode(array("code" => "102", "data" => $params)), $response->getContent());
+    }
+
+    //test case for Register with existed email
+    public function testRegisterErrorExistedEmail()
+    {
+        $user = new User();
+        $user->email = $this->_params['email'];
+        $user->password = $this->_params['password'];
+        $user->device_id = $this->_params['device_id'];
+        $user->save();
+
+        $params = $this->_params;
+        $params['device_id'] = "";
+        $response = $this->_getResponse($params);
+        $this->assertEquals(json_encode(array("code" => "113", "data" => "Email existed")), $response->getContent());
     }
 }

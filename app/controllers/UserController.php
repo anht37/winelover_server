@@ -110,4 +110,8 @@ class UserController extends \BaseController {
         return null;
     }
 
+    public function forgot_password() {
+        
+    }
+
 }

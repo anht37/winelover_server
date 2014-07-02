@@ -22,7 +22,7 @@ Route::group(array('prefix' => 'api'), function()
 {
     Route::post('register', 'UserController@register');
     Route::post('login', 'UserController@login');
-    Route::get('forgot_password', 'UserController@forgot_password');
+    Route::post('forgot_password', 'UserController@forgot_password');
     Route::resource('user', 'UserController');
 });
 
