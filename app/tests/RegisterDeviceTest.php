@@ -6,53 +6,79 @@
  * Time: 14:41
  */
 
-class UserTest extends TestCase {
+class RegisterDeviceTest extends TestCase {
 
+    protected $_params;
+
+    protected $_method;
+    protected $_uri;
+
+    public function setUp()
+    {
+        parent::setUp();
+        $this->_params = array(
+            'auth_key' => '123456',
+            'device_id' => '123456',
+            'platform' => Device::IOS,
+        );
+        $this->_method = 'POST';
+        $this->_uri = 'api/push_notification';
+    }
+
+    private function _getResponse($params = null) {
+        if($params) {
+            $response = $this->call($this->_method, $this->_uri, $params);
+        }else {
+            $response = $this->call($this->_method, $this->_uri, $this->_params);
+        }
+        $this->assertTrue($this->client->getResponse()->isOk());
+        return $response;
+    }
 
     //test case for register successfully
     public function testRegisterSucess() {
-        $params = array('auth_key' => '123','device_id' => '123', 'platform' => Device::IOS);
-        $response = $this->call('POST', 'api/register', $params);
-        $device = Device::where('auth_key', $params['auth_key'])
-            ->where('device_id',$params['device_id'])
-            ->where('platform', $params['platform'])->first();
+        $response = $this->_getResponse();
+        $device = Device::where('auth_key', $this->_params['auth_key'])
+            ->where('device_id',$this->_params['device_id'])
+            ->where('platform', $this->_params['platform'])->first();
         $this->assertNotNull($device);
         $this->assertTrue($this->client->getResponse()->isOk());
-        $this->assertEquals(json_encode(array("code" => "000","data" => "Register Push notification Successful")), $response->getContent());
+        $this->assertEquals(json_encode(array("code" => ApiResponse::OK, "data" => ApiResponse::getErrorContent(ApiResponse::OK))), $response->getContent());
     }
 
     //test case for register existed device
     public function testRegisterDeviceExisted() {
-        $params = array('auth_key' => '123','device_id' => '123', 'platform' => Device::IOS);
-        $device = new Device($params);
-        $device->save();
-        $response = $this->call('POST', 'api/register', $params) ;
+        Device::create($this->_params);
+        $response = $this->_getResponse();
         $this->assertTrue($this->client->getResponse()->isOk());
-        $this->assertEquals(json_encode(array("code" => "106","data" => "Device id has existed")), $response->getContent());
+        $this->assertEquals(json_encode(array("code" => ApiResponse::EXISTED_DEVICE,"data" => ApiResponse::getErrorContent(ApiResponse::EXISTED_DEVICE))), $response->getContent());
     }
 
     //test case for missing auth_key parameter
     public function testRegisterMissingAuthKey() {
-        $params = array('device_id' => '123', 'platform' => Device::IOS);
-        $response = $this->call('POST', 'api/register', $params) ;
+        $params = $this->_params;
+        unset($params['auth_key']);
+        $response = $this->_getResponse();
         $this->assertTrue($this->client->getResponse()->isOk());
-        $this->assertEquals(json_encode(array("code" => "102","data" => json_encode($params))), $response->getContent());
+        $this->assertEquals(json_encode(array("code" => ApiResponse::MISSING_PARAMS,"data" => json_encode($params))), $response->getContent());
     }
 
     //test case for missing device_id parameter
     public function testRegisterMissingDeviceID() {
-        $params = array('auth_key' => '123', 'platform' => Device::IOS);
-        $response = $this->call('POST', 'api/register', $params) ;
+        $params = $this->_params;
+        unset($params['device_id']);
+        $response = $this->_getResponse();
         $this->assertTrue($this->client->getResponse()->isOk());
-        $this->assertEquals(json_encode(array("code" => "102","data" => json_encode($params))), $response->getContent());
+        $this->assertEquals(json_encode(array("code" => ApiResponse::MISSING_PARAMS,"data" => json_encode($params))), $response->getContent());
     }
 
     //test case for missing platform parameter
     public function testRegisterMissingPlatform() {
-        $params = array('auth_key' => '123', 'device_id' => '123');
-        $response = $this->call('POST', 'api/register', $params) ;
+        $params = $this->_params;
+        unset($params['platform']);
+        $response = $this->_getResponse();
         $this->assertTrue($this->client->getResponse()->isOk());
-        $this->assertEquals(json_encode(array("code" => "102","data" => json_encode($params))), $response->getContent());
+        $this->assertEquals(json_encode(array("code" => ApiResponse::MISSING_PARAMS,"data" => json_encode($params))), $response->getContent());
     }
 
 }

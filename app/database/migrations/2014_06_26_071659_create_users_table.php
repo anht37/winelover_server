@@ -19,6 +19,7 @@ class CreateUsersTable extends Migration {
             $table->string('email');
             $table->string('fb_id')->unique()->nullable();
             $table->string('tw_id')->unique()->nullable();
+            $table->string('device_id')->nullable();
             $table->string('password');
             $table->integer('privacy')->default(0);
             $table->softDeletes();

@@ -6,7 +6,8 @@
  * Time: 16:42
  */
 
-class Device extends Eloquent {
+class Device extends Eloquent
+{
     protected $table = 'devices';
     const IOS = 1;
     const ANDROID = 0;

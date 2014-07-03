@@ -103,15 +103,20 @@ class UserController extends \BaseController {
     }
 
     public function register() {
-        return null;
+        $input = Input::all();
+        $result = User::register($input);
+        return Response::json($result);
     }
 
+    public function push_notification() {
+        return null;
+    }
     public function login() {
         return null;
     }
 
     public function forgot_password() {
-        
+
     }
 
 }

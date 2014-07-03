@@ -61,7 +61,7 @@ class RegisterUserTest extends TestCase
     public function testRegisterSuccess()
     {
         $response = $this->_getResponse();
-        $this->assertEquals(json_encode(array("code" => "000", "data" => "ok")), $response->getContent());
+        $this->assertEquals(json_encode(array("code" => ApiResponse::OK, "data" => ApiResponse::getErrorContent(ApiResponse::OK))), $response->getContent());
     }
 
     //test case for Register with no email
@@ -70,7 +70,7 @@ class RegisterUserTest extends TestCase
         $params = $this->_params;
         $params['email'] = "";
         $response = $this->_getResponse($params);
-        $this->assertEquals(json_encode(array("code" => "102", "data" => $params)), $response->getContent());
+        $this->assertEquals(json_encode(array("code" => ApiResponse::MISSING_PARAMS, "data" => $params)), $response->getContent());
     }
 
     //test case for Register with no password
@@ -79,7 +79,7 @@ class RegisterUserTest extends TestCase
         $params = $this->_params;
         $params['password'] = "";
         $response = $this->_getResponse($params);
-        $this->assertEquals(json_encode(array("code" => "102", "data" => $params)), $response->getContent());
+        $this->assertEquals(json_encode(array("code" => ApiResponse::MISSING_PARAMS, "data" => $params)), $response->getContent());
     }
 
     //test case for Register with no DeviceID
@@ -88,7 +88,7 @@ class RegisterUserTest extends TestCase
         $params = $this->_params;
         $params['device_id'] = "";
         $response = $this->_getResponse($params);
-        $this->assertEquals(json_encode(array("code" => "102", "data" => $params)), $response->getContent());
+        $this->assertEquals(json_encode(array("code" => ApiResponse::MISSING_PARAMS, "data" => $params)), $response->getContent());
     }
 
     //test case for Register with existed email
@@ -99,10 +99,7 @@ class RegisterUserTest extends TestCase
         $user->password = $this->_params['password'];
         $user->device_id = $this->_params['device_id'];
         $user->save();
-
-        $params = $this->_params;
-        $params['device_id'] = "";
-        $response = $this->_getResponse($params);
-        $this->assertEquals(json_encode(array("code" => "113", "data" => "Email existed")), $response->getContent());
+        $response = $this->_getResponse();
+        $this->assertEquals(json_encode(array("code" => ApiResponse::EXISTED_EMAIL, "data" => ApiResponse::getErrorContent(ApiResponse::EXISTED_EMAIL))), $response->getContent());
     }
 }
