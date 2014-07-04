@@ -7,7 +7,11 @@
  */
 
 class ApiResponse {
-    private static $_header;
+    public static $API_LIST = array(
+        'login' => 'api/login',
+        'logout' => 'api/logout',
+        'register' => 'api/register',
+    );
     const OK = "000";
     const SERVER_MAINTAIN = "100";
     const SESSION_INVALID = "101";

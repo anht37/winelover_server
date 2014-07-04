@@ -22,6 +22,7 @@ Route::group(array('prefix' => 'api'), function()
 {
     Route::post('register', 'UserController@register');
     Route::post('login', 'UserController@login');
+    Route::post('logout', 'UserController@logout');
     Route::post('forgot_password', 'UserController@forgot_password');
     Route::post('push_notification', 'UserController@push_notification');
     Route::resource('user', 'UserController');

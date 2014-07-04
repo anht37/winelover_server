@@ -16,7 +16,7 @@ class CreateLoginsTable extends Migration {
         Schema::create('logins', function(Blueprint $table)
         {
             $table->increments('id');
-            $table->string('user_id')->unique();
+            $table->string('user_id');
             $table->string('session_id')->unique();
             $table->dateTime('expired_at');
             $table->timestamps();

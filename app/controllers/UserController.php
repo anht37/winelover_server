@@ -112,7 +112,15 @@ class UserController extends \BaseController {
         return null;
     }
     public function login() {
-        return null;
+        $input = Input::all();
+        $result = User::login($input);
+        return Response::json($result);
+    }
+
+    public function logout() {
+        $input = Input::all();
+        $result = Login::logout($input);
+        return Response::json($result);
     }
 
     public function forgot_password() {
