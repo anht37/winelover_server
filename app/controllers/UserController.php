@@ -103,7 +103,10 @@ class UserController extends \BaseController {
     }
 
     public function register() {
-        $input = Input::all();
+        $input = json_decode(Input::get("data"), true);
+        if($input == null) {
+            $input = array();
+        }
         $result = User::register($input);
         return Response::json($result);
     }
@@ -112,13 +115,19 @@ class UserController extends \BaseController {
         return null;
     }
     public function login() {
-        $input = Input::all();
+        $input = json_decode(Input::get("data"), true);
+        if($input == null) {
+            $input = array();
+        }
         $result = User::login($input);
         return Response::json($result);
     }
 
     public function logout() {
-        $input = Input::all();
+        $input = json_decode(Input::get("data"), true);
+        if($input == null) {
+            $input = array();
+        }
         $result = Login::logout($input);
         return Response::json($result);
     }

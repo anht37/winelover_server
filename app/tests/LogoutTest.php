@@ -27,12 +27,11 @@ class LogoutTest extends TestCase
 
     private function _getResponse($params = null)
     {
-
-        if ($params !== null) {
-            $response = $this->call($this->_method, $this->_uri, $params);
-        } else {
-            $response = $this->call($this->_method, $this->_uri, $this->_params);
+        $_params = $this->_params;
+        if($params !== null) {
+            $_params = $params;
         }
+        $response = $this->call($this->_method, $this->_uri, array('data' => json_encode($_params)));
         $this->assertTrue($this->client->getResponse()->isOk());
         return $response;
     }
@@ -41,7 +40,7 @@ class LogoutTest extends TestCase
     {
         parent::setUp();
         $this->resetEvents();
-        $this->call('POST', ApiResponse::$API_LIST['login'], array('fb_id' => '123456'));
+        $this->call('POST', ApiResponse::$API_LIST['login'], array('data' => json_encode(array('fb_id' => '123456'))));
         $login = Login::all()->last();
         $this->_params['session_id'] = $login->session_id;
         $this->client->restart();
@@ -70,18 +69,15 @@ class LogoutTest extends TestCase
     }
 
 
-    //test cases for Login by email - password successfully
     public function testLogoutSuccess()
     {
         $response = $this->_getResponse();
         $this->assertEquals(json_encode(array("code" => ApiResponse::OK, "data" => ApiResponse::getErrorContent(ApiResponse::OK))), $response->getContent());
     }
 
-    //test case for Login by Facebook ID successfully
     public function testLogoutErrorNoSession()
     {
-        $params = $this->_params;
-        unset($params['session_id']);
+        $params = array();
         $response = $this->_getResponse($params);
         $this->assertEquals(json_encode(array("code" => ApiResponse::MISSING_PARAMS, "data" => $params )), $response->getContent());
     }

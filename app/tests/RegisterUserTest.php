@@ -48,11 +48,11 @@ class RegisterUserTest extends TestCase
     }
 
     private function _getResponse($params = null) {
-        if($params) {
-            $response = $this->call($this->_method, $this->_uri, $params);
-        }else {
-            $response = $this->call($this->_method, $this->_uri, $this->_params);
+        $_params = $this->_params;
+        if($params !== null) {
+            $_params = $params;
         }
+        $response = $this->call($this->_method, $this->_uri, array('data' => json_encode($_params)));
         $this->assertTrue($this->client->getResponse()->isOk());
         return $response;
     }
