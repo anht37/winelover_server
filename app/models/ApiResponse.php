@@ -27,6 +27,7 @@ class ApiResponse {
     const DUPLICATED_WISHLIST_ADD = "111";
     const NOT_EXISTED_WINE_WISHLIST = "112";
     const EXISTED_EMAIL = "113";
+    const URL_NOT_EXIST = "114";
     private static $ERROR_LIST = array(
         "000" => "ok",
         "100" => "Server is Maintaining",
@@ -42,7 +43,8 @@ class ApiResponse {
         "110" => "Like not exist",
         "111" => "Duplicated Wine WishList",
         "112" => "Remove Nonexistent Wine WishList",
-        "113" => "Email Existed"
+        "113" => "Email Existed",
+        "114" => "URL not exist"
     );
 
     public static function createResponse($response) {

@@ -28,4 +28,7 @@ Route::group(array('prefix' => 'api'), function()
     Route::resource('user', 'UserController');
 });
 
+Route::any('api/(.*)', 'ApiController@display_error');
 
+
+Route::any('{api_error}', 'ApiController@display_error')->where('api_error', 'api\/.*');

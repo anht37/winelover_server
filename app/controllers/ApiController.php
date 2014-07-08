@@ -85,5 +85,22 @@ class ApiController extends \BaseController {
 		//
 	}
 
+    public function display_error($id) {
+
+        return Response::json(
+            array("code" => ApiResponse::URL_NOT_EXIST, "data" => array(
+               "message" => ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST),
+               "url"     => Request::fullUrl()
+            ))
+        );
+    }
+
+    protected function _getInput() {
+        $input = json_decode(Input::get("data"), true);
+        if($input == null) {
+            $input = array();
+        }
+        return $input;
+    }
 
 }
