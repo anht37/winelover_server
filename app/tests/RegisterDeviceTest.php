@@ -26,11 +26,11 @@ class RegisterDeviceTest extends TestCase {
     }
 
     private function _getResponse($params = null) {
-        if($params) {
-            $response = $this->call($this->_method, $this->_uri, $params);
-        }else {
-            $response = $this->call($this->_method, $this->_uri, $this->_params);
+        $_params = $this->_params;
+        if($params !== null) {
+            $_params = $params;
         }
+        $response = $this->call($this->_method, $this->_uri, array('data' => json_encode($_params)));
         $this->assertTrue($this->client->getResponse()->isOk());
         return $response;
     }
@@ -58,27 +58,27 @@ class RegisterDeviceTest extends TestCase {
     public function testRegisterMissingAuthKey() {
         $params = $this->_params;
         unset($params['auth_key']);
-        $response = $this->_getResponse();
+        $response = $this->_getResponse($params);
         $this->assertTrue($this->client->getResponse()->isOk());
-        $this->assertEquals(json_encode(array("code" => ApiResponse::MISSING_PARAMS,"data" => json_encode($params))), $response->getContent());
+        $this->assertEquals(json_encode(array("code" => ApiResponse::MISSING_PARAMS,"data" => $params)), $response->getContent());
     }
 
     //test case for missing device_id parameter
     public function testRegisterMissingDeviceID() {
         $params = $this->_params;
         unset($params['device_id']);
-        $response = $this->_getResponse();
+        $response = $this->_getResponse($params);
         $this->assertTrue($this->client->getResponse()->isOk());
-        $this->assertEquals(json_encode(array("code" => ApiResponse::MISSING_PARAMS,"data" => json_encode($params))), $response->getContent());
+        $this->assertEquals(json_encode(array("code" => ApiResponse::MISSING_PARAMS,"data" => $params)), $response->getContent());
     }
 
     //test case for missing platform parameter
     public function testRegisterMissingPlatform() {
         $params = $this->_params;
         unset($params['platform']);
-        $response = $this->_getResponse();
+        $response = $this->_getResponse($params);
         $this->assertTrue($this->client->getResponse()->isOk());
-        $this->assertEquals(json_encode(array("code" => ApiResponse::MISSING_PARAMS,"data" => json_encode($params))), $response->getContent());
+        $this->assertEquals(json_encode(array("code" => ApiResponse::MISSING_PARAMS,"data" => $params)), $response->getContent());
     }
 
 }

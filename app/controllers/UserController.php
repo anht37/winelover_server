@@ -103,37 +103,35 @@ class UserController extends \BaseController {
     }
 
     public function register() {
-        $input = json_decode(Input::get("data"), true);
-        if($input == null) {
-            $input = array();
-        }
-        $result = User::register($input);
+        $result = User::register($this->_getInput());
         return Response::json($result);
     }
 
     public function push_notification() {
-        return null;
+        $result = Device::push_notification($this->_getInput());
+        return Response::json($result);
     }
+
     public function login() {
-        $input = json_decode(Input::get("data"), true);
-        if($input == null) {
-            $input = array();
-        }
-        $result = User::login($input);
+        $result = User::login($this->_getInput());
         return Response::json($result);
     }
 
     public function logout() {
-        $input = json_decode(Input::get("data"), true);
-        if($input == null) {
-            $input = array();
-        }
-        $result = Login::logout($input);
+        $result = Login::logout($this->_getInput());
         return Response::json($result);
     }
 
     public function forgot_password() {
 
+    }
+
+    private function _getInput() {
+        $input = json_decode(Input::get("data"), true);
+        if($input == null) {
+            $input = array();
+        }
+        return $input;
     }
 
 }
