@@ -66,6 +66,7 @@ class User extends Eloquent
 
     public static function login($input) {
         $error_code = ApiResponse::OK;
+        $new_user = false;
         $user = null;
         if(array_key_exists('fb_id', $input) && !empty($input['fb_id'])) {
             $user = User::where('fb_id', $input['fb_id'])->first();
@@ -74,6 +75,7 @@ class User extends Eloquent
                 $user->fb_id = $input['fb_id'];
                 $user->save();
                 $user = User::find($user->id);
+                $new_user = true;
             }
         } else {
             $validator = Validator::make(
@@ -104,7 +106,8 @@ class User extends Eloquent
             if($login->save()){
                 $data = array(
                     "session" => $login->session_id,
-                    "user_id" => $login->user_id
+                    "user_id" => $login->user_id,
+                    "new_user" => $new_user
                 );
             }
         }

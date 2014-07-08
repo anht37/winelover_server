@@ -80,7 +80,8 @@ class LoginTest extends TestCase
         $this->assertEquals(json_encode(array("code" => ApiResponse::OK, "data" =>
             array(
                 "session" => $login_infor->session_id,
-                "user_id" => $login_infor->user_id
+                "user_id" => $login_infor->user_id,
+                "new_user" => false,
             )
         )), $response->getContent());
     }
@@ -98,7 +99,8 @@ class LoginTest extends TestCase
         $this->assertEquals(json_encode(array("code" => ApiResponse::OK, "data" =>
             array(
                 "session" => $login_infor->session_id,
-                "user_id" => $login_infor->user_id
+                "user_id" => $login_infor->user_id,
+                "new_user" => false,
             )
         )), $response->getContent());
     }
@@ -114,7 +116,8 @@ class LoginTest extends TestCase
         $this->assertEquals(json_encode(array("code" => ApiResponse::OK, "data" =>
             array(
                 "session" => $login_infor->session_id,
-                "user_id" => $login_infor->user_id
+                "user_id" => $login_infor->user_id,
+                "new_user" => true,
             )
         )), $response->getContent());
     }
