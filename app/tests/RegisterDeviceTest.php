@@ -6,15 +6,11 @@
  * Time: 14:41
  */
 
-class RegisterDeviceTest extends TestCase {
-
-    protected $_params;
-
-    protected $_method;
-    protected $_uri;
+class RegisterDeviceTest extends ApiTestCase {
 
     public function setUp()
     {
+        $this->_models = array('Device');
         parent::setUp();
         $this->_params = array(
             'auth_key' => '123456',
@@ -25,15 +21,6 @@ class RegisterDeviceTest extends TestCase {
         $this->_uri = 'api/push_notification';
     }
 
-    private function _getResponse($params = null) {
-        $_params = $this->_params;
-        if($params !== null) {
-            $_params = $params;
-        }
-        $response = $this->call($this->_method, $this->_uri, array('data' => json_encode($_params)));
-        $this->assertTrue($this->client->getResponse()->isOk());
-        return $response;
-    }
 
     //test case for register successfully
     public function testRegisterSucess() {

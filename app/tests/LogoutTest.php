@@ -6,13 +6,8 @@
  * Time: 13:27
  */
 
-class LogoutTest extends TestCase
+class LogoutTest extends ApiTestCase
 {
-
-    protected $_params;
-
-    protected $_method;
-    protected $_uri;
 
     public function __construct()
     {
@@ -22,50 +17,17 @@ class LogoutTest extends TestCase
         );
         $this->_method = 'POST';
         $this->_uri = ApiResponse::$API_LIST['logout'];
+        $this->_models = array('User');
     }
 
-
-    private function _getResponse($params = null)
-    {
-        $_params = $this->_params;
-        if($params !== null) {
-            $_params = $params;
-        }
-        $response = $this->call($this->_method, $this->_uri, array('data' => json_encode($_params)));
-        $this->assertTrue($this->client->getResponse()->isOk());
-        return $response;
-    }
 
     public function setUp()
     {
         parent::setUp();
-        $this->resetEvents();
         $this->call('POST', ApiResponse::$API_LIST['login'], array('data' => json_encode(array('fb_id' => '123456'))));
         $login = Login::all()->last();
         $this->_params['session_id'] = $login->session_id;
         $this->client->restart();
-    }
-
-    public function tearDown()
-    {
-        User::truncate();
-        Login::truncate();
-    }
-
-    private function resetEvents()
-    {
-        // Define the models that have event listeners.
-        $models = array('User');
-
-        // Reset their event listeners.
-        foreach ($models as $model) {
-
-            // Flush any existing listeners.
-            call_user_func(array($model, 'flushEventListeners'));
-
-            // Reregister them.
-            call_user_func(array($model, 'boot'));
-        }
     }
 
 

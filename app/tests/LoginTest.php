@@ -1,19 +1,12 @@
 <?php
-
 /**
  * Created by PhpStorm.
  * User: anhtd
  * Date: 01/07/2014
  * Time: 15:13
  */
-class LoginTest extends TestCase
+class LoginTest extends ApiTestCase
 {
-
-    protected $_params;
-
-    protected $_method;
-    protected $_uri;
-
     public function __construct()
     {
         parent::__construct();
@@ -23,24 +16,13 @@ class LoginTest extends TestCase
         );
         $this->_method = 'POST';
         $this->_uri = 'api/login';
+        $this->_models = array('User');
     }
 
-
-    private function _getResponse($params = null)
-    {
-        $_params = $this->_params;
-        if($params !== null) {
-            $_params = $params;
-        }
-        $response = $this->call($this->_method, $this->_uri, array('data' => json_encode($_params)));
-        $this->assertTrue($this->client->getResponse()->isOk());
-        return $response;
-    }
 
     public function setUp()
     {
         parent::setUp();
-        $this->resetEvents();
         $user = new User();
         $user->email = $this->_params['email'];
         $user->password = $this->_params['password'];
@@ -48,26 +30,6 @@ class LoginTest extends TestCase
         $user->save();
     }
 
-    public function tearDown()
-    {
-        User::truncate();
-    }
-
-    private function resetEvents()
-    {
-        // Define the models that have event listeners.
-        $models = array('User');
-
-        // Reset their event listeners.
-        foreach ($models as $model) {
-
-            // Flush any existing listeners.
-            call_user_func(array($model, 'flushEventListeners'));
-
-            // Reregister them.
-            call_user_func(array($model, 'boot'));
-        }
-    }
 
 
     //test cases for Login by email - password successfully

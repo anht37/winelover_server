@@ -6,13 +6,9 @@
  * Date: 01/07/2014
  * Time: 15:13
  */
-class RegisterUserTest extends TestCase
+class RegisterUserTest extends ApiTestCase
 {
 
-    protected $_params;
-
-    protected $_method;
-    protected $_uri;
     public function __construct()
     {
         parent::__construct();
@@ -23,38 +19,7 @@ class RegisterUserTest extends TestCase
         );
         $this->_method = 'POST';
         $this->_uri = 'api/register';
-    }
-
-    public function setUp()
-    {
-        parent::setUp();
-        $this->resetEvents();
-    }
-
-    private function resetEvents()
-    {
-        // Define the models that have event listeners.
-        $models = array('User');
-
-        // Reset their event listeners.
-        foreach ($models as $model) {
-
-            // Flush any existing listeners.
-            call_user_func(array($model, 'flushEventListeners'));
-
-            // Reregister them.
-            call_user_func(array($model, 'boot'));
-        }
-    }
-
-    private function _getResponse($params = null) {
-        $_params = $this->_params;
-        if($params !== null) {
-            $_params = $params;
-        }
-        $response = $this->call($this->_method, $this->_uri, array('data' => json_encode($_params)));
-        $this->assertTrue($this->client->getResponse()->isOk());
-        return $response;
+        $this->_models = array('User');
     }
 
     //test case for Register with full information
