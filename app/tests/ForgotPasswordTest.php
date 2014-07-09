@@ -28,25 +28,25 @@ class ForgotPasswordTest extends ApiTestCase
     public function testForgotPasswordSuccess()
     {
         $response = $this->_getResponse();
-        $this->assertEquals(json_encode(array("code" => "000", "data" => "New password has sent to your email")), $response->getContent());
+        $this->assertEquals(json_encode(array("code" => ApiResponse::OK, "data" =>  "ok")), $response->getContent());
     }
 
     public function testForgotPasswordErrorEmailNotExisted()
     {
-        $response = $this->_getResponse(array('email' => '123'));
-        $this->assertEquals(json_encode(array("code" => "108", "data" => "Email is not existed")), $response->getContent());
+        $response = $this->_getResponse(array('email' => '123@gmail.com'));
+        $this->assertEquals(json_encode(array("code" => ApiResponse::NOT_EXISTED_EMAIL, "data" => ApiResponse::getErrorContent(ApiResponse::NOT_EXISTED_EMAIL))), $response->getContent());
     }
 
     public function testForgotPasswordErrorEmptyEmail()
     {
         $response = $this->_getResponse(array('email' => ''));
-        $this->assertEquals(json_encode(array("code" => "102", "data" => array('email' => ''))), $response->getContent());
+        $this->assertEquals(json_encode(array("code" => ApiResponse::MISSING_PARAMS, "data" => array('email' => ''))), $response->getContent());
     }
 
     public function testForgotPasswordErrorMissingEmail()
     {
         $response = $this->_getResponse(array());
-        $this->assertEquals(json_encode(array("code" => "102", "data" => array('email' => ''))), $response->getContent());
+        $this->assertEquals(json_encode(array("code" => ApiResponse::MISSING_PARAMS, "data" => array())), $response->getContent());
     }
 
 } 

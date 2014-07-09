@@ -97,7 +97,8 @@ class UserController extends ApiController {
     }
 
     public function forgot_password() {
-
+        $result = User::forgot_password($this->_getInput());
+        return Response::json($result);
     }
 
 }

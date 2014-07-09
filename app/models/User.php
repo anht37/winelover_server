@@ -113,4 +113,29 @@ class User extends Eloquent
         }
         return array("code" => $error_code, "data" => $data);
     }
+
+    public static function forgot_password($input) {
+        $error_code = ApiResponse::OK;
+        $validator = Validator::make(
+            $input,
+            array(
+                'email' => 'required|email',
+            )
+        );
+        //validate params
+        if ($validator->fails()) {
+            $error_code = ApiResponse::MISSING_PARAMS;
+            $data = $input;
+        }else {
+            //check email existed
+            if (User::where('email', $input['email'])->first() == null) {
+                $error_code = ApiResponse::NOT_EXISTED_EMAIL;
+                $data = ApiResponse::getErrorContent(ApiResponse::NOT_EXISTED_EMAIL);
+            } else {
+                //TODO need implement send email
+                $data = "ok";
+            }
+        }
+        return array("code" => $error_code, "data" => $data);
+    }
 }
