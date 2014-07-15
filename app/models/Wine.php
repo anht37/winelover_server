@@ -7,7 +7,8 @@ e<?php
  */
 
 class Wine {
-    public static function scan($data) {
-        $image = $data["image"];
+    public static function scan($file_path) {
+        $query = Config::get('winedetect.script').' predict '.Config::get('winedetect.config').' '.$file_path;
+        return exec($query);
     }
 } 

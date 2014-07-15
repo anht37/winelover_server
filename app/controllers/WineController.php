@@ -77,7 +77,15 @@ class WineController extends ApiController {
 
     public function scan()
     {
-        dd(Input::file('file'));
+        $result = "";
+        $file = Input::file('file');
+        $destinationPath = public_path()."/uploads/";
+        $file_name = date('YmdHis').'_'.$file->getClientOrginalName();
+        $uploadSuccess = $file->move($destinationPath,$file_name);
+        if($uploadSuccess) {
+            $result = Wine::scan($destinationPath.$file_name);
+        }
+        return Response::json(array("result" => $result));
     }
 
 }
