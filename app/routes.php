@@ -25,6 +25,7 @@ Route::group(array('prefix' => 'api'), function()
     Route::post('logout', 'UserController@logout');
     Route::post('forgot_password', 'UserController@forgot_password');
     Route::post('push_notification', 'UserController@push_notification');
+    Route::post('scan', 'WineController@scan');
     Route::resource('user', 'UserController');
 });
 
