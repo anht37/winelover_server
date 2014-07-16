@@ -26,9 +26,22 @@ Route::group(array('prefix' => 'api'), function()
     Route::post('forgot_password', 'UserController@forgot_password');
     Route::post('push_notification', 'UserController@push_notification');
     Route::resource('user', 'UserController');
+    Route::resource('wine', 'WineController');
 });
+
 
 Route::any('api/(.*)', 'ApiController@display_error');
 
 
 Route::any('{api_error}', 'ApiController@display_error')->where('api_error', 'api\/.*');
+
+
+
+// Route::get('/authtest', function()
+// {
+//     return View::make('hello');
+// });
+// Route::group(array('prefix' => 'api/v1'), function()
+// {
+//     Route::resource('wine', 'WineController');
+// });
