@@ -28,6 +28,7 @@ Route::group(array('prefix' => 'api'), function()
     Route::post('scan', 'WineController@scan');
     Route::resource('user', 'UserController');
     Route::resource('wine', 'WineController');
+    Route::resource('winery', 'WineryController');
 });
 
 

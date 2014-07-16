@@ -15,6 +15,7 @@ class CreateWinesTable extends Migration {
 		Schema::create('wines', function(Blueprint $table)
 		{
 			$table->increments('wine_id');
+			$table->string('name');
 			$table->integer('year');
 			$table->integer('winery_id');
 			$table->string('image_url');

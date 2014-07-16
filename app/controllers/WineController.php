@@ -10,12 +10,14 @@ class WineController extends ApiController {
 	public function index()
 	{
 		$wine = Wine::all();
-
-	    return Response::json(array(
-	        'error' => false,
-	        'wines' => $wine->toArray()),
-	        200
-	    );
+		
+		foreach ($wine as $key => $value) {
+			$value->winery_id = Winery::where('id',$value->winery_id)->first()->brand_name;
+		}
+		$error_code = ApiResponse::OK;
+        $data = $wine->toArray();
+	    
+	    return array("code" => $error_code, "data" => $data);
 	}
 
 
@@ -38,7 +40,7 @@ class WineController extends ApiController {
 	public function store()
 	{
 		$wine = new Wine;
-	    
+	    $wine->name = Request::get('name');
 	    $wine->year = Request::get('year');
 	    $wine->winery_id = Request::get('winery_id');
 	    $wine->image_url = Request::get('image_url');
@@ -47,14 +49,24 @@ class WineController extends ApiController {
 	 
 	    // Validation and Filtering is sorely needed!!
 	    // Seriously, I'm a bad person for leaving that out.
-	 
-	    $wine->save();
 
-	    return Response::json(array(
-	        'error' => false,
-	        'wines' => $wine->toArray()),
-	        200
-	    );
+
+
+	 	if(Winery::where('id',$wine->winery_id)->first())
+	 	{
+	 		$wine->save();
+	 		
+	 		$wine->wine_unique_id = $wine->wine_id . '_' . $wine->year;
+	    	$wine->save();
+
+	 		$error_code = ApiResponse::OK;
+            $data = $wine->toArray();
+	 	} else
+	 	{
+	 		$error_code = ApiResponse::UNAVAILABLE_WINE;
+            $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_WINE);
+	 	}
+	    return array("code" => $error_code, "data" => $data);
 	}
 
 
@@ -66,15 +78,15 @@ class WineController extends ApiController {
 	 */
 	public function show($wine_id)
 	{
-		$wine = Wine::where('wine_id', $wine_id)
-            ->take(1)
-            ->get();
- 		//dd($wine);
-	    return Response::json(array(
-	        'error' => false,
-	        'wines' => $wine->toArray()),
-	        200
-	    );
+		if($wine = Wine::where('wine_id', $wine_id)->first()) {
+			$wine->winery_id = Winery::where('id',$wine->winery_id)->first()->brand_name;
+			$error_code = ApiResponse::OK;
+            $data = $wine->toArray();
+		} else {
+			$error_code = ApiResponse::UNAVAILABLE_WINE;
+            $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_WINE);
+		}
+ 		return array("code" => $error_code, "data" => $data);
 	}
 
 
@@ -98,8 +110,13 @@ class WineController extends ApiController {
 	 */
 	public function update($wine_id)
 	{
+	
 		$wine = Wine::where('wine_id', $wine_id)->first();
  
+	    if ( Request::get('name') )
+	    {
+	        $wine->name = Request::get('name');
+	    }
 	    if ( Request::get('year') )
 	    {
 	        $wine->year = Request::get('year');
@@ -123,13 +140,20 @@ class WineController extends ApiController {
 
 	    $wine->wine_unique_id = $wine->wine_id . '_' . $wine->year;
 
-	    $wine->save();
+	    if(Winery::where('id',$wine->winery_id)->first())
+	 	{
+	 		$wine->save();
+
+	 		$error_code = ApiResponse::OK;
+            $data = $wine->toArray();
+	 	} else
+	 	{
+	 		$error_code = ApiResponse::UNAVAILABLE_WINE;
+            $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_WINE);
+	 	}
+	    return array("code" => $error_code, "data" => $data);
  
-	    return Response::json(array(
-	        'error' => false,
-	        'message' => 'wine updated'),
-	        200
-	    );
+	    
 	}
 
 
@@ -144,12 +168,9 @@ class WineController extends ApiController {
 		$wine = Wine::where('wine_id', $wine_id);
  
 	    $wine->delete();
-	 
-	    return Response::json(array(
-	        'error' => false,
-	        'message' => 'wine deleted'),
-	        200
-	        );
+	    $error_code = ApiResponse::OK;
+	 	return array("code" => $error_code, "data" => 'Wine deleted');
+	    
 	}
 	public function scan()
     {
