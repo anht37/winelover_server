@@ -12,7 +12,7 @@ class UserTableSeeder extends Seeder {
         for ($i = 1; $i < 10; $i ++) {
             User::create(array(
                 'email' => "test_$i@gmail.com",
-                'password' => Hash::make('test')
+                'password' => Hash::make('123456')
             ));
         }
 
