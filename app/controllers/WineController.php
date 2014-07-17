@@ -46,8 +46,7 @@ class WineController extends ApiController {
 	    $wine->image_url = Request::get('image_url');
 	    $wine->average_price = Request::get('average_price');
 	    $wine->average_rate = Request::get('average_rate');
-	    if ( Request::get('wine_type') )
-	    {
+	    if ( Request::get('wine_type') ) {
 	        $wine->wine_type = Request::get('wine_type');
 	    }
 	 
@@ -56,8 +55,7 @@ class WineController extends ApiController {
 
 
 
-	 	if(Winery::where('id',$wine->winery_id)->first())
-	 	{
+	 	if(Winery::where('id',$wine->winery_id)->first()) {
 	 		$wine->save();
 	 		
 	 		$wine->wine_unique_id = $wine->wine_id . '_' . $wine->year;
@@ -65,8 +63,7 @@ class WineController extends ApiController {
 
 	 		$error_code = ApiResponse::OK;
             $data = $wine->toArray();
-	 	} else
-	 	{
+	 	} else {
 	 		$error_code = ApiResponse::UNAVAILABLE_WINE;
             $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_WINE);
 	 	}
@@ -124,44 +121,35 @@ class WineController extends ApiController {
 	
 		$wine = Wine::where('wine_id', $wine_id)->first();
  
-	    if ( Request::get('name') )
-	    {
+	    if ( Request::get('name') ) {
 	        $wine->name = Request::get('name');
 	    }
-	    if ( Request::get('year') )
-	    {
+	    if ( Request::get('year') ) {
 	        $wine->year = Request::get('year');
 	    }
-	    if ( Request::get('winery_id') )
-	    {
+	    if ( Request::get('winery_id') ) {
 	        $wine->winery_id = Request::get('winery_id');
 	    }
-	 	if ( Request::get('image_url') )
-	    {
+	 	if ( Request::get('image_url') ) {
 	        $wine->image_url = Request::get('image_url');
 	    }
-	    if (Request::get('average_price'))
-	    {
+	    if (Request::get('average_price')) {
 	        $wine->average_price = Request::get('average_price');
 	    }
-	    if ( Request::get('average_rate') )
-	    {
+	    if ( Request::get('average_rate') ) {
 	        $wine->average_rate = Request::get('average_rate');
 	    }
-	    if ( Request::get('wine_type') )
-	    {
+	    if ( Request::get('wine_type') ) {
 	        $wine->wine_type = Request::get('wine_type');
 	    }
 	    $wine->wine_unique_id = $wine->wine_id . '_' . $wine->year;
 
-	    if(Winery::where('id',$wine->winery_id)->first())
-	 	{
+	    if(Winery::where('id',$wine->winery_id)->first()) {
 	 		$wine->save();
 
 	 		$error_code = ApiResponse::OK;
             $data = $wine->toArray();
-	 	} else
-	 	{
+	 	} else {
 	 		$error_code = ApiResponse::UNAVAILABLE_WINE;
             $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_WINE);
 	 	}
@@ -181,9 +169,15 @@ class WineController extends ApiController {
 	{
 		$wine = Wine::where('wine_id', $wine_id);
  
-	    $wine->delete();
-	    $error_code = ApiResponse::OK;
-	 	return array("code" => $error_code, "data" => 'Wine deleted');
+	    if($wine) {
+ 			$wine->delete();
+	 		$error_code = ApiResponse::OK;
+	 		$data = 'Wine deleted';
+ 		} else {
+ 			$error_code = ApiResponse::UNAVAILABLE_WINE;
+	        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_WINE);
+	    } 
+	 	return array("code" => $error_code, "data" => $data);
 	    
 	}
 	public function scan()

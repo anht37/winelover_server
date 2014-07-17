@@ -29,6 +29,7 @@ Route::group(array('prefix' => 'api'), function()
     Route::resource('user', 'UserController');
     Route::resource('wine', 'WineController');
     Route::resource('winery', 'WineryController');
+    Route::resource('rating', 'RatingController');
 });
 
 

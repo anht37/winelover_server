@@ -18,7 +18,7 @@ class WineTableSeeder extends Seeder {
             'wine_unique_id' => '1_2011',
             'average_price' => '1200',
             'average_rate' => '3.0',
-            'wine_type' => 'white',
+            'wine_type' => '2',
         ));
 
         Wine::create(array(
@@ -30,7 +30,7 @@ class WineTableSeeder extends Seeder {
             'wine_unique_id' => '2_2010',
             'average_price' => '1700',
             'average_rate' => '4.0',
-            'wine_type' => 'white',
+            'wine_type' => '2',
         ));
         Wine::create(array(
             'wine_id' => '3',
@@ -41,7 +41,7 @@ class WineTableSeeder extends Seeder {
             'wine_unique_id' => '3_2011',
             'average_price' => '1600',
             'average_rate' => '2.5',
-            'wine_type' => 'red',
+            'wine_type' => '1',
         ));
         Wine::create(array(
             'wine_id' => '4',
@@ -52,7 +52,7 @@ class WineTableSeeder extends Seeder {
             'wine_unique_id' => '4_2013',
             'average_price' => '1200',
             'average_rate' => '2.0',
-            'wine_type' => 'yellow',
+            'wine_type' => '3',
         ));
         Wine::create(array(
             'wine_id' => '5',
@@ -63,7 +63,7 @@ class WineTableSeeder extends Seeder {
             'wine_unique_id' => '5_2009',
             'average_price' => '2200',
             'average_rate' => '4.5',
-            'wine_type' => 'red',
+            'wine_type' => '1',
         ));
 //        Wine::create(array(
 //        	'name' => 'カベルネ・ソーヴィニヨン',

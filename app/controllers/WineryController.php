@@ -98,20 +98,16 @@ class WineryController extends ApiController {
 	{
 		$winery = Winery::where('id', $id)->first();
  
-	    if ( Request::get('brand_name') )
-	    {
+	    if ( Request::get('brand_name') ) {
 	        $winery->brand_name = Request::get('brand_name');
 	    }
-	    if ( Request::get('country_id') )
-	    {
+	    if ( Request::get('country_id') ) {
 	        $winery->country_id = Request::get('country_id');
 	    }
-	 	if ( Request::get('region') )
-	    {
+	 	if ( Request::get('region') ) {
 	        $winery->region = Request::get('region');
 	    }
-	    if (Request::get('description'))
-	    {
+	    if (Request::get('description')) {
 	        $winery->description = Request::get('description');
 	    }
 	    $winery->save();
@@ -133,9 +129,15 @@ class WineryController extends ApiController {
 	{
 		$winery = Winery::where('id', $id);
  
-	    $winery->delete();
-	 	$error_code = ApiResponse::OK;
-	    return array("code" => $error_code, "data" => 'Winery deleted');
+	    if($winery) {
+ 			$winery->delete();
+	 		$error_code = ApiResponse::OK;
+	 		$data = 'Winery deleted';
+ 		} else {
+ 			$error_code = ApiResponse::URL_NOT_EXIST;
+	        $data = ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST);
+	    } 
+	    return array("code" => $error_code, "data" => $data);
 	}
 
 
