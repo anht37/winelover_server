@@ -12,7 +12,7 @@ class ApiResponse {
         'logout' => 'api/logout',
         'register' => 'api/register',
     );
-    const OK = "000";
+    const OK = "0";
     const SERVER_MAINTAIN = "100";
     const SESSION_INVALID = "101";
     const MISSING_PARAMS = "102";
