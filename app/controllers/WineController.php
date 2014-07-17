@@ -79,7 +79,14 @@ class WineController extends ApiController {
 	public function show($wine_id)
 	{
 		if($wine = Wine::where('wine_id', $wine_id)->first()) {
-			$wine->winery_id = Winery::where('id',$wine->winery_id)->first()->brand_name;
+            $winery = Winery::where('id',$wine->winery_id)->first();
+            if($winery) {
+                $wine->winery = Winery::where('id',$wine->winery_id)->first()->brand_name;
+            }else {
+                $wine->winery = '';
+            }
+            $wine->image_url = URL::asset($wine->image_url);
+
 			$error_code = ApiResponse::OK;
             $data = $wine->toArray();
 		} else {
