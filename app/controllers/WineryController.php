@@ -68,7 +68,7 @@ class WineryController extends ApiController {
 		$winery = Winery::where('id', $id)
             ->take(1)
             ->get();
- 		//dd($wine);
+ 		
 	    $error_code = ApiResponse::OK;
         $data = $winery->toArray();
 	    
@@ -135,8 +135,6 @@ class WineryController extends ApiController {
  
 	    $winery->delete();
 	 	$error_code = ApiResponse::OK;
-        $data = $winery->toArray();
-	    
 	    return array("code" => $error_code, "data" => 'Winery deleted');
 	}
 

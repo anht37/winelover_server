@@ -22,7 +22,7 @@ class CreateWinesTable extends Migration {
 			$table->string('wine_unique_id');
 			$table->float('average_price');
 			$table->float('average_rate');
-			$table->integer('wine_type');
+			$table->integer('wine_type')->default(3);
 			$table->softDeletes();
 			$table->timestamps();
 		});

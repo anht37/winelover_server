@@ -13,8 +13,6 @@ class WineController extends ApiController {
 		foreach ($wine as $wines) {
 			$wines->winery_id = $wines->winery->brand_name;
 		}
-		//$wines = $wine->winery['brand_name'];
-		
 		
 		$error_code = ApiResponse::OK;
         $data = $wine->toArray();
@@ -48,6 +46,10 @@ class WineController extends ApiController {
 	    $wine->image_url = Request::get('image_url');
 	    $wine->average_price = Request::get('average_price');
 	    $wine->average_rate = Request::get('average_rate');
+	    if ( Request::get('wine_type') )
+	    {
+	        $wine->wine_type = Request::get('wine_type');
+	    }
 	 
 	    // Validation and Filtering is sorely needed!!
 	    // Seriously, I'm a bad person for leaving that out.
@@ -146,7 +148,10 @@ class WineController extends ApiController {
 	    {
 	        $wine->average_rate = Request::get('average_rate');
 	    }
-
+	    if ( Request::get('wine_type') )
+	    {
+	        $wine->wine_type = Request::get('wine_type');
+	    }
 	    $wine->wine_unique_id = $wine->wine_id . '_' . $wine->year;
 
 	    if(Winery::where('id',$wine->winery_id)->first())
