@@ -14,4 +14,8 @@ class Wine extends Eloquent {
         $query = Config::get('winedetect.script').' predict '.Config::get('winedetect.config').' '.$file_path;
         return exec($query);
     }
+    public function winery()
+	{
+    	return $this->belongsTo('Winery','winery_id');
+	}
 }

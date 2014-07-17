@@ -9,11 +9,13 @@ class WineController extends ApiController {
 	 */
 	public function index()
 	{
-		$wine = Wine::all();
-		
-		foreach ($wine as $key => $value) {
-			$value->winery_id = Winery::where('id',$value->winery_id)->first()->brand_name;
+		$wine = Wine::with('winery')->get();
+		foreach ($wine as $wines) {
+			$wines->winery_id = $wines->winery->brand_name;
 		}
+		//$wines = $wine->winery['brand_name'];
+		
+		
 		$error_code = ApiResponse::OK;
         $data = $wine->toArray();
 	    

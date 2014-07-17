@@ -17,8 +17,8 @@ class CreateWineriesTable extends Migration {
 			$table->increments('id');
 			$table->string('brand_name');
 			$table->integer('country_id');
-			$table->string('region');
-			$table->text('description');
+			$table->string('region')->nullable();
+			$table->text('description')->nullable();
 			$table->softDeletes();
 			$table->timestamps();
 		});
