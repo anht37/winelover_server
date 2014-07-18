@@ -31,9 +31,7 @@ class WineController extends ApiController {
 			$page = 1;
 			$limit = 10;
 		}
-		
-		
-	
+
 		$wine = Wine::with('winery')->forPage($page, $limit)->get();
 		
 		foreach ($wine as $wines) {

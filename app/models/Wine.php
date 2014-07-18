@@ -24,12 +24,12 @@ class Wine extends Eloquent {
             'page' => $getPage,
             'limit' => $getLimit
         );
-        //dd($paginate);
+        
         $rules = array(
             'page' => 'integer',
             'limit' =>'integer'
         );
-        //dd(Validator::make($paginate, $rules));
+       
         $validator = Validator::make($paginate, $rules);
 
         if($validator->fails()) {
