@@ -9,7 +9,33 @@ class WineController extends ApiController {
 	 */
 	public function index()
 	{
-		$wine = Wine::with('winery')->get();
+		
+		if(Input::get('page')) {
+			$getPage = Input::get('page');
+			if(Input::get('limit')) {
+				$getLimit = Input::get('limit');
+			} else {
+				$getLimit = 10;		
+			}
+			$paginate = Wine::paginate($getPage, $getLimit);
+			if($paginate == 'FALSE') {
+				$error_code = ApiResponse::URL_NOT_EXIST;
+		       	$data = ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST);
+		     	return array("code" => $error_code, "data" => $data);
+			} else {
+				$page = $paginate['page'];
+				$limit = $paginate['limit'];
+			}
+
+		} else {
+			$page = 1;
+			$limit = 10;
+		}
+		
+		
+	
+		$wine = Wine::with('winery')->forPage($page, $limit)->get();
+		
 		foreach ($wine as $wines) {
 			$wines->winery_id = $wines->winery->brand_name;
 		}
@@ -19,8 +45,6 @@ class WineController extends ApiController {
 	    
 	    return array("code" => $error_code, "data" => $data);
 	}
-
-
 	/**
 	 * Show the form for creating a new resource.
 	 *
