@@ -65,9 +65,14 @@ class WineryController extends ApiController {
 	 */
 	public function show($id)
 	{
-		$winery = Winery::where('id', $id)
-            ->take(1)
-            ->get();
+		$winery = Winery::where('id', $id)->first();
+        if($winery) {
+			$error_code = ApiResponse::OK;
+       	 	$data = $winery->toArray();
+		} else {
+			$error_code = ApiResponse::URL_NOT_EXIST;
+	        $data = ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST);
+		}
  		
 	    $error_code = ApiResponse::OK;
         $data = $winery->toArray();

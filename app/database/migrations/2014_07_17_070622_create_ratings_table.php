@@ -21,7 +21,7 @@ class CreateRatingsTable extends Migration {
 			$table->text('content')->nullable();
 			$table->integer('like_count')->default(0);
 			$table->integer('comment_count')->default(0);
-			$table->tinyInteger('is_my_wine')->default(0);
+			$table->tinyInteger('is_my_wine')->default(1);
 			$table->softDeletes();
 			$table->timestamps();
 		});

@@ -39,18 +39,13 @@ class RatingController extends ApiController {
 		$rating = new Rating;
 	    
 	    $rating->user_id = Request::get('user_id');
+
 	    $rating->wine_unique_id = Request::get('wine_unique_id');
 	    
-	    if ( Request::get('rate')) {
-	    	if((Request::get('rate') > 0 && Request::get('rate') < 5) && (Request::get('rate')*10)%5==0) {
-	    		$rating->rate = Request::get('rate');
-	    	} else {
-		    	$error_code = ApiResponse::UNAVAILABLE_RATING;
-	        	$data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING);
-	        	return array("code" => $error_code, "data" => $data);
-	    	}
-
+	    if (Request::get('rate')) {  
+	    	$rating->rate = Request::get('rate');
 	    }
+
 	    $rating->content = Request::get('content');
 	    
 	    if (Request::get('like_count')) {
@@ -62,13 +57,19 @@ class RatingController extends ApiController {
 	    if (Request::get('is_my_wine')) {
 	        $rating->is_my_wine = Request::get('is_my_wine');
 	    }
-	 
+	 	
 	    // Validation and Filtering is sorely needed!!
 	    // Seriously, I'm a bad person for leaving that out.
-	    $rating->save();
-
-	    $error_code = ApiResponse::OK;
-        $data = $rating->toArray();
+	    $check = Rating::check_validator(Input::all());
+	    if($check == 'FALSE') {
+	    	$error_code = ApiResponse::UNAVAILABLE_RATING;
+	        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING);
+	    } else {
+	    	$rating->user_id = $check['user_id'];
+			$rating->save();
+			$error_code = ApiResponse::OK;
+			$data = $rating->toArray();	    
+		}
 	    
 	    return array("code" => $error_code, "data" => $data);
 	}
@@ -82,13 +83,14 @@ class RatingController extends ApiController {
 	 */
 	public function show($id)
 	{
-		$rating = Rating::where('id', $id)
-            ->take(1)
-            ->get();
- 		
-	    $error_code = ApiResponse::OK;
-        $data = $rating->toArray();
-	    
+		$rating = Rating::where('id', $id)->first();
+		if($rating) {
+			$error_code = ApiResponse::OK;
+       	 	$data = $rating->toArray();
+		} else {
+			$error_code = ApiResponse::UNAVAILABLE_RATING;
+	        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING);
+		}
 	    return array("code" => $error_code, "data" => $data);
 	}
 
@@ -121,14 +123,8 @@ class RatingController extends ApiController {
 	    if ( Request::get('wine_unique_id') ) {
 	        $rating->wine_unique_id = Request::get('wine_unique_id');
 	    }
-	 	if ( Request::get('rate') ) {
-	        if((Request::get('rate') > 0 && Request::get('rate') < 5) && (Request::get('rate')*10)%5==0) {
-	    		$rating->rate = Request::get('rate');
-	    	} else {
-		    	$error_code = ApiResponse::UNAVAILABLE_RATING;
-	        	$data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING);
-	        	return array("code" => $error_code, "data" => $data);
-	    	}
+	 	if (Request::get('rate')) {  
+	    	$rating->rate = Request::get('rate');
 	    }
 	    if (Request::get('content')) {
 	        $rating->content = Request::get('content');
@@ -142,9 +138,17 @@ class RatingController extends ApiController {
 	    if (Request::get('is_my_wine')) {
 	        $rating->is_my_wine = Request::get('is_my_wine');
 	    }
-	    $rating->save();
- 		$error_code = ApiResponse::OK;
-        $data = $rating->toArray();
+	    
+	    $check = Rating::check(Input::all());
+	    if($check == 'FALSE') {
+	    	$error_code = ApiResponse::UNAVAILABLE_RATING;
+	        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING);
+	    } else {
+	    	$rating->user_id = $check['user_id'];
+			$rating->save();
+			$error_code = ApiResponse::OK;
+			$data = $rating->toArray();	    
+		}
 	    
 	    return array("code" => $error_code, "data" => $data);
 	}
@@ -167,9 +171,6 @@ class RatingController extends ApiController {
  			$error_code = ApiResponse::UNAVAILABLE_RATING;
 	        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING);
 	    } 
-	    
 	    return array("code" => $error_code, "data" => $data);
 	}
-
-
 }
