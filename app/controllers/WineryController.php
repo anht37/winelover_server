@@ -74,9 +74,6 @@ class WineryController extends ApiController {
 	        $data = ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST);
 		}
  		
-	    $error_code = ApiResponse::OK;
-        $data = $winery->toArray();
-	    
 	    return array("code" => $error_code, "data" => $data);
 	}
 

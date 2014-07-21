@@ -1,8 +1,8 @@
-
 <?php
- 
+use Illuminate\Database\Eloquent\SoftDeletingTrait; 
 class Wine extends Eloquent {
- 
+    
+    use SoftDeletingTrait;
     protected $table = 'wines';
     protected $primaryKey = 'wine_id';
 

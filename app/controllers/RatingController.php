@@ -139,7 +139,7 @@ class RatingController extends ApiController {
 	        $rating->is_my_wine = Request::get('is_my_wine');
 	    }
 	    
-	    $check = Rating::check(Input::all());
+	    $check = Rating::check_validator(Input::all());
 	    if($check == 'FALSE') {
 	    	$error_code = ApiResponse::UNAVAILABLE_RATING;
 	        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING);

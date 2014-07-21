@@ -1,7 +1,8 @@
 <?php
- 
+use Illuminate\Database\Eloquent\SoftDeletingTrait;
 class Rating extends Eloquent {
- 
+    
+    use SoftDeletingTrait;
     protected $table = 'ratings';
     protected $primaryKey = 'id';
 
