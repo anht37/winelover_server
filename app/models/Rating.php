@@ -7,13 +7,10 @@ class Rating extends Eloquent {
     protected $primaryKey = 'id';
 
     public static function check_validator($input)
-    {	
-    	$input['user_id'] = Uuid::generate(4);
-    	
+    {	   	
         $validator = Validator::make(
             $input,
             array(
-                'user_id' => 'exists:users,user_id',
                 'like_count' => 'integer',
                 'comment_count' => 'integer',
                 'is_my_wine' => 'in:0,1',
@@ -37,4 +34,11 @@ class Rating extends Eloquent {
         	
         }
  	}
+
+    public static function getUser_id($input)
+    {
+        $sess_user = Login::where('session_id', $input)->first();
+        return $sess_user['user_id'];
+    }
+
 }

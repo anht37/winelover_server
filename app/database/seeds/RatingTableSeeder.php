@@ -21,7 +21,7 @@ class RatingTableSeeder extends Seeder {
 
         Rating::create(array(
             'id' => '2',
-            'user_id' => '1c896322-8be2-4582-a3e1-bc7b8947c9db',
+            'user_id' => '8bd7e2b9-8206-4eca-9c84-831094f5b2d4',
             'wine_unique_id' => '2_2009',
             'rate' => '1.5',
             'like_count' => '5',
@@ -41,7 +41,7 @@ class RatingTableSeeder extends Seeder {
 
         Rating::create(array(
             'id' => '4',
-            'user_id' => '1c896322-8be2-4582-a3e1-bc7b8947c9db',
+            'user_id' => '8bd7e2b9-8206-4eca-9c84-831094f5b2d4',
             'wine_unique_id' => '4_2009',
             'rate' => '3.0',
             'like_count' => '3',

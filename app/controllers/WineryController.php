@@ -7,6 +7,13 @@ class WineryController extends ApiController {
 	 *
 	 * @return Response
 	 */
+
+
+	public function __construct()
+    {
+        $this->beforeFilter('session');
+    }
+
 	public function index()
 	{
 		$winery = Winery::all();
@@ -38,22 +45,32 @@ class WineryController extends ApiController {
 	public function store()
 	{
 		$winery = new Winery;
+		$input = $this->_getInput();
 	    
-	    $winery->brand_name = Request::get('brand_name');
-	    $winery->country_id = Request::get('country_id');
-	    $winery->region = Request::get('region');
-	    $winery->description = Request::get('description');
-	 
-	    // Validation and Filtering is sorely needed!!
-	    // Seriously, I'm a bad person for leaving that out.
-	    $winery->save();
+	    if(!empty($input['brand_name'])) {
+	    	$winery->brand_name = $input['brand_name'];
 
-	    $error_code = ApiResponse::OK;
-        $data = $winery->toArray();
-	    
+		    if (!empty($input['country_id'])) {
+		        $winery->country_id = $input['country_id'];
+		    }
+		 	if (!empty($input['region'])) {
+		        $winery->region = $input['region'];
+		    }
+		    if (!empty($input['description'])) {
+		        $winery->description = $input['description'];
+		    }
+		 
+		    // Validation and Filtering is sorely needed!!
+		    // Seriously, I'm a bad person for leaving that out.
+		    $winery->save();
+
+		    $error_code = ApiResponse::OK;
+	        $data = $winery->toArray();
+	    } else {
+	    	$error_code = ApiResponse::MISSING_PARAMS;
+	        $data = $input;
+	    }
 	    return array("code" => $error_code, "data" => $data);
-
-	    
 	}
 
 
@@ -99,23 +116,32 @@ class WineryController extends ApiController {
 	public function update($id)
 	{
 		$winery = Winery::where('id', $id)->first();
- 
-	    if ( Request::get('brand_name') ) {
-	        $winery->brand_name = Request::get('brand_name');
-	    }
-	    if ( Request::get('country_id') ) {
-	        $winery->country_id = Request::get('country_id');
-	    }
-	 	if ( Request::get('region') ) {
-	        $winery->region = Request::get('region');
-	    }
-	    if (Request::get('description')) {
-	        $winery->description = Request::get('description');
-	    }
-	    $winery->save();
- 		$error_code = ApiResponse::OK;
-        $data = $winery->toArray();
-	    
+		$input = $this->_getInput();
+		if($winery) {
+	 		if(!empty($input)) {
+			    if (!empty($input['brand_name'])) {
+			        $winery->brand_name = $input['brand_name'];
+			    }
+			    if (!empty($input['country_id'])) {
+			        $winery->country_id = $input['country_id'];
+			    }
+			 	if (!empty($input['region'])) {
+			        $winery->region = $input['region'];
+			    }
+			    if (!empty($input['description'])) {
+			        $winery->description = $input['description'];
+			    }
+			    $winery->save();
+		 		$error_code = ApiResponse::OK;
+		        $data = $winery->toArray();
+		    } else {
+		    	$error_code = ApiResponse::MISSING_PARAMS;
+		        $data = $input;
+		    }
+	   	} else {
+	   		$error_code = ApiResponse::URL_NOT_EXIST;
+	        $data = ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST);
+	   	}
 	    return array("code" => $error_code, "data" => $data);
 	    
 	}

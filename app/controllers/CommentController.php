@@ -7,6 +7,11 @@ class CommentController extends \BaseController {
 	 *
 	 * @return Response
 	 */
+	public function __construct()
+    {
+        $this->beforeFilter('session');
+    }
+
 	public function index($rating_id)
 	{
 		$input = array('rating_id' => $rating_id);
@@ -18,13 +23,12 @@ class CommentController extends \BaseController {
 		} else {
 			$comment = Comment::where('rating_id', $rating_id)->get();
 			$error_code = ApiResponse::OK;
-			if(isset($comment)){
-				$data = 'No Comment';
+			if(count($comment) > 0){
+				$data = $comment->toArray();
 			} else {
-	        	$data = $comment->toArray();
+	        	$data = 'No Comment';
 			}
 		}
-
 	    return array("code" => $error_code, "data" => $data);
 	}
 
@@ -48,32 +52,24 @@ class CommentController extends \BaseController {
 	public function store($rating_id)
 	{
 		$comment = new Comment;
-	    
+	    $input = $this->_getInput();
 	    $comment->rating_id = $rating_id;
-	    $comment->user_id = Request::get('user_id');
-	    $comment->content = Request::get('content');
-
-	    $input = array('rating_id' => $rating_id, 'user_id' => Request::get('user_id'), 'content' => Request::get('content'));
-	    $check_user = Comment::check_user($input);
-	    $check_rating = Comment::check_rating($input);
-	    if ($check_rating == 'FALSE' && $check_user == 'FALSE') {
-	    	$error_code = ApiResponse::UNAVAILABLE_RATING . ' and ' . ApiResponse::UNAVAILABLE_USER;
-	        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING) . ' and ' . ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_USER) ;
-		}
-	     elseif ($check_rating == 'FALSE') {
-	    	$error_code = ApiResponse::UNAVAILABLE_RATING;
-	        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING) ;
-	
-		}  elseif($check_user == 'FALSE') {
-	    	$error_code = ApiResponse::UNAVAILABLE_USER;
-	        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_USER) ;
-	    } else {
-	    	$comment->user_id = $check_user['user_id'];
+	    $comment->user_id = Rating::getUser_id(Request::header('session'));
+	    if(!empty($input['content'])) {
+	    	$comment->content = $input['content'];
+	    }
+	    $rating = array('rating_id' => $rating_id);
+	    $check_rating = Comment::check_rating($rating);
+	    if ($check_rating == 'FALSE') {
+		    $error_code = ApiResponse::UNAVAILABLE_RATING;
+		    $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING);
+		
+		} else {
 			$comment->save();
 			$error_code = ApiResponse::OK;
-			$data = $comment->toArray();	    
+			$data = $comment;
+				    
 		}
-
 	    return array("code" => $error_code, "data" => $data);
 	}
 
@@ -87,7 +83,7 @@ class CommentController extends \BaseController {
 	public function show($rating_id, $id)
 	{
 		
-		$comment = Comment::where('rating_id', $rating_id)->having('id', '=', $id)->first();
+		$comment = Comment::where('id', $id)->first();
 	    if($comment) {
 			$error_code = ApiResponse::OK;
 	       	$data = $content->toArray();
@@ -121,42 +117,24 @@ class CommentController extends \BaseController {
 	 */
 	public function update($rating_id, $id)
 	{
-	    $comment = Comment::where('rating_id', $rating_id)->having('id', '=', $id)->first();
+	    $comment = Comment::where('id', $id)->first();
+	    $input = $this->_getInput();
  		if($comment) {
- 			//if ( Request::get('rating_id') ) {
-	        	$comment->rating_id = $rating_id;
-		    //}
-		    if ( Request::get('user_id') ) {
-		        $comment->user_id = Request::get('user_id');
-		    }
-		    if ( Request::get('content') ) {
-		        $comment->content = Request::get('content');
-		    }
-		    $input = $input = array('rating_id' => $rating_id, 'user_id' => Request::get('user_id'), 'content' => Request::get('content'));
-		    $check_user = Comment::check_user($input);
-		    $check_rating = Comment::check_rating($input);
-		    if ($check_rating == 'FALSE' && $check_user == 'FALSE') {
-		    	$error_code = ApiResponse::UNAVAILABLE_RATING . ' and ' . ApiResponse::UNAVAILABLE_USER;
-		        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING) . ' and ' . ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_USER);
-			}
-		     elseif ($check_rating == 'FALSE') {
-		    	$error_code = ApiResponse::UNAVAILABLE_RATING;
-		        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING) ;
-		
-			}  elseif($check_user == 'FALSE') {
-		    	$error_code = ApiResponse::UNAVAILABLE_USER;
-		        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_USER) ;
+ 			if(!empty($input)) {
+			    if(!empty($input['content'])) {
+		    		$comment->content = $input['content'];
+		    	}
+					$comment->save();
+					$error_code = ApiResponse::OK;
+					$data = $comment->toArray();	    
 			} else {
-		    	$comment->user_id = $check_user['user_id'];
-				$comment->save();
-				$error_code = ApiResponse::OK;
-				$data = $comment->toArray();	    
+				$error_code = ApiResponse::MISSING_PARAMS;
+		        $data = $input;
 			}
 	 	} else {
 	 		$error_code = ApiResponse::URL_NOT_EXIST;
 	        $data = ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST);
 	 	}
-	    
 	    return array("code" => $error_code, "data" => $data);
 	}
 
@@ -169,7 +147,7 @@ class CommentController extends \BaseController {
 	 */
 	public function destroy($rating_id, $id)
 	{
-		$comment = Comment::where('rating_id', $rating_id)->having('id', '=', $id)->first();
+		$comment = Comment::where('id', '=', $id)->first();
  
 	    if($comment) {
  			$comment->delete();

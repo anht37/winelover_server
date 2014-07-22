@@ -7,9 +7,14 @@ class WineController extends ApiController {
 	 *
 	 * @return Response
 	 */
+
+	public function __construct()
+    {
+        $this->beforeFilter('session');
+    }
+
 	public function index()
 	{
-		
 		if(Input::get('page')) {
 			$getPage = Input::get('page');
 			if(Input::get('limit')) {
@@ -60,35 +65,50 @@ class WineController extends ApiController {
 	 * @return Response
 	 */
 	public function store()
-	{
+	{	
+
 		$wine = new Wine;
-	    $wine->name = Request::get('name');
-	    $wine->year = Request::get('year');
-	    $wine->winery_id = Request::get('winery_id');
-	    $wine->image_url = Request::get('image_url');
-	    $wine->average_price = Request::get('average_price');
-	    $wine->average_rate = Request::get('average_rate');
-	    if ( Request::get('wine_type') ) {
-	        $wine->wine_type = Request::get('wine_type');
-	    }
-	 
-	    // Validation and Filtering is sorely needed!!
-	    // Seriously, I'm a bad person for leaving that out.
+		$input = $this->_getInput();
+		
+		if(!empty($input['name']) && !empty($input['year']) && !empty($input['winery_id'])) {
+			$wine->name = $input['name'];
+		    $wine->year = $input['year'];
+		    $wine->winery_id = $input['winery_id'];
+		    if (!empty($input['image_url'])) {
+		        $wine->image_url = $input['image_url'];
+		    }
+		    if (!empty($input['average_price'])) {
+		        $wine->average_price = $input['average_price'];
+		    }
+		    if ( !empty($input['average_rate']) ) {
+		        $wine->average_rate = $input['average_rate'];
+		    }
+		    if (!empty($input['wine_type']) ) {
+		        $wine->wine_type = $input['wine_type'];
+		    }
+		 	
+		    // Validation and Filtering is sorely needed!!
+		    // Seriously, I'm a bad person for leaving that out.
 
 
 
-	 	if(Winery::where('id',$wine->winery_id)->first()) {
-	 		$wine->save();
-	 		
-	 		$wine->wine_unique_id = $wine->wine_id . '_' . $wine->year;
-	    	$wine->save();
+		 	if(Winery::where('id',$wine->winery_id)->first()) {
+		 		$wine->save();
+		 		
+		 		$wine->wine_unique_id = $wine->wine_id . '_' . $wine->year;
+		    	$wine->save();
 
-	 		$error_code = ApiResponse::OK;
-            $data = $wine->toArray();
-	 	} else {
-	 		$error_code = ApiResponse::UNAVAILABLE_WINE;
-            $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_WINE);
-	 	}
+		 		$error_code = ApiResponse::OK;
+	            $data = $wine;
+		 	} else {
+		 		$error_code = ApiResponse::UNAVAILABLE_WINE;
+	            $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_WINE);
+		 	}
+		} else {
+			$error_code = ApiResponse::MISSING_PARAMS;
+	        $data = $input;
+		}
+	    
 	    return array("code" => $error_code, "data" => $data);
 	}
 
@@ -140,41 +160,51 @@ class WineController extends ApiController {
 	 */
 	public function update($wine_id)
 	{
-	
 		$wine = Wine::where('wine_id', $wine_id)->first();
- 
-	    if ( Request::get('name') ) {
-	        $wine->name = Request::get('name');
-	    }
-	    if ( Request::get('year') ) {
-	        $wine->year = Request::get('year');
-	    }
-	    if ( Request::get('winery_id') ) {
-	        $wine->winery_id = Request::get('winery_id');
-	    }
-	 	if ( Request::get('image_url') ) {
-	        $wine->image_url = Request::get('image_url');
-	    }
-	    if (Request::get('average_price')) {
-	        $wine->average_price = Request::get('average_price');
-	    }
-	    if ( Request::get('average_rate') ) {
-	        $wine->average_rate = Request::get('average_rate');
-	    }
-	    if ( Request::get('wine_type') ) {
-	        $wine->wine_type = Request::get('wine_type');
-	    }
-	    $wine->wine_unique_id = $wine->wine_id . '_' . $wine->year;
+		$input = $this->_getInput();
+		if($wine) {
+	 		if(!empty($input)) {
+	 			if ( !empty($input['name']) ) {
+		        $wine->name = $input['name'];
+			    }
+			    if ( !empty($input['year']) ) {
+			        $wine->year = $input['year'];
+			    }
+			    if ( !empty($input['winery_id']) ) {
+			        $wine->winery_id = $input['winery_id'];
+			    }
+			 	if ( !empty($input['image_url']) ) {
+			        $wine->image_url = $input['image_url'];
+			    }
+			    if (!empty($input['average_price'])) {
+			        $wine->average_price = $input['average_price'];
+			    }
+			    if ( !empty($input['average_rate']) ) {
+			        $wine->average_rate = $input['average_rate'];
+			    }
+			    if ( !empty($input['wine_type']) ) {
+			        $wine->wine_type = $input['wine_type'];
+			    }
+			    $wine->wine_unique_id = $wine->wine_id . '_' . $wine->year;
 
-	    if(Winery::where('id',$wine->winery_id)->first()) {
-	 		$wine->save();
+			    if(Winery::where('id',$wine->winery_id)->first()) {
+			 		$wine->save();
 
-	 		$error_code = ApiResponse::OK;
-            $data = $wine->toArray();
+			 		$error_code = ApiResponse::OK;
+		            $data = $wine;
+			 	} else {
+			 		$error_code = ApiResponse::UNAVAILABLE_WINE;
+		            $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_WINE);
+			 	}
+	 		} else {
+	 		 	$error_code = ApiResponse::MISSING_PARAMS;
+		        $data = $input;
+	 		}
 	 	} else {
-	 		$error_code = ApiResponse::UNAVAILABLE_WINE;
-            $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_WINE);
+	 		$error_code = ApiResponse::URL_NOT_EXIST;
+	        $data = ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST);
 	 	}
+	    
 	    return array("code" => $error_code, "data" => $data);
  
 	    

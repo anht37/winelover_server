@@ -1,5 +1,5 @@
 <?php
-
+use Carbon\Carbon;
 /*
 |--------------------------------------------------------------------------
 | Application & Route Filters
@@ -87,4 +87,23 @@ Route::filter('csrf', function()
 	{
 		throw new Illuminate\Session\TokenMismatchException;
 	}
+});
+
+Route::filter('session', function()
+{
+    if (empty($session = Request::header('session')))
+    {	
+    	$error_code = ApiResponse::SESSION_INVALID;
+        $data = ApiResponse::getErrorContent(ApiResponse::SESSION_INVALID);
+ 		return array("code" => $error_code, "data" => $data);
+    	
+    } else {
+    	$login = Login::where('session_id',$session)->first();
+    	$date = Carbon::now()->format('Y-m-d H:i:s');
+    	if($date > $login["expired_at"]) {
+ 			$error_code = ApiResponse::SESSION_INVALID;
+        	$data = ApiResponse::getErrorContent(ApiResponse::SESSION_INVALID);
+ 			return array("code" => $error_code, "data" => $data);
+    	} 
+    }
 });

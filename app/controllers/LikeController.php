@@ -7,6 +7,11 @@ class LikeController extends \BaseController {
 	 *
 	 * @return Response
 	 */
+	// public function __construct()
+ //    {
+ //        $this->beforeFilter('session');
+ //    }
+
 	public function index($rating_id)
 	{	
 		$input = array('rating_id' => $rating_id);
@@ -17,13 +22,12 @@ class LikeController extends \BaseController {
 		} else {
 			$like = Like::where('rating_id', $rating_id)->get();
 			$error_code = ApiResponse::OK;
-			if(isset($like)){
-				$data = 'No Like';
-			} else {
-	        	$data = $like->toArray();
+			if (count($like) > 0) {
+				$data = $like->toArray();
+			} else {	
+	        	$data = 'No Like';
 			}
 		}
-
 	    return array("code" => $error_code, "data" => $data);
 	}
 
@@ -48,27 +52,18 @@ class LikeController extends \BaseController {
 	{
 			$like = new Like;
 		    $like->rating_id = $rating_id;
-		    $like->user_id = Request::get('user_id');
-
-		    $input = array('rating_id' => $rating_id, 'user_id' => Request::get('user_id'));
-		    $check_user = Like::check_user($input);
+		    $like->user_id = Rating::getUser_id(Request::header('session'));
+		    
+		    $input = array('rating_id' => $like->rating_id);
 		    $check_rating = Like::check_rating($input);
-		    if ($check_rating == 'FALSE' && $check_user == 'FALSE') {
-		    	$error_code = ApiResponse::UNAVAILABLE_RATING . ' and ' . ApiResponse::UNAVAILABLE_USER;
-		        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING) . ' and ' . ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_USER);
-			}
-		     elseif ($check_rating == 'FALSE') {
+		    if ($check_rating == 'FALSE') {
 		    	$error_code = ApiResponse::UNAVAILABLE_RATING;
-		        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING) ;
+		        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING);
 		
-			}  elseif($check_user == 'FALSE') {
-		    	$error_code = ApiResponse::UNAVAILABLE_USER;
-		        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_USER) ;
-		    } else {
-		    	$like->user_id = $check_user['user_id'];
-		    	if(Like::where('rating_id', $rating_id)->having('user_id', '=', $like->user_id)->first()) {
+			} else {
+		    	if (Like::where('rating_id', $like->rating_id)->having('user_id', '=', $like->user_id)->first()) {
 					$error_code = ApiResponse::DUPLICATED_LIKE;
-				 	$data = ApiResponse::getErrorContent(ApiResponse::DUPLICATED_LIKE) ;
+				 	$data = ApiResponse::getErrorContent(ApiResponse::DUPLICATED_LIKE);
 				} else {
 					$like->save();
 					$error_code = ApiResponse::OK;
@@ -86,10 +81,10 @@ class LikeController extends \BaseController {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function show($rating_id, $id)
+	public function show($rating_id)
 	{	
-		
-		$like = Like::where('rating_id', $rating_id)->having('id', '=', $id)->first();
+		$user_id = Rating::getUser_id(Request::header('session'));
+		$like = Like::where('rating_id', $rating_id)->having('user_id', '=', $user_id)->first();
 	    if($like) {
 			$error_code = ApiResponse::OK;
 	       	$data = $like->toArray();
@@ -121,42 +116,33 @@ class LikeController extends \BaseController {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function update($rating_id, $id)
+	public function update($rating_id)
 	{	
 
 		// $like = Like::where('rating_id', $rating_id)->having('id', '=', $id)->first();
- 	// 	if($like) {
- 	// 		//if ( Request::get('rating_id') ) {
+ 	//  	if($like) {
 	 //        $like->rating_id = $rating_id;
-		//     //}
+	 //    }
 		//     if ( Request::get('user_id') ) {
 		//         $like->user_id = Request::get('user_id');
-		//     }
-		//     $input = array('rating_id' => $rating_id, 'user_id' => Request::get('user_id'));
+	 // 	    }
+		//     $input = array('rating_id' => $rating_id);
 		//     $check_user = Like::check_user($input);
 		//     $check_rating = Like::check_rating($input);
 		//     if ($check_rating == 'FALSE' && $check_user == 'FALSE') {
-	 //    		$error_code = ApiResponse::UNAVAILABLE_RATING . ' and ' . ApiResponse::UNAVAILABLE_USER;
-	 //        	$data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING) . ' and ' . ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_USER);
-		// 	}
-		//      elseif ($check_rating == 'FALSE') {
-		//     	$error_code = ApiResponse::UNAVAILABLE_RATING;
-		//         $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING) ;
-		
-		// 	}  elseif($check_user == 'FALSE') {
-		//     	$error_code = ApiResponse::UNAVAILABLE_USER;
-		//         $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_USER) ;
-		// 	} else {
-		//     	$like->user_id = $check_user['user_id'];
-		// 		$like->save();
-		// 		$error_code = ApiResponse::OK;
-		// 		$data = $like->toArray();	    
-		// 	}
-	 // 	} else {
-	 // 		$error_code = ApiResponse::URL_NOT_EXIST;
-	 //        $data = ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST);
-	 // 	}
-	    
+	 //     		$error_code = ApiResponse::UNAVAILABLE_RATING . ' and ' . ApiResponse::UNAVAILABLE_USER;
+	 //         	$data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING) . ' and ' . ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_USER);
+		//  	} elseif ($check_rating == 'FALSE') {
+		//      	$error_code = ApiResponse::UNAVAILABLE_RATING;
+		//         $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING);
+		//  	}  elseif($check_user == 'FALSE') {
+		//      	$error_code = ApiResponse::UNAVAILABLE_USER;
+		//          $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_USER);
+		//  	} else {
+		//  		$like->save();
+		//  		$error_code = ApiResponse::OK;
+		//  		$data = $like->toArray();	    
+		//  	}
 	 //    return array("code" => $error_code, "data" => $data);
 	    
 	}
@@ -168,10 +154,10 @@ class LikeController extends \BaseController {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function destroy($rating_id, $id)
+	public function destroy($rating_id)
 	{
-		$like = Like::where('rating_id', $rating_id)->having('id', '=', $id)->first();
- 
+		$user_id = Rating::getUser_id(Request::header('session'));
+		$like = Like::where('rating_id', $rating_id)->having('user_id', '=', $user_id)->first();
 	    if($like) {
  			$like->delete();
 	 		$error_code = ApiResponse::OK;
