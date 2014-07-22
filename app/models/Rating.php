@@ -41,4 +41,24 @@ class Rating extends Eloquent {
         return $sess_user['user_id'];
     }
 
+    public static function check_rating($input)
+    {   
+        
+        
+        $validator = Validator::make(
+            $input,
+            array(
+                
+                'rating_id' => 'exists:ratings,id',
+            )
+        );
+        //validate params
+        if ($validator->fails()) {
+            return "FALSE";
+        } else {
+                return $input;
+        }
+        
+    }
+
 }

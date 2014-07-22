@@ -15,7 +15,7 @@ class LikeController extends \BaseController {
 	public function index($rating_id)
 	{	
 		$input = array('rating_id' => $rating_id);
-		$check_rating = Like::check_rating($input);
+		$check_rating = Rating::check_rating($input);
 		if ($check_rating == 'FALSE') {
 	    	$error_code = ApiResponse::UNAVAILABLE_RATING;
 	        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING);

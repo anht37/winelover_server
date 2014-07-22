@@ -15,7 +15,7 @@ class CommentController extends \BaseController {
 	public function index($rating_id)
 	{
 		$input = array('rating_id' => $rating_id);
-		$check_rating = Comment::check_rating($input);
+		$check_rating = Rating::check_rating($input);
 		if ($check_rating == 'FALSE') {
 	    	$error_code = ApiResponse::UNAVAILABLE_RATING;
 	        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING);
@@ -59,7 +59,7 @@ class CommentController extends \BaseController {
 	    	$comment->content = $input['content'];
 
 	    	$rating = array('rating_id' => $rating_id);
-		    $check_rating = Comment::check_rating($rating);
+		    $check_rating = Rating::check_rating($rating);
 		    if ($check_rating == 'FALSE') {
 			    $error_code = ApiResponse::UNAVAILABLE_RATING;
 			    $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING);
