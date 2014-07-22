@@ -57,19 +57,24 @@ class CommentController extends \BaseController {
 	    $comment->user_id = Rating::getUser_id(Request::header('session'));
 	    if(!empty($input['content'])) {
 	    	$comment->content = $input['content'];
+
+	    	$rating = array('rating_id' => $rating_id);
+		    $check_rating = Comment::check_rating($rating);
+		    if ($check_rating == 'FALSE') {
+			    $error_code = ApiResponse::UNAVAILABLE_RATING;
+			    $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING);
+			
+			} else {
+				$comment->save();
+				$error_code = ApiResponse::OK;
+				$data = $comment;
+					    
+			}
+	    } else {
+	    	$error_code = ApiResponse::MISSING_PARAMS;
+		    $data = $input;
 	    }
-	    $rating = array('rating_id' => $rating_id);
-	    $check_rating = Comment::check_rating($rating);
-	    if ($check_rating == 'FALSE') {
-		    $error_code = ApiResponse::UNAVAILABLE_RATING;
-		    $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING);
-		
-		} else {
-			$comment->save();
-			$error_code = ApiResponse::OK;
-			$data = $comment;
-				    
-		}
+	    
 	    return array("code" => $error_code, "data" => $data);
 	}
 
@@ -86,7 +91,7 @@ class CommentController extends \BaseController {
 		$comment = Comment::where('id', $id)->first();
 	    if($comment) {
 			$error_code = ApiResponse::OK;
-	       	$data = $content->toArray();
+	       	$data = $comment->toArray();
 		} else {
 			$error_code = ApiResponse::URL_NOT_EXIST;
 		    $data = ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST);
