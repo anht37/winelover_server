@@ -7,10 +7,10 @@ class LikeController extends \BaseController {
 	 *
 	 * @return Response
 	 */
-	// public function __construct()
- //    {
- //        $this->beforeFilter('session');
- //    }
+	 public function __construct()
+    {
+        $this->beforeFilter('session');
+    }
 
 	public function index($rating_id)
 	{	
