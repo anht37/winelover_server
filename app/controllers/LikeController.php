@@ -14,8 +14,8 @@ class LikeController extends \BaseController {
 
 	public function index($rating_id)
 	{	
-		$input = array('rating_id' => $rating_id);
-		$check_rating = Rating::check_rating($input);
+		
+		$check_rating = Rating::check_rating($rating_id);
 		if ($check_rating == 'FALSE') {
 	    	$error_code = ApiResponse::UNAVAILABLE_RATING;
 	        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING);
@@ -52,23 +52,31 @@ class LikeController extends \BaseController {
 	{
 			$like = new Like;
 		    $like->rating_id = $rating_id;
-		    $like->user_id = Rating::getUser_id(Request::header('session'));
+		    $like->user_id = Session::get('user_id');
 		    
-		    $input = array('rating_id' => $like->rating_id);
-		    $check_rating = Like::check_rating($input);
-		    if ($check_rating == 'FALSE') {
-		    	$error_code = ApiResponse::UNAVAILABLE_RATING;
-		        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING);
-		
-			} else {
+		    $check_rating = Rating::check_rating($like->rating_id);
+		    if ($check_rating != 'FALSE') {
+
 		    	if (Like::where('rating_id', $like->rating_id)->having('user_id', '=', $like->user_id)->first()) {
 					$error_code = ApiResponse::DUPLICATED_LIKE;
 				 	$data = ApiResponse::getErrorContent(ApiResponse::DUPLICATED_LIKE);
 				} else {
+					
+					//update like_count on rating
+					$like_rating = Rating::where('id', $rating_id)->first();
+					$like_rating->like_count = $like_rating->like_count + 1;
+					$like_rating->save();
+					
 					$like->save();
 					$error_code = ApiResponse::OK;
 					$data = $like->toArray();
-				}		    
+				}		   
+
+			} else {
+		    	 
+		    	$error_code = ApiResponse::UNAVAILABLE_RATING;
+		        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING);
+		
 			}
 	
 	    return array("code" => $error_code, "data" => $data);
@@ -81,9 +89,9 @@ class LikeController extends \BaseController {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function show($rating_id)
+	public function show($rating_id, $id)
 	{	
-		$user_id = Rating::getUser_id(Request::header('session'));
+		$user_id = Session::get('user_id');
 		$like = Like::where('rating_id', $rating_id)->having('user_id', '=', $user_id)->first();
 	    if($like) {
 			$error_code = ApiResponse::OK;
@@ -156,10 +164,16 @@ class LikeController extends \BaseController {
 	 */
 	public function destroy($rating_id)
 	{
-		$user_id = Rating::getUser_id(Request::header('session'));
+		$user_id = Session::get('user_id');
 		$like = Like::where('rating_id', $rating_id)->having('user_id', '=', $user_id)->first();
 	    if($like) {
  			$like->delete();
+ 			
+ 			//update like_count on rating
+ 			$like_rating = Rating::where('id', $rating_id)->first();
+			$like_rating->like_count = $like_rating->like_count - 1;
+			$like_rating->save();
+	 		
 	 		$error_code = ApiResponse::OK;
 	 		$data = 'like deleted';
  		} else {

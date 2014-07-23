@@ -44,7 +44,7 @@ class RatingController extends ApiController {
 		$rating = new Rating;
 	    $input = $this->_getInput();
 	    
-	    $rating->user_id = Rating::getUser_id(Request::header('session'));
+	    $rating->user_id = Session::get('user_id');
 	    if(!empty($input['wine_unique_id'])) {
 	    	$rating->wine_unique_id = $input['wine_unique_id'];
 	    
@@ -67,13 +67,17 @@ class RatingController extends ApiController {
 		    // Validation and Filtering is sorely needed!!
 		    // Seriously, I'm a bad person for leaving that out.
 		    $check = Rating::check_validator(Input::all());
-		    if($check == 'FALSE') {
+		    if($check != 'FALSE') {
+
+		    	$rating->save();
+				$error_code = ApiResponse::OK;
+				$data = $rating->toArray();	 
+
+		    } else {
+				
 		    	$error_code = ApiResponse::UNAVAILABLE_RATING;
 		        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING);
-		    } else {
-				$rating->save();
-				$error_code = ApiResponse::OK;
-				$data = $rating->toArray();	    
+
 			}
 	    } else {
 	    	$error_code = ApiResponse::MISSING_PARAMS;
@@ -149,22 +153,26 @@ class RatingController extends ApiController {
 			    }
 			    
 			    $check = Rating::check_validator(Input::all());
-			    if($check == 'FALSE') {
-			    	$error_code = ApiResponse::UNAVAILABLE_RATING;
-			        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING);
-			    } else {
+			    if($check != 'FALSE') {
+			    	
 			    	$rating->user_id = $check['user_id'];
 					$rating->save();
 					$error_code = ApiResponse::OK;
-					$data = $rating->toArray();	    
+					$data = $rating->toArray();	   
+
+			    } else {
+			    	
+					$error_code = ApiResponse::UNAVAILABLE_RATING;
+			        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING); 
+				
 				}
 		    } else {
 		    	$error_code = ApiResponse::MISSING_PARAMS;
 		        $data = $input;
 		    }
 		} else {
-			$error_code = ApiResponse::URL_NOT_EXIST;
-	        $data = ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST);
+			$error_code = ApiResponse::UNAVAILABLE_RATING;
+	        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING);
 		}
 	    return array("code" => $error_code, "data" => $data);
 	}

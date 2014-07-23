@@ -35,28 +35,15 @@ class Rating extends Eloquent {
         }
  	}
 
-    public static function getUser_id($input)
-    {
-        $sess_user = Login::where('session_id', $input)->first();
-        return $sess_user['user_id'];
-    }
-
-    public static function check_rating($input)
+    public static function check_rating($rating_id)
     {   
+        $rating = Rating::where('id', $rating_id)->first();
         
-        
-        $validator = Validator::make(
-            $input,
-            array(
-                
-                'rating_id' => 'exists:ratings,id',
-            )
-        );
-        //validate params
-        if ($validator->fails()) {
-            return "FALSE";
+        if ($rating) {
+            return $rating_id;
         } else {
-                return $input;
+            return "FALSE";
+                
         }
         
     }

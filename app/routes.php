@@ -34,7 +34,7 @@ Route::group(array('prefix' => 'api'), function()
     Route::get('like/{rating_id}', 'LikeController@index');
     Route::post('like/{rating_id}', 'LikeController@store');
     Route::put('like/{rating_id}', 'LikeController@update');
-    Route::get('like/{rating_id}', 'LikeController@show');
+    Route::get('like/{rating_id}/{id}', 'LikeController@show');
     Route::delete('like/{rating_id}', 'LikeController@destroy');
 
     Route::get('comment/{rating_id}', 'CommentController@index');

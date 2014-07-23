@@ -104,6 +104,8 @@ Route::filter('session', function()
  			$error_code = ApiResponse::SESSION_INVALID;
         	$data = ApiResponse::getErrorContent(ApiResponse::SESSION_INVALID);
  			return array("code" => $error_code, "data" => $data);
-    	} 
+    	}
+    	Session::put('user_id', $login->user_id);
     }
+
 });

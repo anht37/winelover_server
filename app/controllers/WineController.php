@@ -101,8 +101,8 @@ class WineController extends ApiController {
 		 		$error_code = ApiResponse::OK;
 	            $data = $wine;
 		 	} else {
-		 		$error_code = ApiResponse::UNAVAILABLE_WINE;
-	            $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_WINE);
+		 		$error_code = ApiResponse::UNAVAILABLE_WINERY;
+	            $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_WINERY);
 		 	}
 		} else {
 			$error_code = ApiResponse::MISSING_PARAMS;
@@ -193,16 +193,16 @@ class WineController extends ApiController {
 			 		$error_code = ApiResponse::OK;
 		            $data = $wine;
 			 	} else {
-			 		$error_code = ApiResponse::UNAVAILABLE_WINE;
-		            $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_WINE);
+			 		$error_code = ApiResponse::UNAVAILABLE_WINERY;
+		            $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_WINERY);
 			 	}
 	 		} else {
 	 		 	$error_code = ApiResponse::MISSING_PARAMS;
 		        $data = $input;
 	 		}
 	 	} else {
-	 		$error_code = ApiResponse::URL_NOT_EXIST;
-	        $data = ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST);
+	 		$error_code = ApiResponse::UNAVAILABLE_WINE;
+	        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_WINE);
 	 	}
 	    
 	    return array("code" => $error_code, "data" => $data);

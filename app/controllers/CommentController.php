@@ -14,13 +14,10 @@ class CommentController extends \BaseController {
 
 	public function index($rating_id)
 	{
-		$input = array('rating_id' => $rating_id);
-		$check_rating = Rating::check_rating($input);
-		if ($check_rating == 'FALSE') {
-	    	$error_code = ApiResponse::UNAVAILABLE_RATING;
-	        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING);
-	
-		} else {
+		
+		$check_rating = Rating::check_rating($rating_id);
+		if ($check_rating != 'FALSE') {
+
 			$comment = Comment::where('rating_id', $rating_id)->get();
 			$error_code = ApiResponse::OK;
 			if(count($comment) > 0){
@@ -28,6 +25,12 @@ class CommentController extends \BaseController {
 			} else {
 	        	$data = 'No Comment';
 			}
+
+		} else {
+			
+	    	$error_code = ApiResponse::UNAVAILABLE_RATING;
+	        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING);
+	
 		}
 	    return array("code" => $error_code, "data" => $data);
 	}
@@ -54,21 +57,27 @@ class CommentController extends \BaseController {
 		$comment = new Comment;
 	    $input = $this->_getInput();
 	    $comment->rating_id = $rating_id;
-	    $comment->user_id = Rating::getUser_id(Request::header('session'));
+	    $comment->user_id = Session::get('user_id');
 	    if(!empty($input['content'])) {
 	    	$comment->content = $input['content'];
+		    $check_rating = Rating::check_rating($comment->rating_id);
+		    if ($check_rating != 'FALSE') {
 
-	    	$rating = array('rating_id' => $rating_id);
-		    $check_rating = Rating::check_rating($rating);
-		    if ($check_rating == 'FALSE') {
-			    $error_code = ApiResponse::UNAVAILABLE_RATING;
-			    $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING);
-			
-			} else {
-				$comment->save();
+		    	$comment->save();
+
+				//update comment_count on rating
+				$comment_rating = Rating::where('id', $rating_id)->first();
+				$comment_rating->comment_count = $comment_rating->comment_count + 1;
+				$comment_rating->save();
+				
 				$error_code = ApiResponse::OK;
 				$data = $comment;
 					    
+			} else {
+				
+			    $error_code = ApiResponse::UNAVAILABLE_RATING;
+			    $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING);
+			
 			}
 	    } else {
 	    	$error_code = ApiResponse::MISSING_PARAMS;
@@ -156,6 +165,11 @@ class CommentController extends \BaseController {
  
 	    if($comment) {
  			$comment->delete();
+ 			//update comment_count on rating
+ 			$comment_rating = Rating::where('id', $rating_id)->first();
+			$comment_rating->comment_count = $comment_rating->comment_count - 1;
+			$comment_rating->save();
+
 	 		$error_code = ApiResponse::OK;
 	 		$data = 'Comment deleted';
  		} else {
