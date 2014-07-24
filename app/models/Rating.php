@@ -6,6 +6,12 @@ class Rating extends Eloquent {
     protected $table = 'ratings';
     protected $primaryKey = 'id';
 
+    public function wine()
+    {
+        return $this->belongsTo('Wine','wine_unique_id', 'wine_unique_id');
+    }
+    
+
     public static function check_validator($input)
     {	   	
         $validator = Validator::make(

@@ -1,33 +1,48 @@
 <?php
 
-class LikeController extends \BaseController {
+class LikeController extends ApiController {
 
 	/**
 	 * Display a listing of the resource.
 	 *
 	 * @return Response
 	 */
-	 public function __construct()
-    {
-        $this->beforeFilter('session');
-    }
 
-	public function index($rating_id)
+	public function index()
 	{	
-		
-		$check_rating = Rating::check_rating($rating_id);
-		if ($check_rating == 'FALSE') {
-	    	$error_code = ApiResponse::UNAVAILABLE_RATING;
-	        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING);
+		$user_id = Session::get('user_id');
+		$error_code = ApiResponse::OK;
+		$input = $this->_getInput();
+
+		if(!empty($input['rating_id'])) {
+	    	$rating_id = $input['rating_id'];
+
+	    	$check_rating = Rating::check_rating($rating_id);
+			if ($check_rating != 'FALSE') {
+		    	
+				$like = Like::where('rating_id', $rating_id)->get();
+				
+				if (count($like) > 0) {
+					$data = $like->toArray();
+				} else {	
+		        	$data = 'No Like';
+				}
+			} else {
+				$error_code = ApiResponse::UNAVAILABLE_RATING;
+		        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING);
+
+		    }
 		} else {
-			$like = Like::where('rating_id', $rating_id)->get();
-			$error_code = ApiResponse::OK;
+			$like = Like::where('user_id', $user_id)->get();
+			
 			if (count($like) > 0) {
 				$data = $like->toArray();
 			} else {	
-	        	$data = 'No Like';
+			    $data = 'No Like';
 			}
+
 		}
+		
 	    return array("code" => $error_code, "data" => $data);
 	}
 
@@ -48,37 +63,40 @@ class LikeController extends \BaseController {
 	 *
 	 * @return Response
 	 */
-	public function store($rating_id)
+	public function store()
 	{
 			$like = new Like;
-		    $like->rating_id = $rating_id;
+		   
 		    $like->user_id = Session::get('user_id');
-		    
-		    $check_rating = Rating::check_rating($like->rating_id);
-		    if ($check_rating != 'FALSE') {
+			$input = $this->_getInput();
 
-		    	if (Like::where('rating_id', $like->rating_id)->having('user_id', '=', $like->user_id)->first()) {
-					$error_code = ApiResponse::DUPLICATED_LIKE;
-				 	$data = ApiResponse::getErrorContent(ApiResponse::DUPLICATED_LIKE);
+			if(!empty($input['rating_id'])) {
+	    		$like->rating_id = $input['rating_id'];
+
+			    $check_rating = Rating::check_rating($like->rating_id);
+			    if ($check_rating != 'FALSE') {
+
+			    	if (Like::where('rating_id', $like->rating_id)->having('user_id', '=', $like->user_id)->first()) {
+						$error_code = ApiResponse::DUPLICATED_LIKE;
+					 	$data = ApiResponse::getErrorContent(ApiResponse::DUPLICATED_LIKE);
+					} else {
+						//update like_count on rating
+						$like_rating = Rating::where('id', $like->rating_id)->first();
+						$like_rating->like_count = $like_rating->like_count + 1;
+						$like_rating->save();
+						
+						$like->save();
+						$error_code = ApiResponse::OK;
+						$data = $like->toArray();
+					}		   
+
 				} else {
-					
-					//update like_count on rating
-					$like_rating = Rating::where('id', $rating_id)->first();
-					$like_rating->like_count = $like_rating->like_count + 1;
-					$like_rating->save();
-					
-					$like->save();
-					$error_code = ApiResponse::OK;
-					$data = $like->toArray();
-				}		   
-
-			} else {
-		    	 
-		    	$error_code = ApiResponse::UNAVAILABLE_RATING;
-		        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING);
-		
+			    	 
+			    	$error_code = ApiResponse::UNAVAILABLE_RATING;
+			        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING);
+			
+				}
 			}
-	
 	    return array("code" => $error_code, "data" => $data);
 	}
 
@@ -89,10 +107,10 @@ class LikeController extends \BaseController {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function show($rating_id, $id)
+	public function show($id)
 	{	
 		$user_id = Session::get('user_id');
-		$like = Like::where('rating_id', $rating_id)->having('user_id', '=', $user_id)->first();
+		$like = Like::where('id', $id)->first();
 	    if($like) {
 			$error_code = ApiResponse::OK;
 	       	$data = $like->toArray();
@@ -124,7 +142,7 @@ class LikeController extends \BaseController {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function update($rating_id)
+	public function update($id)
 	{	
 
 		// $like = Like::where('rating_id', $rating_id)->having('id', '=', $id)->first();
@@ -162,17 +180,17 @@ class LikeController extends \BaseController {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function destroy($rating_id)
+	public function destroy($id)
 	{
 		$user_id = Session::get('user_id');
-		$like = Like::where('rating_id', $rating_id)->having('user_id', '=', $user_id)->first();
+		$like = Like::where('id', $id)->first();
 	    if($like) {
- 			$like->delete();
- 			
- 			//update like_count on rating
- 			$like_rating = Rating::where('id', $rating_id)->first();
+
+	    	//update like_count on rating
+ 			$like_rating = Rating::where('id', $like->rating_id)->first();
 			$like_rating->like_count = $like_rating->like_count - 1;
 			$like_rating->save();
+ 			$like->delete();
 	 		
 	 		$error_code = ApiResponse::OK;
 	 		$data = 'like deleted';
@@ -183,22 +201,22 @@ class LikeController extends \BaseController {
 	    return array("code" => $error_code, "data" => $data);
 	}
 
-	public function display_error($rating_id, $id) {
+	// public function display_error($rating_id, $id) {
 
-        return Response::json(
-            array("code" => ApiResponse::URL_NOT_EXIST, "data" => array(
-               "message" => ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST),
-               "url"     => Request::fullUrl()
-            ))
-        );
-    }
+ //        return Response::json(
+ //            array("code" => ApiResponse::URL_NOT_EXIST, "data" => array(
+ //               "message" => ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST),
+ //               "url"     => Request::fullUrl()
+ //            ))
+ //        );
+ //    }
 
-    protected function _getInput() {
-        $input = json_decode(Input::get("data"), true);
-        if($input == null) {
-            $input = array();
-        }
-        return $input;
-    }
+ //    protected function _getInput() {
+ //        $input = json_decode(Input::get("data"), true);
+ //        if($input == null) {
+ //            $input = array();
+ //        }
+ //        return $input;
+ //    }
 
 }

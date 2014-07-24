@@ -9,11 +9,6 @@ class WineryController extends ApiController {
 	 */
 
 
-	public function __construct()
-    {
-        $this->beforeFilter('session');
-    }
-
 	public function index()
 	{
 		$winery = Winery::all();
@@ -87,8 +82,8 @@ class WineryController extends ApiController {
 			$error_code = ApiResponse::OK;
        	 	$data = $winery->toArray();
 		} else {
-			$error_code = ApiResponse::URL_NOT_EXIST;
-	        $data = ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST);
+			$error_code = ApiResponse::UNAVAILABLE_WINERY;
+	        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_WINERY);
 		}
  		
 	    return array("code" => $error_code, "data" => $data);
@@ -139,8 +134,8 @@ class WineryController extends ApiController {
 		        $data = $input;
 		    }
 	   	} else {
-	   		$error_code = ApiResponse::URL_NOT_EXIST;
-	        $data = ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST);
+	   		$error_code = ApiResponse::UNAVAILABLE_WINERY;
+	        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_WINERY);
 	   	}
 	    return array("code" => $error_code, "data" => $data);
 	    
@@ -162,8 +157,8 @@ class WineryController extends ApiController {
 	 		$error_code = ApiResponse::OK;
 	 		$data = 'Winery deleted';
  		} else {
- 			$error_code = ApiResponse::URL_NOT_EXIST;
-	        $data = ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST);
+ 			$error_code = ApiResponse::UNAVAILABLE_WINERY;
+	        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_WINERY);
 	    } 
 	    return array("code" => $error_code, "data" => $data);
 	}

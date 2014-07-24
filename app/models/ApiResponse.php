@@ -29,6 +29,11 @@ class ApiResponse {
     const EXISTED_EMAIL = "113";
     const URL_NOT_EXIST = "114";
     const UNAVAILABLE_WINERY = "115";
+    const UNAVAILABLE_COMMENT = "116";
+    const DUPLICATED_FOLLOW = "117";
+    const NOT_EXISTED_FOLLOW = "118";
+
+
     private static $ERROR_LIST = array(
         "000" => "ok",
         "100" => "Server is Maintaining",
@@ -46,7 +51,10 @@ class ApiResponse {
         "112" => "Remove Nonexistent Wine WishList",
         "113" => "Email Existed",
         "114" => "URL not exist",
-        "115" => "Winery is not available"
+        "115" => "Winery is not available",
+        "116" => "Comment is not available",
+        "117" => "Already Follow",
+        "118" => "Follow not exist",
     );
 
     public static function createResponse($response) {

@@ -8,11 +8,6 @@ class WineController extends ApiController {
 	 * @return Response
 	 */
 
-	public function __construct()
-    {
-        $this->beforeFilter('session');
-    }
-
 	public function index()
 	{
 		if(Input::get('page')) {

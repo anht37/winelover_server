@@ -7,14 +7,11 @@ class RatingController extends ApiController {
 	 *
 	 * @return Response
 	 */
-	public function __construct()
-    {
-        $this->beforeFilter('session');
-    }
 
 	public function index() 
 	{
-		$rating = Rating::all();
+		$user_id = Session::get('user_id');
+		$rating = Rating::where('user_id', $user_id)->get();
 		
 		$error_code = ApiResponse::OK;
         $data = $rating->toArray();
