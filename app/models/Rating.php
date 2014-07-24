@@ -10,7 +10,10 @@ class Rating extends Eloquent {
     {
         return $this->belongsTo('Wine','wine_unique_id', 'wine_unique_id');
     }
-    
+    public function profile()
+    {
+        return $this->belongsTo('Profile','user_id', 'user_id');
+    }
 
     public static function check_validator($input)
     {	   	
