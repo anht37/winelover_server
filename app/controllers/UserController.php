@@ -100,5 +100,10 @@ class UserController extends ApiController {
         $result = User::forgot_password($this->_getInput());
         return Response::json($result);
     }
+    public function timeline() {
+    	$user_id = Session::get('user_id');
+    	$result = Rating::timeline($user_id);
+        return Response::json($result);
+    }
 
 }

@@ -37,7 +37,8 @@ Route::group(array('prefix' => 'api'), function()
         Route::resource('like', 'LikeController');
         Route::resource('comment', 'CommentController');
         Route::resource('follow', 'FollowController');
-        Route::resource('timeline', 'TimelineController');
+        Route::resource('profile/basic/', 'ProfileController');
+        Route::get('timeline', 'UserController@timeline');
 
     });
     

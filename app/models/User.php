@@ -98,6 +98,12 @@ class User extends Eloquent
         }
 
         if($error_code == ApiResponse::OK) {
+            $profile = Profile::where('user_id', $user->user_id)->first();
+            if(empty($profile)) {
+                $profile = new Profile;
+                $profile->user_id = $user->user_id;
+                $profile->save();
+            }
             $login = new Login();
             $login->user_id = $user->user_id;
             $login->session_id = md5($user->user_id.microtime());
