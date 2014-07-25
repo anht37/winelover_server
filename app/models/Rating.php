@@ -56,5 +56,33 @@ class Rating extends Eloquent {
         }
         
     }
+    public static function timeline($user_id) {
+        $error_code = ApiResponse::OK;
+        $rating_user = Rating::where('user_id', $user_id)->with('profile')->with('wine')->get();
+
+        $user_follow = Follow::where('from_id', $user_id)->orderBy('updated_at', 'asc')->get();
+        $timeline = array();
+        foreach($user_follow as $user) {
+            $profiles = Profile::where('user_id', $user->to_id)->with('rating')->first();
+            if($profiles){
+                foreach ($profiles->rating as $rating) {
+
+                    $rating_wine = Wine::where('wine_unique_id', $rating->wine_unique_id)->first();
+                    $rating->wine_unique_id = $rating_wine;
+                }
+                $timeline[] = $profiles;
+            }
+        }
+        $data = array('user_timeline' => $rating_user, 'user_follow_rating' => $timeline);
+        // $paginator = $timeline;
+     //    $perPage = Input::get('per_Page', 15);   
+     //    $page = Input::get('page', 1);
+     //    if ($page > count($paginator) or $page < 1) { $page = 1; }
+     //    $offset = ($page * $perPage) - $perPage;
+     //    $articles = array_slice($paginator,$offset,$perPage);
+     //    $datas = Paginator::make($articles, count($paginator), $perPage);
+
+        return array("code" => $error_code, "data" => $data);
+    }
 
 }
