@@ -75,9 +75,13 @@ class CommentController extends ApiController {
 		    $check_rating = Rating::check_rating($comment->rating_id);
 		    if ($check_rating != 'FALSE') {
 		    	//update comment_count on rating
-				$comment_rating = Rating::where('id', $like->rating_id)->first();
+				$comment_rating = Rating::where('id', $comment->rating_id)->first();
 				$comment_rating->comment_count = $comment_rating->comment_count + 1;
 				$comment_rating->save();
+
+				$comment_profile = Profile::where('user_id', $comment->user_id)->first();
+				$comment_profile->comment_count = $comment_profile->comment_count + 1;
+				$comment_profile->save();
 
 		    	$comment->save();
 				
@@ -184,6 +188,9 @@ class CommentController extends ApiController {
 		$comment = Comment::where('id', '=', $id)->first();
  
 	    if($comment) {
+	    	$comment_profile = Profile::where('user_id', $comment->user_id)->first();
+			$comment_profile->comment_count = $comment_profile->comment_count - 1;
+			$comment_profile->save();
 
 	    	//update comment_count on rating
  			$comment_rating = Rating::where('id', $rating_id)->first();

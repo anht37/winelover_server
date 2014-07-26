@@ -59,21 +59,30 @@ class Rating extends Eloquent {
     public static function timeline($user_id) {
         $error_code = ApiResponse::OK;
         $rating_user = Rating::where('user_id', $user_id)->with('profile')->with('wine')->get();
-
         $user_follow = Follow::where('from_id', $user_id)->orderBy('updated_at', 'asc')->get();
         $timeline = array();
-        foreach($user_follow as $user) {
-            $profiles = Profile::where('user_id', $user->to_id)->with('rating')->first();
-            if($profiles){
-                foreach ($profiles->rating as $rating) {
+        if($user_follow) {
+            foreach($user_follow as $user) {
+                $profiles = Profile::where('user_id', $user->to_id)->with('rating')->first();
+                if($profiles){
+                    foreach ($profiles->rating as $rating) {
 
-                    $rating_wine = Wine::where('wine_unique_id', $rating->wine_unique_id)->first();
-                    $rating->wine_unique_id = $rating_wine;
+                        $rating_wine = Wine::where('wine_unique_id', $rating->wine_unique_id)->first();
+                        $rating->wine_unique_id = $rating_wine;
+                    }
+                    $timeline[] = $profiles;
                 }
-                $timeline[] = $profiles;
             }
+
+        } else {
+            $timeline = "Don't have any user is followed",
         }
-        $data = array('user_timeline' => $rating_user, 'user_follow_rating' => $timeline);
+        if ($rating_user) {
+            $data = array('user_timeline' => $rating_user, 'user_follow_rating' => $timeline);
+        } else {
+            $data = array('user_timeline' => "Don't have any rate", 'user_follow_rating' => $timeline);
+        }
+        
         // $paginator = $timeline;
      //    $perPage = Input::get('per_Page', 15);   
      //    $page = Input::get('page', 1);

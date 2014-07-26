@@ -66,6 +66,10 @@ class RatingController extends ApiController {
 		    $check = Rating::check_validator(Input::all());
 		    if($check != 'FALSE') {
 
+		    	$rating_profile = Profile::where('user_id',$rating->user_id)->first();
+		    	$rating_profile->rate_count = $rating_profile->rate_count + 1;
+		    	$rating_profile->save(); 
+
 		    	$rating->save();
 				$error_code = ApiResponse::OK;
 				$data = $rating->toArray();	 
@@ -185,6 +189,10 @@ class RatingController extends ApiController {
 	{
 		$rating = Rating::where('id', $id)->first();
  		if($rating) {
+ 			$rating_profile = Profile::where('user_id',$rating->user_id)->first();
+		    $rating_profile->rate_count = $rating_profile->rate_count - 1;
+		    $rating_profile->save(); 
+
  			$rating->delete();
 	 		$error_code = ApiResponse::OK;
 	 		$data = 'Rating Deleted';

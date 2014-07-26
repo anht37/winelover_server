@@ -43,12 +43,20 @@ class FollowController extends ApiController {
 	    	$follow->to_id = $input['follow_id'];
 	    	$user = User::where('user_id', $follow->to_id)->first(); 
 		 	if ($user) {
+
 		 		if(Follow::where('from_id',$follow->from_id)->having('to_id', '=', $follow->to_id)->first()) {
 		 			
 		 			$error_code = ApiResponse::DUPLICATED_FOLLOW;
 	        		$data = ApiResponse::getErrorContent(ApiResponse::DUPLICATED_FOLLOW);
 		 		} else {
 
+		 			$following_profile = Profile::where('user_id', $follow->from_id)->first();
+					$following_profile->following_count = $following_profile->following_count + 1;
+					$follower_profile = Profile::where('user_id', $follow->to_id)->first();
+					$follower_profile->follower_count = $follower_profile->follower_count + 1;
+					
+					$following_profile->save();
+					$follower_profile->save();
 			 		$follow->save();
 
 				    $error_code = ApiResponse::OK;
@@ -124,6 +132,14 @@ class FollowController extends ApiController {
 		$follow = Follow::where('to_id', $id)->having('from_id', '=' , $from_id)->first();
 
 	    if($follow) {
+	    	$following_profile = Profile::where('user_id', $follow->from_id)->first();
+			$following_profile->following_count = $following_profile->following_count - 1;
+			$follower_profile = Profile::where('user_id', $follow->to_id)->first();
+			$follower_profile->follower_count = $follower_profile->follower_count - 1;
+					
+			$following_profile->save();
+			$follower_profile->save();
+
  			$follow->delete();
 	 		$error_code = ApiResponse::OK;
 	 		$data = 'Follow deleted';

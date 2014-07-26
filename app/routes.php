@@ -37,7 +37,11 @@ Route::group(array('prefix' => 'api'), function()
         Route::resource('like', 'LikeController');
         Route::resource('comment', 'CommentController');
         Route::resource('follow', 'FollowController');
+        Route::resource('wishlist', 'WishlistController');
         Route::resource('profile/basic/', 'ProfileController');
+        Route::get('profile/basic/{user_id}', 'ProfileController@getProfile_basic_user');
+        Route::get('profile/wishlist/{user_id}', 'ProfileController@getProfile_wishlist_user');
+        
         Route::get('timeline', 'UserController@timeline');
 
     });

@@ -12,9 +12,5 @@ class Profile extends Eloquent {
     {
         return $this->hasMany('Rating','user_id', 'user_id');
     }
-    public function wine($input)
-    {
-    	$rating = Rating::where('id', $input)->first();
-        return $rating->belongsTo('Wine','wine_unique_id', 'wine_unique_id');
-    }
+    
 }

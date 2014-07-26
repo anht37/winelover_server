@@ -1,11 +1,10 @@
 <?php
 use Illuminate\Database\Eloquent\SoftDeletingTrait;
  
-class Follow extends Eloquent {
+class Wishlist extends Eloquent {
 
 	use SoftDeletingTrait;
  
-    protected $table = 'follows';
+    protected $table = 'wishlists';
     protected $primaryKey = 'id';
-
 }
