@@ -202,45 +202,77 @@ class ProfileController extends ApiController {
 	public function getProfile_basic_user($user_id)
 	{
 		$error_code = ApiResponse::OK;
-	
-		if(User::where('user_id',$user_id)->first()){
-			$profile = Profile::where('user_id', $user_id)->first();
-			if($profile) {
-				$data = $profile;
-			} else { 
+		if($user_id) {
+			if(User::where('user_id',$user_id)->first()){
+				$profile = Profile::where('user_id', $user_id)->first();
+				if($profile) {
+					$data = $profile;
+				} else { 
+					$error_code = ApiResponse::UNAVAILABLE_USER;
+			        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_USER);
+				}
+			} else {
 				$error_code = ApiResponse::UNAVAILABLE_USER;
-		        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_USER);
+			    $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_USER);
 			}
 		} else {
-			$error_code = ApiResponse::UNAVAILABLE_USER;
-		    $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_USER);
+			$error_code = ApiResponse::MISSING_PARAMS;
+	        $data = "Missing user_id";
 		}
-
 		return array("code" => $error_code, "data" => $data);
 	}
 
 	public function getProfile_wishlist_user($user_id)
 	{
 		$error_code = ApiResponse::OK;
-		
-		if(User::where('user_id',$user_id)->first()){
-			$profile = Profile::where('user_id', $user_id)->first();
-			if($profile) {
-				$wishlist = Wishlist::where('user_id', $user_id)->get();
-				if (count($wishlist) > 0) {
-					$data = $wishlist->toArray();
-				} else {	
-				    $data = 'No Wine in wishlist';
+		if($user_id) {
+			if(User::where('user_id',$user_id)->first()){
+				$profile = Profile::where('user_id', $user_id)->first();
+				if($profile) {
+					$wishlist = Wishlist::where('user_id', $user_id)->get();
+					if (count($wishlist) > 0) {
+						$data = $wishlist->toArray();
+					} else {	
+					    $data = 'No Wine in wishlist';
+					}
+				} else { 
+					$error_code = ApiResponse::UNAVAILABLE_USER;
+			        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_USER);
 				}
-			} else { 
+			} else {
+				$error_code = ApiResponse::UNAVAILABLE_USER;
+			    $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_USER);
+			}
+		} else {
+			$error_code = ApiResponse::MISSING_PARAMS;
+	        $data = "Missing user_id";
+		}
+
+		return array("code" => $error_code, "data" => $data);
+	}
+
+	public function getProfile_Top_rate($user_id, $per_page)
+	{	
+		$error_code = ApiResponse::OK;
+		$page = 1;
+		if($user_id && $per_page) {
+			if(User::where('user_id',$user_id)->first()) {
+				$check_paginate = Wine::paginate($page, $per_page);
+				if ($check_paginate != 'FALSE') {
+					$top_rate = Rating::where('user_id',$user_id)->orderBy('rate', 'desc')->forPage($page, $per_page)->get();
+					$data = $top_rate;
+				} else {
+					$error_code = ApiResponse::URL_NOT_EXIST;
+		       		$data = ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST);
+				}
+			} else {
 				$error_code = ApiResponse::UNAVAILABLE_USER;
 		        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_USER);
 			}
 		} else {
-			$error_code = ApiResponse::UNAVAILABLE_USER;
-		    $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_USER);
+			$error_code = ApiResponse::MISSING_PARAMS;
+	        $data = "Missing user_id or per_page";
 		}
-
 		return array("code" => $error_code, "data" => $data);
 	}
 

@@ -18,13 +18,14 @@ class WineController extends ApiController {
 				$getLimit = 10;		
 			}
 			$paginate = Wine::paginate($getPage, $getLimit);
-			if($paginate == 'FALSE') {
+			if($paginate != 'FALSE') {
+				$page = $paginate['page'];
+				$limit = $paginate['limit'];
+				
+			} else {
 				$error_code = ApiResponse::URL_NOT_EXIST;
 		       	$data = ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST);
 		     	return array("code" => $error_code, "data" => $data);
-			} else {
-				$page = $paginate['page'];
-				$limit = $paginate['limit'];
 			}
 
 		} else {
