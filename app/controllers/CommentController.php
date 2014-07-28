@@ -68,7 +68,7 @@ class CommentController extends ApiController {
 	    $input = $this->_getInput();
 	    $comment->user_id = Session::get('user_id');
 
-	    if(!empty($input['content'] && !empty($input['rating_id'])) {
+	    if(!empty($input['content']) && !empty($input['rating_id'])) {
 	    	$comment->content = $input['content'];
 	    	$comment->rating_id = $input['rating_id'];
 
@@ -189,11 +189,14 @@ class CommentController extends ApiController {
  
 	    if($comment) {
 	    	$comment_profile = Profile::where('user_id', $comment->user_id)->first();
-			$comment_profile->comment_count = $comment_profile->comment_count - 1;
-			$comment_profile->save();
+            //TODO : Fix all check object not null before execute
+            if($comment_profile != null) {
+                $comment_profile->comment_count = $comment_profile->comment_count - 1;
+                $comment_profile->save();
+            }
 
 	    	//update comment_count on rating
- 			$comment_rating = Rating::where('id', $rating_id)->first();
+ 			$comment_rating = Rating::where('id', $comment->rating_id)->first();
 			$comment_rating->comment_count = $comment_rating->comment_count - 1;
 			$comment_rating->save();
  			$comment->delete();

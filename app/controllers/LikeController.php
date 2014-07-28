@@ -18,7 +18,8 @@ class LikeController extends ApiController {
 	    	$rating_id = $input['rating_id'];
 
 	    	$check_rating = Rating::check_rating($rating_id);
-			if ($check_rating != 'FALSE') {
+            //TODO: check false value by double =
+			if ($check_rating !== false) {
 		    	
 				$like = Like::where('rating_id', $rating_id)->get();
 				

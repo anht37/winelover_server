@@ -9,6 +9,7 @@ class FollowController extends ApiController {
 	 */
 	public function index()
 	{
+        //TODO: GET all following user of current user
 		$follow = Follow::all();
 		
 		$error_code = ApiResponse::OK;
