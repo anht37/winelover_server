@@ -17,6 +17,7 @@ class Rating extends Eloquent {
 
     public static function check_validator($input)
     {	   	
+
         $validator = Validator::make(
             $input,
             array(
@@ -32,6 +33,7 @@ class Rating extends Eloquent {
             return "FALSE";
         } else {
         	if($input['rate']) {
+
 	    		if(($input['rate']*10)%5==0) {
 			    	return $input;
 	    		} else {
@@ -59,9 +61,16 @@ class Rating extends Eloquent {
     public static function timeline($user_id) {
         $error_code = ApiResponse::OK;
         $rating_user = Rating::where('user_id', $user_id)->with('profile')->with('wine')->get();
+        if (isset($rating_user)) {
+            $user_rating = $rating_user;
+        } else {
+            $user_rating = "Don't have any rating";
+        }
+
         $user_follow = Follow::where('from_id', $user_id)->orderBy('updated_at', 'asc')->get();
-        $timeline = array();
-        if($user_follow) {
+        
+        if(isset($user_follow)) {
+            $timeline = array();
             foreach($user_follow as $user) {
                 $profiles = Profile::where('user_id', $user->to_id)->with('rating')->first();
                 if($profiles){
@@ -72,16 +81,12 @@ class Rating extends Eloquent {
                     }
                     $timeline[] = $profiles;
                 }
-            }
-
+            } 
         } else {
-            $timeline = "Don't have any user is followed",
+            $timeline = "Don't have any user is followed";
         }
-        if ($rating_user) {
-            $data = array('user_timeline' => $rating_user, 'user_follow_rating' => $timeline);
-        } else {
-            $data = array('user_timeline' => "Don't have any rate", 'user_follow_rating' => $timeline);
-        }
+        
+        $data = array('user_timeline' => $user_rating, 'user_follow_rating' => $timeline);
         
         // $paginator = $timeline;
      //    $perPage = Input::get('per_Page', 15);   

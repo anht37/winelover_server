@@ -17,6 +17,8 @@ class DatabaseSeeder extends Seeder {
 		$this->call('RatingTableSeeder');
 		$this->call('LikeTableSeeder');
 		$this->call('CommentTableSeeder');
+		$this->call('FollowTableSeeder');
+		$this->call('ProfileTableSeeder');
 
 	}
 
