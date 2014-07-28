@@ -65,7 +65,7 @@ class WineTableSeeder extends Seeder {
         //     'average_rate' => '4.5',
         //     'wine_type' => '1',
         // ));
-        for ($i = 1; $i < 101; $i ++) {
+        for ($i = 1; $i < 11; $i ++) {
         Wine::create(array(
             'wine_id' => "$i",
             'name' => "Wine_$i",

@@ -9,10 +9,10 @@
 class RatingTableSeeder extends Seeder {
     public function run() {
         DB::table('ratings')->delete();
-
+        $user_id = User::where('email','testacc@gmail.com')->first()->user_id;
         Rating::create(array(
             'id' => '2',
-            'user_id' => '1719d374-5017-4d67-9e4c-e2ee6ff743e4',
+            'user_id' => $user_id,
             'wine_unique_id' => '2_2009',
             'rate' => '1.5',
             'like_count' => '5',
@@ -22,7 +22,7 @@ class RatingTableSeeder extends Seeder {
 
         Rating::create(array(
             'id' => '3',
-            'user_id' => '1719d374-5017-4d67-9e4c-e2ee6ff743e4',
+            'user_id' => $user_id,
             'wine_unique_id' => '3_2009',
             'rate' => '4.5',
             'like_count' => '8',

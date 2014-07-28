@@ -9,10 +9,10 @@
 class ProfileTableSeeder extends Seeder {
     public function run() {
         DB::table('profiles')->delete();
-
+        $user_id = User::where('email',"testacc@gmail.com")->first()->user_id;
         Profile::create(array(
             'id' => '1',
-            'user_id' => '1719d374-5017-4d67-9e4c-e2ee6ff743e4',
+            'user_id' => $user_id,
             'follower_count' => '3',
             'following_count' => '5',
             'rate_count' => '5',

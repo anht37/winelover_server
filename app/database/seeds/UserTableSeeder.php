@@ -9,12 +9,20 @@
 class UserTableSeeder extends Seeder {
     public function run() {
         DB::table('users')->delete();
+        
+        User::create(array(
+        	'id'=> 1,
+            'email' => "testacc@gmail.com",
+            'password' => '123456'
+
+        ));
         for ($i = 1; $i < 10; $i ++) {
             User::create(array(
                 'email' => "test_$i@gmail.com",
-                'password' => Hash::make('123456')
+                'password' => '123456'
             ));
         }
+        
 
     }
 } 
