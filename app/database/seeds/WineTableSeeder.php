@@ -71,7 +71,7 @@ class WineTableSeeder extends Seeder {
             'name' => "Wine_$i",
             'year' => '2009',
             'winery_id' => '5',
-            'image_url' => 'wines5.png',
+            'image_url' => 'wines/'.$i.'.png',
             'wine_unique_id' => $i . "_2009",
             'average_price' => '2200',
             'average_rate' => '4.5',

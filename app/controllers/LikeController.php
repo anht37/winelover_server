@@ -18,7 +18,7 @@ class LikeController extends ApiController {
 	    	$rating_id = $input['rating_id'];
 
 	    	$check_rating = Rating::check_rating($rating_id);
-            //TODO: check false value by double =
+            
 			if ($check_rating !== false) {
 		    	
 				$like = Like::where('rating_id', $rating_id)->get();
@@ -75,7 +75,7 @@ class LikeController extends ApiController {
 	    		$like->rating_id = $input['rating_id'];
 
 			    $check_rating = Rating::check_rating($like->rating_id);
-			    if ($check_rating != 'FALSE') {
+			    if ($check_rating !== false) {
 
 			    	if (Like::where('rating_id', $like->rating_id)->having('user_id', '=', $like->user_id)->first()) {
 						$error_code = ApiResponse::DUPLICATED_LIKE;
@@ -83,9 +83,11 @@ class LikeController extends ApiController {
 					} else {
 						//update like_count on rating
 						$like_rating = Rating::where('id', $like->rating_id)->first();
-						$like_rating->like_count = $like_rating->like_count + 1;
-						$like_rating->save();
-						
+						if($like_rating != null) {
+
+							$like_rating->like_count = $like_rating->like_count + 1;
+							$like_rating->save();
+						}						
 						$like->save();
 						$error_code = ApiResponse::OK;
 						$data = $like->toArray();
@@ -189,8 +191,10 @@ class LikeController extends ApiController {
 
 	    	//update like_count on rating
  			$like_rating = Rating::where('id', $like->rating_id)->first();
-			$like_rating->like_count = $like_rating->like_count - 1;
-			$like_rating->save();
+			if($like_rating != null) {
+				$like_rating->like_count = $like_rating->like_count - 1;
+				$like_rating->save();
+			}
  			$like->delete();
 	 		
 	 		$error_code = ApiResponse::OK;

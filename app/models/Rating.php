@@ -30,15 +30,15 @@ class Rating extends Eloquent {
         );
         //validate params
         if ($validator->fails()) {
-            return "FALSE";
+            return false;
         } else {
         	if($input['rate']) {
 
 	    		if(($input['rate']*10)%5==0) {
 			    	return $input;
 	    		} else {
-                    //TODO : Fix all "false" string to false value
-			    	return "FALSE";
+                    
+			    	return false;
 	    		}
 	    	} else {
 			    return $input;
@@ -54,8 +54,8 @@ class Rating extends Eloquent {
         if ($rating) {
             return $rating_id;
         } else {
-            //TODO : Fix all "false" string to false value
-            return "FALSE";
+            
+            return false;
                 
         }
         

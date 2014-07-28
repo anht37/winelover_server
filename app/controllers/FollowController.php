@@ -9,12 +9,14 @@ class FollowController extends ApiController {
 	 */
 	public function index()
 	{
-        //TODO: GET all following user of current user
-		$follow = Follow::all();
-		
-		$error_code = ApiResponse::OK;
-        $data = $follow->toArray();
-	    
+        $user_id = Session::get('user_id');
+        $error_code = ApiResponse::OK;
+		$follow = Follow::where('from_id', $user_id)->get();
+		if($follow) {
+			$data = $follow->toArray();
+		} else {
+			$data = "Don't have any user is followed !"
+		} 
 	    return array("code" => $error_code, "data" => $data);
 	}
 
@@ -52,12 +54,15 @@ class FollowController extends ApiController {
 		 		} else {
 
 		 			$following_profile = Profile::where('user_id', $follow->from_id)->first();
-					$following_profile->following_count = $following_profile->following_count + 1;
+					if($following_profile != null) {
+						$following_profile->following_count = $following_profile->following_count + 1;
+						$following_profile->save();
+					}
 					$follower_profile = Profile::where('user_id', $follow->to_id)->first();
-					$follower_profile->follower_count = $follower_profile->follower_count + 1;
-					
-					$following_profile->save();
-					$follower_profile->save();
+					if($follower_profile) {
+						$follower_profile->follower_count = $follower_profile->follower_count + 1;
+						$follower_profile->save();
+					}
 			 		$follow->save();
 
 				    $error_code = ApiResponse::OK;
@@ -134,12 +139,15 @@ class FollowController extends ApiController {
 
 	    if($follow) {
 	    	$following_profile = Profile::where('user_id', $follow->from_id)->first();
-			$following_profile->following_count = $following_profile->following_count - 1;
+			if($following_profile != null) {
+				$following_profile->following_count = $following_profile->following_count + 1;
+				$following_profile->save();
+			}
 			$follower_profile = Profile::where('user_id', $follow->to_id)->first();
-			$follower_profile->follower_count = $follower_profile->follower_count - 1;
-					
-			$following_profile->save();
-			$follower_profile->save();
+			if($follower_profile) {
+				$follower_profile->follower_count = $follower_profile->follower_count + 1;
+				$follower_profile->save();
+			}
 
  			$follow->delete();
 	 		$error_code = ApiResponse::OK;

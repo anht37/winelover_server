@@ -18,7 +18,7 @@ class CommentController extends ApiController {
 	    	$rating_id = $input['rating_id'];
 
 			$check_rating = Rating::check_rating($rating_id);
-			if ($check_rating != 'FALSE') {
+			if ($check_rating !== false) {
 
 				$comment = Comment::where('rating_id', $rating_id)->get();
 				
@@ -73,15 +73,21 @@ class CommentController extends ApiController {
 	    	$comment->rating_id = $input['rating_id'];
 
 		    $check_rating = Rating::check_rating($comment->rating_id);
-		    if ($check_rating != 'FALSE') {
+		    if ($check_rating !== false) {
 		    	//update comment_count on rating
 				$comment_rating = Rating::where('id', $comment->rating_id)->first();
-				$comment_rating->comment_count = $comment_rating->comment_count + 1;
-				$comment_rating->save();
+				if($comment_rating != null) {
+					$comment_rating->comment_count = $comment_rating->comment_count + 1;
+					$comment_rating->save();
+	 				$comment->delete();
+	 			}
 
 				$comment_profile = Profile::where('user_id', $comment->user_id)->first();
-				$comment_profile->comment_count = $comment_profile->comment_count + 1;
-				$comment_profile->save();
+            
+	            if($comment_profile != null) {
+	                $comment_profile->comment_count = $comment_profile->comment_count + 1;
+	                $comment_profile->save();
+	            }
 
 		    	$comment->save();
 				
@@ -151,7 +157,7 @@ class CommentController extends ApiController {
  				if(!empty($input['rating_id'])) {
 		    		
 		    		$check_rating = Rating::check_rating($input['rating_id']);
-		    		if($check_rating != 'FALSE') {
+		    		if($check_rating !== false) {
 		    			$comment->rating_id = $input['rating_id'];
 		    		} else {
 		    			$error_code = ApiResponse::UNAVAILABLE_RATING;
@@ -189,17 +195,20 @@ class CommentController extends ApiController {
  
 	    if($comment) {
 	    	$comment_profile = Profile::where('user_id', $comment->user_id)->first();
-            //TODO : Fix all check object not null before execute
+            
             if($comment_profile != null) {
                 $comment_profile->comment_count = $comment_profile->comment_count - 1;
                 $comment_profile->save();
             }
 
 	    	//update comment_count on rating
+
  			$comment_rating = Rating::where('id', $comment->rating_id)->first();
-			$comment_rating->comment_count = $comment_rating->comment_count - 1;
-			$comment_rating->save();
- 			$comment->delete();
+			if($comment_rating != null) {
+				$comment_rating->comment_count = $comment_rating->comment_count - 1;
+				$comment_rating->save();
+ 				$comment->delete();
+ 			}
 
 	 		$error_code = ApiResponse::OK;
 	 		$data = 'Comment deleted';

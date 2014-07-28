@@ -258,7 +258,7 @@ class ProfileController extends ApiController {
 		if($user_id && $per_page) {
 			if(User::where('user_id',$user_id)->first()) {
 				$check_paginate = Wine::paginate($page, $per_page);
-				if ($check_paginate != 'FALSE') {
+				if ($check_paginate !== false) {
 					$top_rate = Rating::where('user_id',$user_id)->orderBy('rate', 'desc')->forPage($page, $per_page)->get();
 					$data = $top_rate;
 				} else {

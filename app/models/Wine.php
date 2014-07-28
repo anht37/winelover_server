@@ -33,7 +33,7 @@ class Wine extends Eloquent {
         $validator = Validator::make($paginate, $rules);
 
         if($validator->fails()) {
-            return 'FALSE';
+            return false;
         } else {
             return $paginate;
         }

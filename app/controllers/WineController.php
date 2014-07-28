@@ -18,7 +18,7 @@ class WineController extends ApiController {
 				$getLimit = 10;		
 			}
 			$paginate = Wine::paginate($getPage, $getLimit);
-			if($paginate != 'FALSE') {
+			if($paginate !== false) {
 				$page = $paginate['page'];
 				$limit = $paginate['limit'];
 				

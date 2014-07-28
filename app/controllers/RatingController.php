@@ -64,7 +64,7 @@ class RatingController extends ApiController {
 		    // Validation and Filtering is sorely needed!!
 		    // Seriously, I'm a bad person for leaving that out.
 		    $check = Rating::check_validator($input);
-		    if($check != 'FALSE') {
+		    if($check !== false) {
 
 		    	$rating_profile = Profile::where('user_id',$rating->user_id)->first();
 		    	$rating_profile->rate_count = $rating_profile->rate_count + 1;
