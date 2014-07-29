@@ -12,10 +12,12 @@ class RatingController extends ApiController {
 	{
 		$user_id = Session::get('user_id');
 		$rating = Rating::where('user_id', $user_id)->get();
-		
 		$error_code = ApiResponse::OK;
-        $data = $rating->toArray();
-	    
+		if(count($rating) > 0 ) {
+        	$data = $rating->toArray();
+		} else {
+			$data = "Don't have any rating !";
+		}
 	    return array("code" => $error_code, "data" => $data);
 	}
 

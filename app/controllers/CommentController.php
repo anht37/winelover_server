@@ -1,6 +1,6 @@
 <?php
 
-class CommentController extends ApiController {
+class CommentController extends \BaseController {
 
 	/**
 	 * Display a listing of the resource.
@@ -8,39 +8,23 @@ class CommentController extends ApiController {
 	 * @return Response
 	 */
 
-	public function index()
+	public function index($rating_id)
 	{
 		$user_id = Session::get('user_id');
 		$error_code = ApiResponse::OK;
-		$input = $this->_getInput();
+		$check_rating = Rating::check_rating($rating_id);
+		if ($check_rating !== false) {
 
-		if(!empty($input['rating_id'])) {
-	    	$rating_id = $input['rating_id'];
-
-			$check_rating = Rating::check_rating($rating_id);
-			if ($check_rating !== false) {
-
-				$comment = Comment::where('rating_id', $rating_id)->get();
-				
-				if(count($comment) > 0){
-					$data = $comment->toArray();
-				} else {
-		        	$data = 'No Comment';
-				}
-
-			} else {
-				
-		    	$error_code = ApiResponse::UNAVAILABLE_RATING;
-		        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING);
-			}
-		} else {
-			$comment = Comment::where('user_id', $user_id)->get();
-			
-			if(count($comment) > 0){
-				$data = $comment->toArray();
-			} else {
+		 	$comment = Comment::where('user_id',$user_id)->where('rating_id', $rating_id)->get();
+		 	if(count($comment) > 0){
+		 		$data = $comment->toArray();
+		 	} else {
 		        $data = 'No Comment';
-			}
+		 	}
+
+		} else {
+		    $error_code = ApiResponse::UNAVAILABLE_RATING;
+		    $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING);
 		}
 	    return array("code" => $error_code, "data" => $data);
 	}
@@ -62,16 +46,15 @@ class CommentController extends ApiController {
 	 *
 	 * @return Response
 	 */
-	public function store()
+	public function store($rating_id)
 	{
 		$comment = new Comment;
 	    $input = $this->_getInput();
 	    $comment->user_id = Session::get('user_id');
 
-	    if(!empty($input['content']) && !empty($input['rating_id'])) {
+	    if(!empty($input['content'])) {
 	    	$comment->content = $input['content'];
-	    	$comment->rating_id = $input['rating_id'];
-
+	    	$comment->rating_id = $rating_id;
 		    $check_rating = Rating::check_rating($comment->rating_id);
 		    if ($check_rating !== false) {
 		    	//update comment_count on rating
@@ -100,7 +83,7 @@ class CommentController extends ApiController {
 			}
 	    } else {
 	    	$error_code = ApiResponse::MISSING_PARAMS;
-		    $data = $input;
+		    $data = "Missing content";
 	    }
 	    
 	    return array("code" => $error_code, "data" => $data);
@@ -113,7 +96,7 @@ class CommentController extends ApiController {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function show($id)
+	public function show($rating_id, $id)
 	{
 		
 		$comment = Comment::where('id', $id)->first();
@@ -148,23 +131,12 @@ class CommentController extends ApiController {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function update($id)
+	public function update($rating_id, $id)
 	{
 	    $comment = Comment::where('id', $id)->first();
 	    $input = $this->_getInput();
  		if($comment) {
  			if(!empty($input)) {
- 				if(!empty($input['rating_id'])) {
-		    		
-		    		$check_rating = Rating::check_rating($input['rating_id']);
-		    		if($check_rating !== false) {
-		    			$comment->rating_id = $input['rating_id'];
-		    		} else {
-		    			$error_code = ApiResponse::UNAVAILABLE_RATING;
-			    		$data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING);
-			    		return array("code" => $error_code, "data" => $data);
-		    		}
-		    	}
 			    if(!empty($input['content'])) {
 		    		$comment->content = $input['content'];
 		    	}
@@ -189,7 +161,7 @@ class CommentController extends ApiController {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function destroy($id)
+	public function destroy($rating_id, $id)
 	{
 		$comment = Comment::where('id', '=', $id)->first();
  
@@ -218,4 +190,22 @@ class CommentController extends ApiController {
 	    } 
 	    return array("code" => $error_code, "data" => $data);
 	}
+
+	public function display_error($id) {
+
+        return Response::json(
+            array("code" => ApiResponse::URL_NOT_EXIST, "data" => array(
+               "message" => ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST),
+               "url"     => Request::fullUrl()
+            ))
+        );
+    }
+
+    protected function _getInput() {
+        $input = json_decode(Input::get("data"), true);
+        if($input == null) {
+            $input = array();
+        }
+        return $input;
+    }
 }

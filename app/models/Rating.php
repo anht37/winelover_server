@@ -49,56 +49,62 @@ class Rating extends Eloquent {
 
     public static function check_rating($rating_id)
     {   
+        
         $rating = Rating::where('id', $rating_id)->first();
         
         if ($rating) {
             return $rating_id;
         } else {
-            
             return false;
-                
         }
         
     }
-    public static function timeline($user_id) {
-        $rating_userlogin = Rating::where('user_id', $user_id)->with('profile')->with('wine')->get();
-        $timeline = array();
-        if (isset($rating_userlogin)) {
-            foreach ($rating_userlogin as $rating) {
-                $winery = Winery::where('id', $rating->wine->winery_id)->first();
-                $rating->wine->winery_id = $winery;
-            }
-            $timeline[] = $rating_userlogin;
-                
-        } else {
-            $timeline['user_login'] = "Don't have any rating";
-        }
-
+    public static function timeline($user_id) 
+    {
+        $error_code = ApiResponse::OK;
+        $user_timeline = array();
+        $user_timeline[] = $user_id;
         $user_follow = Follow::where('from_id', $user_id)->orderBy('updated_at', 'asc')->get();
         
         if(isset($user_follow)) {
             foreach($user_follow as $user) {
-                $rating_user = Rating::where('user_id', $user->to_id)->with('profile')->with('wine')->get();
-                if (isset($rating_user)) {
-                    foreach ($rating_user as $rating) {
-                        $winery = Winery::where('id', $rating->wine->winery_id)->first(); 
-                        $rating->wine->winery_id = $winery; 
-                    }
-                    $timeline[] = $rating_user;
-                } else {
-                    $timeline[] = "Don't have any rating";
-                }
+                $user_timeline[] = $user->to_id;
             }
-        } 
-        $paginator = $timeline;
-        $perPage = Input::get('per_Page', 15);   
-        $page = Input::get('page', 1);
-        if ($page > count($paginator) or $page < 1) { $page = 1; }
-        $offset = ($page * $perPage) - $perPage;
-        $articles = array_slice($paginator,$offset,$perPage);
-        $data = Paginator::make($articles, count($paginator), $perPage);
+        }
+        if(Input::get('page')) {
+            $getPage = Input::get('page');
+            if(Input::get('per_page')) {
+                $getLimit = Input::get('per_page');
+            } else {
+                $getLimit = 10;     
+            }
+            $paginate = Wine::paginate($getPage, $getLimit);
+            if($paginate !== false) {
+                $page = $paginate['page'];
+                $limit = $paginate['limit'];
+                
+            } else {
+                $error_code = ApiResponse::URL_NOT_EXIST;
+                $data = ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST);
+                return array("code" => $error_code, "data" => $data);
+            }
 
-        return  $data;
+        } else {
+            $page = 1;
+            $limit = 15;
+        }
+
+        $ratings = Rating::whereIn('user_id', $user_timeline)->with('profile')->with('wine')->forPage($page, $limit)->get();
+        if ($ratings) {
+            foreach ($ratings as $rating) {
+                $winery = Winery::where('id', $rating->wine->winery_id)->first();
+                $rating->wine->winery_id = $winery;
+                $rating->wine->image_url = URL::asset($rating->wine->image_url);
+            }
+            $data = $ratings;
+        } else {
+            $data = "Don't have any rating !";
+        }
+        return array("code" => $error_code, "data" => $data);
     }
-
 }

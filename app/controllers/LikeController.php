@@ -12,36 +12,11 @@ class LikeController extends ApiController {
 	{	
 		$user_id = Session::get('user_id');
 		$error_code = ApiResponse::OK;
-		$input = $this->_getInput();
-
-		if(!empty($input['rating_id'])) {
-	    	$rating_id = $input['rating_id'];
-
-	    	$check_rating = Rating::check_rating($rating_id);
-            
-			if ($check_rating !== false) {
-		    	
-				$like = Like::where('rating_id', $rating_id)->get();
-				
-				if (count($like) > 0) {
-					$data = $like->toArray();
-				} else {	
-		        	$data = 'No Like';
-				}
-			} else {
-				$error_code = ApiResponse::UNAVAILABLE_RATING;
-		        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING);
-
-		    }
-		} else {
-			$like = Like::where('user_id', $user_id)->get();
-			
-			if (count($like) > 0) {
-				$data = $like->toArray();
-			} else {	
-			    $data = 'No Like';
-			}
-
+		$like = Like::where('user_id', $user_id)->get();
+		if (count($like) > 0) {
+			$data = $like->toArray();
+		} else {	
+			$data = 'No Like';
 		}
 		
 	    return array("code" => $error_code, "data" => $data);
@@ -148,32 +123,6 @@ class LikeController extends ApiController {
 	public function update($id)
 	{	
 
-		// $like = Like::where('rating_id', $rating_id)->having('id', '=', $id)->first();
- 	//  	if($like) {
-	 //        $like->rating_id = $rating_id;
-	 //    }
-		//     if ( Request::get('user_id') ) {
-		//         $like->user_id = Request::get('user_id');
-	 // 	    }
-		//     $input = array('rating_id' => $rating_id);
-		//     $check_user = Like::check_user($input);
-		//     $check_rating = Like::check_rating($input);
-		//     if ($check_rating == 'FALSE' && $check_user == 'FALSE') {
-	 //     		$error_code = ApiResponse::UNAVAILABLE_RATING . ' and ' . ApiResponse::UNAVAILABLE_USER;
-	 //         	$data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING) . ' and ' . ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_USER);
-		//  	} elseif ($check_rating == 'FALSE') {
-		//      	$error_code = ApiResponse::UNAVAILABLE_RATING;
-		//         $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING);
-		//  	}  elseif($check_user == 'FALSE') {
-		//      	$error_code = ApiResponse::UNAVAILABLE_USER;
-		//          $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_USER);
-		//  	} else {
-		//  		$like->save();
-		//  		$error_code = ApiResponse::OK;
-		//  		$data = $like->toArray();	    
-		//  	}
-	 //    return array("code" => $error_code, "data" => $data);
-	    
 	}
 
 
@@ -183,10 +132,10 @@ class LikeController extends ApiController {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function destroy($id)
+	public function destroy($rating_id)
 	{
 		$user_id = Session::get('user_id');
-		$like = Like::where('id', $id)->first();
+		$like = Like::where('rating_id', $rating_id)->first();
 	    if($like) {
 
 	    	//update like_count on rating
@@ -205,7 +154,38 @@ class LikeController extends ApiController {
 	    } 
 	    return array("code" => $error_code, "data" => $data);
 	}
+	// public function getLike_rating()
+	// {
+	// 	$user_id = Session::get('user_id');
+	// 	$error_code = ApiResponse::OK;
+	// 	$input = $this->_getInput();
 
+	// 	if(!empty($input['rating_id'])) {
+	//     	$rating_id = $input['rating_id'];
+
+	//     	$check_rating = Rating::check_rating($rating_id);
+            
+	// 		if ($check_rating !== false) {
+		    	
+	// 			$like = Like::where('rating_id', $rating_id)->get();
+				
+	// 			if (count($like) > 0) {
+	// 				$data = $like->toArray();
+	// 			} else {	
+	// 	        	$data = 'No Like';
+	// 			}
+	// 		} else {
+	// 			$error_code = ApiResponse::UNAVAILABLE_RATING;
+	// 	        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING);
+
+	// 	    }
+	// 	} else {
+	// 		$error_code = ApiResponse::MISSING_PARAMS;
+	//         $data = "Missing rating_id";
+	// 	}
+		
+	//     return array("code" => $error_code, "data" => $data);
+	// }
 	// public function display_error($rating_id, $id) {
 
  //        return Response::json(

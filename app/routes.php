@@ -35,7 +35,13 @@ Route::group(array('prefix' => 'api'), function()
         Route::resource('winery', 'WineryController');
         Route::resource('rating', 'RatingController');
         Route::resource('like', 'LikeController');
-        Route::resource('comment', 'CommentController');
+
+        Route::get('comment/{rating_id}', 'CommentController@index');
+        Route::post('comment/{rating_id}', 'CommentController@store');
+        Route::put('comment/{rating_id}/{id}', 'CommentController@update');
+        Route::get('comment/{rating_id}/{id}', 'CommentController@show');
+        Route::delete('comment/{rating_id}/{id}', 'CommentController@destroy');
+
         Route::resource('follow', 'FollowController');
         Route::resource('wishlist', 'WishlistController');
         Route::resource('profile', 'ProfileController');

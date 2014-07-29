@@ -12,8 +12,8 @@ class WineController extends ApiController {
 	{
 		if(Input::get('page')) {
 			$getPage = Input::get('page');
-			if(Input::get('limit')) {
-				$getLimit = Input::get('limit');
+			if(Input::get('per_page')) {
+				$getLimit = Input::get('per_page');
 			} else {
 				$getLimit = 10;		
 			}
