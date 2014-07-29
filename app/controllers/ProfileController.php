@@ -14,6 +14,9 @@ class ProfileController extends ApiController {
 		if(User::where('user_id',$user_id)->first()){
 			$profile = Profile::where('user_id', $user_id)->first();
 			if($profile) {
+				if ($profile->image != null) {
+                    $profile->image = URL::asset($profile->image);   
+                }
 				$data = $profile;
 			} else { 
 				$error_code = ApiResponse::UNAVAILABLE_USER;

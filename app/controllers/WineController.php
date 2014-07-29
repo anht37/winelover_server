@@ -124,8 +124,10 @@ class WineController extends ApiController {
             }else {
                 $wine->winery = '';
             }
-            $wine->image_url = URL::asset($wine->image_url);
-
+            if($wine->image_url != null) {
+            	$wine->image_url = URL::asset($wine->image_url);
+            }
+            
 			$error_code = ApiResponse::OK;
             $data = $wine->toArray();
 		} else {

@@ -49,7 +49,7 @@ class Rating extends Eloquent {
 
     public static function check_rating($rating_id)
     {   
-        
+
         $rating = Rating::where('id', $rating_id)->first();
         
         if ($rating) {
@@ -99,7 +99,12 @@ class Rating extends Eloquent {
             foreach ($ratings as $rating) {
                 $winery = Winery::where('id', $rating->wine->winery_id)->first();
                 $rating->wine->winery_id = $winery;
-                $rating->wine->image_url = URL::asset($rating->wine->image_url);
+                if ($rating->wine->image_url != null) {
+                    $rating->wine->image_url = URL::asset($rating->wine->image_url);
+                }
+                if ($rating->profile->image != null) {
+                    $rating->profile->image = URL::asset($rating->profile->image);   
+                }
             }
             $data = $ratings;
         } else {
