@@ -117,24 +117,22 @@ class WineController extends ApiController {
 	 */
 	public function show($wine_id)
 	{
-		if($wine = Wine::where('wine_id', $wine_id)->first()) {
-            $winery = Winery::where('id',$wine->winery_id)->first();
-            if($winery) {
-                $wine->winery = Winery::where('id',$wine->winery_id)->first()->brand_name;
-            }else {
-                $wine->winery = '';
+		$wine = Wine::where('wine_id', $wine_id)->with('winery')->first();
+    	if($wine) {
+            $rating = Rating::where('wine_unique_id', $wine->wine_unique_id)->with('profile')->get();
+            if(count($rating) == 0) {
+            	$rating = "Don't have any rate !";
             }
             if($wine->image_url != null) {
             	$wine->image_url = URL::asset($wine->image_url);
-            }
+            }   
             
 			$error_code = ApiResponse::OK;
-            $data = $wine->toArray();
 		} else {
 			$error_code = ApiResponse::UNAVAILABLE_WINE;
             $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_WINE);
 		}
- 		return array("code" => $error_code, "data" => $data);
+ 		return array("code" => $error_code, "data" => array('wine' => $wine, 'rate' => $rating ));
 	}
 
 
@@ -245,5 +243,25 @@ class WineController extends ApiController {
         }
         return Response::json(array("result" => $result));
     }
+
+  //   public function getWine_detail($wine_unique_id)
+  //   {
+  //   	$wine = Wine::where('wine_unique_id', $wine_unique_id)->with('winery')->first();
+  //   	if($wine) {
+  //           $rating = Rating::where('wine_unique_id', $wine_unique_id)->with('profile')->get();
+  //           if(count($rating) == 0) {
+  //           	$rating = "Don't have any rate !";
+  //           }
+  //           if($wine->image_url != null) {
+  //           	$wine->image_url = URL::asset($wine->image_url);
+  //           }   
+            
+		// 	$error_code = ApiResponse::OK;
+		// } else {
+		// 	$error_code = ApiResponse::UNAVAILABLE_WINE;
+  //           $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_WINE);
+		// }
+ 	// 	return array("code" => $error_code, "data" => array('wine' => $wine, 'rate' => $rating ));
+  //   }
 
 }

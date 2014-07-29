@@ -11,7 +11,7 @@ class RatingController extends ApiController {
 	public function index() 
 	{
 		$user_id = Session::get('user_id');
-		$rating = Rating::where('user_id', $user_id)->get();
+		$rating = Rating::where('user_id', $user_id)->where('is_my_wine', 1)->get();
 		$error_code = ApiResponse::OK;
 		if(count($rating) > 0 ) {
         	$data = $rating->toArray();
@@ -69,8 +69,17 @@ class RatingController extends ApiController {
 		    if($check !== false) {
 
 		    	$rating_profile = Profile::where('user_id',$rating->user_id)->first();
-		    	$rating_profile->rate_count = $rating_profile->rate_count + 1;
-		    	$rating_profile->save(); 
+		    	if($rating_profile != null) {
+		    		$rating_profile->rate_count = $rating_profile->rate_count + 1;
+		    		$rating_profile->save(); 
+		    	}
+		    	$rating_wine = Wine::where('wine_unique_id',$rating->wine_unique_id)->first();
+		    	if($rating_wine != null) {
+		    		$rating_rate = $rating_wine->average_rate * $rating_wine->rate_count;
+		    		$rating_wine->rate_count = $rating_wine->rate_count + 1;
+		    		$rating_wine->average_rate = ($rating_rate + $rating->rate)/ $rating_wine->rate_count;
+		    		$rating_wine->save(); 
+		    	}
 
 		    	$rating->save();
 				$error_code = ApiResponse::OK;
@@ -133,8 +142,10 @@ class RatingController extends ApiController {
 	public function update($id)
 	{
 		$rating = Rating::where('id', $id)->first();
+
 		$input = $this->_getInput();
 		if($rating) {
+			$rating_rate_old = $rating->rate;
 	 		if(!empty($input)) {
 	 			if (!empty($input['wine_unique_id'])) { 
 			    	$rating->wine_unique_id = $input['wine_unique_id'];
@@ -157,8 +168,13 @@ class RatingController extends ApiController {
 			    
 			    $check = Rating::check_validator(Input::all());
 			    if($check != 'FALSE') {
+			    	$rating_wine = Wine::where('wine_unique_id',$rating->wine_unique_id)->first();
+				    if($rating_wine != null) {
+				    	$rating_rate = $rating_wine->average_rate * $rating_wine->rate_count;
+				    	$rating_wine->average_rate = ($rating_rate - $rating_rate_old + $rating->rate)/ $rating_wine->rate_count;
+				    	$rating_wine->save(); 
+				    }
 			    	
-			    	$rating->user_id = $check['user_id'];
 					$rating->save();
 					$error_code = ApiResponse::OK;
 					$data = $rating->toArray();	   
@@ -192,12 +208,35 @@ class RatingController extends ApiController {
 		$rating = Rating::where('id', $id)->first();
  		if($rating) {
  			$rating_profile = Profile::where('user_id',$rating->user_id)->first();
-		    $rating_profile->rate_count = $rating_profile->rate_count - 1;
-		    $rating_profile->save(); 
+	 		if($rating_profile != null) {
+			    $rating_profile->rate_count = $rating_profile->rate_count - 1;
+			    $rating_profile->save(); 
+			}
+			$rating_wine = Wine::where('wine_unique_id',$rating->wine_unique_id)->first();
+		    if($rating_wine != null) {
+		    	$rating_rate = $rating_wine->average_rate * $rating_wine->rate_count;
+		    	$rating_wine->rate_count = $rating_wine->rate_count - 1;
+		    	$rating_wine->average_rate = ($rating_rate - $rating->rate)/ $rating_wine->rate_count;
+		    	$rating_wine->save(); 
+		    }
 
  			$rating->delete();
 	 		$error_code = ApiResponse::OK;
 	 		$data = 'Rating Deleted';
+ 		} else {
+ 			$error_code = ApiResponse::UNAVAILABLE_RATING;
+	        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING);
+	    } 
+	    return array("code" => $error_code, "data" => $data);
+	}
+	public function remove($id)
+	{
+		$rating = Rating::where('id', $id)->first();
+ 		if($rating) {
+ 			$rating->is_my_wine = 0;
+ 			$rating->save();
+	 		$error_code = ApiResponse::OK;
+	 		$data = 'Rating is removed from my wine';
  		} else {
  			$error_code = ApiResponse::UNAVAILABLE_RATING;
 	        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING);

@@ -16,7 +16,7 @@ class CreateRatingsTable extends Migration {
 		{
 			$table->increments('id');
 			$table->string('user_id');
-			$table->string('wine_unique_id');
+			$table->string('wine_unique_id')->nullable();
 			$table->float('rate')->default(0);
 			$table->text('content')->nullable();
 			$table->integer('like_count')->default(0);

@@ -94,7 +94,8 @@ class Rating extends Eloquent {
             $limit = 15;
         }
 
-        $ratings = Rating::whereIn('user_id', $user_timeline)->with('profile')->with('wine')->forPage($page, $limit)->get();
+        $ratings = Rating::whereIn('user_id', $user_timeline)->whereNotNull('wine_unique_id')->with('profile')->with('wine')->forPage($page, $limit)->get();
+        
         if ($ratings) {
             foreach ($ratings as $rating) {
                 $winery = Winery::where('id', $rating->wine->winery_id)->first();
