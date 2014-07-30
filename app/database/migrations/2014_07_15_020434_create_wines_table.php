@@ -23,7 +23,7 @@ class CreateWinesTable extends Migration {
 			$table->float('average_price')->nullable();
 			$table->float('average_rate')->nullable();
 			$table->integer('wine_type')->default(3);
-			$table->integer('rate_count')->->default(0);
+			$table->integer('rate_count')->default(0);
 			$table->softDeletes();
 			$table->timestamps();
 		});

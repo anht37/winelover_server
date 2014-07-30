@@ -52,7 +52,6 @@ Route::group(array('prefix' => 'api'), function()
         Route::get('timeline', 'UserController@timeline');
 
     });
-    
 });
 
 
