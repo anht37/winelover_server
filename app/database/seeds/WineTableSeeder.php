@@ -77,6 +77,7 @@ class WineTableSeeder extends Seeder {
                 'average_price' => '2200',
                 'average_rate' => '4.5',
                 'wine_type' => '1',
+                'rate_count' => '3',
                 );
             $winery_id = $data['winery_id'];
             $winery = Winery::where('id',$winery_id)->with('country')->first();
@@ -86,7 +87,7 @@ class WineTableSeeder extends Seeder {
             Wine::create($data);
         }
 //        Wine::create(array(
-//        	'name' => 'カベルネ・ソーヴィニヨン',
+//        	'name' => 'カベルネ・ソーヴィニヨン',s
 //            'year' => '1990',
 //            'winery_id' => '1',
 //            'image_url' => public_path() . '/images/1',

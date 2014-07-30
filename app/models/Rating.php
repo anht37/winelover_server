@@ -32,7 +32,7 @@ class Rating extends Eloquent {
         if ($validator->fails()) {
             return false;
         } else {
-        	if($input['rate']) {
+        	if(!empty($input['rate'])) {
 
 	    		if(($input['rate']*10)%5==0) {
 			    	return $input;
@@ -99,10 +99,21 @@ class Rating extends Eloquent {
         if ($ratings) {
             foreach ($ratings as $rating) {   
                 $winery = Winery::where('id', $rating->wine->winery_id)->first();
-                $rating->wine->winery_id = $winery;
-                $country_flag = explode( '.', $rating->wine->wine_flag,-1);
-                $country_name = explode( '/', $country_flag[0]);
-                $rating->wine->winery_id->country_id = $country_name[1];
+                $rating->winery= $winery;
+                $country = Country::where('id', $rating->winery->country_id)->first();
+                $winery->country_name = $country->country_name; 
+                $like = Like::where('user_id',$rating->user_id)->where('rating_id', $rating->id)->first();
+                if($like) {
+                    $rating->liked = true;
+                } else {
+                    $rating->liked = false;
+                }
+                $wishlist = Wishlist::where('user_id',$rating->user_id)->where('wine_unique_id',$rating->wine_unique_id)->first();
+                if($wishlist) {
+                    $rating->wishlist = true;
+                } else {
+                    $rating->wishlist = false;
+                }
                 if ($rating->wine->image_url != null) {
                     $rating->wine->image_url = URL::asset($rating->wine->image_url);
                 }

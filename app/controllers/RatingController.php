@@ -167,13 +167,19 @@ class RatingController extends ApiController {
 			    }
 			    
 			    $check = Rating::check_validator(Input::all());
-			    if($check != 'FALSE') {
-			    	$rating_wine = Wine::where('wine_unique_id',$rating->wine_unique_id)->first();
-				    if($rating_wine != null) {
-				    	$rating_rate = $rating_wine->average_rate * $rating_wine->rate_count;
-				    	$rating_wine->average_rate = ($rating_rate - $rating_rate_old + $rating->rate)/ $rating_wine->rate_count;
-				    	$rating_wine->save(); 
-				    }
+			    if($check !== false) {
+			    	if($rating->rate > 0) {
+			    		$rating_wine = Wine::where('wine_unique_id',$rating->wine_unique_id)->first();
+					    if($rating_wine != null) {
+					    	$rating_rate = $rating_wine->average_rate * $rating_wine->rate_count;
+					    	if($rating_rate == 0) {
+					    		$rating_wine->average_rate = ($rating_rate + $rating->rate)/ $rating_wine->rate_count;
+					    	} else {
+					    		$rating_wine->average_rate = ($rating_rate - $rating_rate_old + $rating->rate)/ $rating_wine->rate_count;
+					    	}
+					    	$rating_wine->save(); 
+					    }
+			    	} 
 			    	
 					$rating->save();
 					$error_code = ApiResponse::OK;
@@ -216,7 +222,11 @@ class RatingController extends ApiController {
 		    if($rating_wine != null) {
 		    	$rating_rate = $rating_wine->average_rate * $rating_wine->rate_count;
 		    	$rating_wine->rate_count = $rating_wine->rate_count - 1;
-		    	$rating_wine->average_rate = ($rating_rate - $rating->rate)/ $rating_wine->rate_count;
+		    	if($rating_wine->rate_count > 0) {
+		    		$rating_wine->average_rate = ($rating_rate - $rating->rate)/ $rating_wine->rate_count;
+		    	} else {
+		    		$rating_wine->average_rate = 0;
+		    	}
 		    	$rating_wine->save(); 
 		    }
 
