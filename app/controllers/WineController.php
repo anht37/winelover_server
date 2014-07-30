@@ -37,6 +37,12 @@ class WineController extends ApiController {
 		
 		foreach ($wine as $wines) {
 			$wines->winery_id = $wines->winery->brand_name;
+			if($wines->image_url != null) {
+            	$wines->image_url = URL::asset($wines->image_url);
+            }   
+            if($wines->wine_flag != null) {
+            	$wines->wine_flag = URL::asset($wines->wine_flag);
+            } 
 		}
 		
 		$error_code = ApiResponse::OK;
@@ -119,6 +125,8 @@ class WineController extends ApiController {
 	{
 		$wine = Wine::where('wine_id', $wine_id)->with('winery')->first();
     	if($wine) {
+    		$country_name = Country::where('id',$wine->winery->country_id)->first()->country_name;
+    		$wine->winery->country_id = $country_name;
             $rating = Rating::where('wine_unique_id', $wine->wine_unique_id)->with('profile')->get();
             if(count($rating) == 0) {
             	$rating = "Don't have any rate !";
@@ -126,7 +134,9 @@ class WineController extends ApiController {
             if($wine->image_url != null) {
             	$wine->image_url = URL::asset($wine->image_url);
             }   
-            
+            if($wine->wine_flag != null) {
+            	$wine->wine_flag = URL::asset($wine->wine_flag);
+            } 
 			$error_code = ApiResponse::OK;
 		} else {
 			$error_code = ApiResponse::UNAVAILABLE_WINE;

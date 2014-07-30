@@ -10,4 +10,8 @@ class Winery extends Eloquent {
     {
         return $this->hasMany('Wine', 'winery_id');
     }
+    public function country()
+    {
+        return $this->belongsTo('Country', 'country_id');
+    }
 }

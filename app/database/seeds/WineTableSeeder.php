@@ -66,17 +66,24 @@ class WineTableSeeder extends Seeder {
         //     'wine_type' => '1',
         // ));
         for ($i = 1; $i < 11; $i ++) {
-        Wine::create(array(
-            'wine_id' => "$i",
-            'name' => "Wine_$i",
-            'year' => '2009',
-            'winery_id' => '5',
-            'image_url' =>  'wines/'.$i.'.png',
-            'wine_unique_id' => $i . "_2009",
-            'average_price' => '2200',
-            'average_rate' => '4.5',
-            'wine_type' => '1',
-            ));
+            $data = array(
+                'wine_id' => "$i",
+                'name' => "Wine_$i",
+                'year' => '2009',
+                'winery_id' => "$i",
+                'wine_flag' => '',
+                'image_url' =>  'wines/'.$i.'.png',
+                'wine_unique_id' => $i . "_2009",
+                'average_price' => '2200',
+                'average_rate' => '4.5',
+                'wine_type' => '1',
+                );
+            $winery_id = $data['winery_id'];
+            $winery = Winery::where('id',$winery_id)->with('country')->first();
+            if($winery) {
+                $data['wine_flag'] = $winery->country->flag_url;
+            }
+            Wine::create($data);
         }
 //        Wine::create(array(
 //        	'name' => 'カベルネ・ソーヴィニヨン',

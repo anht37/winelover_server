@@ -95,13 +95,19 @@ class Rating extends Eloquent {
         }
 
         $ratings = Rating::whereIn('user_id', $user_timeline)->whereNotNull('wine_unique_id')->with('profile')->with('wine')->forPage($page, $limit)->get();
-        
+
         if ($ratings) {
-            foreach ($ratings as $rating) {
+            foreach ($ratings as $rating) {   
                 $winery = Winery::where('id', $rating->wine->winery_id)->first();
                 $rating->wine->winery_id = $winery;
+                $country_flag = explode( '.', $rating->wine->wine_flag,-1);
+                $country_name = explode( '/', $country_flag[0]);
+                $rating->wine->winery_id->country_id = $country_name[1];
                 if ($rating->wine->image_url != null) {
                     $rating->wine->image_url = URL::asset($rating->wine->image_url);
+                }
+                if ($rating->wine->wine_flag != null) {
+                    $rating->wine->wine_flag = URL::asset($rating->wine->wine_flag);
                 }
                 if ($rating->profile->image != null) {
                     $rating->profile->image = URL::asset($rating->profile->image);   
