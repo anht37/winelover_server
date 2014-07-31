@@ -135,7 +135,7 @@ class LikeController extends ApiController {
 	public function destroy($rating_id)
 	{
 		$user_id = Session::get('user_id');
-		$like = Like::where('rating_id', $rating_id)->first();
+		$like = Like::where('rating_id', $rating_id)->where('user_id',$user_id)->first();
 	    if($like) {
 
 	    	//update like_count on rating
