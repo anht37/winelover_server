@@ -129,6 +129,12 @@ class WineController extends ApiController {
 		$error_code = ApiResponse::OK;
     	if($wine) {
     		$country_name = Country::where('id',$wine->winery->country_id)->first()->country_name;
+    		$wine_note = Winenote::where('wine_unique_id', $wine->wine_unique_id)->where('user_id',$user_id)->first();
+    		if($wine_note) {
+    			$wine->winenote = $wine_note->note;
+    		} else {
+    			$wine->winenote = "Don't have any note";
+    		}
     		$wine->winery->country_id = $country_name;
     		$rating_user = Rating::where('wine_unique_id', $wine->wine_unique_id)->where('user_id',$user_id)->with('profile')->first();
     		if(count($rating_user) == 0) {
