@@ -102,7 +102,7 @@ class Rating extends Eloquent {
                 $rating->winery= $winery;
                 $country = Country::where('id', $rating->winery->country_id)->first();
                 $winery->country_name = $country->country_name; 
-                $like = Like::where('user_id',$rating->user_id)->where('rating_id', $rating->id)->first();
+                $like = Like::where('user_id',$user_id)->where('rating_id', $rating->id)->first();
                 if($like) {
                     $rating->liked = true;
                 } else {

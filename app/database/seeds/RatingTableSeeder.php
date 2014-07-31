@@ -11,7 +11,7 @@ class RatingTableSeeder extends Seeder {
         DB::table('ratings')->delete();
         $user_id = User::where('email','testacc@gmail.com')->first()->user_id;
         Rating::create(array(
-            'id' => '21',
+            'id' => '1',
             'user_id' => $user_id,
             'wine_unique_id' => '1_2009',
             'rate' => '1.5',
