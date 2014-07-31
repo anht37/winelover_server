@@ -12,7 +12,7 @@ class CountryTableSeeder extends Seeder {
 
 		$file_list = array();
 		$file_folder = public_path() . "/flags/";
-
+		$i = 0;
 		//use the directory class
 		$files = dir($file_folder);
 		//read all files ;from the  directory
@@ -22,12 +22,14 @@ class CountryTableSeeder extends Seeder {
 		  	$country_name = explode( '.', $file_name,-1);
 
 		    $file_list[] = array(
+		    	"id" => $i ++,
 		    	"country_name" => $country_name[0],
 		    	"flag_url" => "flags/".$file_name,
 		    );
 		   } 
 
 		closedir($files->handle);
+
 		foreach ($file_list as $file) {
 			Country::create($file);
 		}

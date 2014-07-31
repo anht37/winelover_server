@@ -52,5 +52,6 @@ class ApiTestCase extends TestCase {
             call_user_func(array($model, 'boot'));
         }
     }
+    
 
 } 

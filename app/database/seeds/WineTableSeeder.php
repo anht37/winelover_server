@@ -83,7 +83,10 @@ class WineTableSeeder extends Seeder {
             $winery = Winery::where('id',$winery_id)->with('country')->first();
             if($winery) {
                 $data['wine_flag'] = $winery->country->flag_url;
+            } else {
+                $data['wine_flag'] = '';
             }
+
             Wine::create($data);
         }
 //        Wine::create(array(

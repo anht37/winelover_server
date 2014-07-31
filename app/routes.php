@@ -32,6 +32,7 @@ Route::group(array('prefix' => 'api'), function()
     {
 
         Route::resource('wine', 'WineController');
+        Route::resource('winenote', 'WinenoteController');
         Route::resource('winery', 'WineryController');
         Route::resource('rating', 'RatingController');
         Route::resource('like', 'LikeController');

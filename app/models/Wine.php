@@ -39,4 +39,12 @@ class Wine extends Eloquent {
         }
         
     }
+    // public static function cmp($a, $b) {
+    //     $a['user_id'] = Session::get('user_id');
+    //     if($a['user_id'] == $b['user_id']) {
+    //             return 1;
+    //     } else {
+    //             return 0;
+    //     }   
+    // }
 }

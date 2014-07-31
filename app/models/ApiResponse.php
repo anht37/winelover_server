@@ -32,6 +32,8 @@ class ApiResponse {
     const UNAVAILABLE_COMMENT = "116";
     const DUPLICATED_FOLLOW = "117";
     const NOT_EXISTED_FOLLOW = "118";
+    const UNAVAILABLE_WINE_NOTE = "119";
+    const DUPLICATED_WINE_NOTE_ADD = "120";
 
 
     private static $ERROR_LIST = array(
@@ -55,6 +57,8 @@ class ApiResponse {
         "116" => "Comment is not available",
         "117" => "Already Follow",
         "118" => "Follow not exist",
+        "119" => "Wine note is not available",
+        "120" => "Duplicated Wine note",
     );
 
     public static function createResponse($response) {

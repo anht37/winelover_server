@@ -124,12 +124,17 @@ class WineController extends ApiController {
 	 */
 	public function show($wine_id)
 	{
+		$user_id = Session::get('user_id');
 		$wine = Wine::where('wine_id', $wine_id)->with('winery')->first();
 		$error_code = ApiResponse::OK;
     	if($wine) {
     		$country_name = Country::where('id',$wine->winery->country_id)->first()->country_name;
     		$wine->winery->country_id = $country_name;
-            $rating = Rating::where('wine_unique_id', $wine->wine_unique_id)->with('profile')->get();
+    		$rating_user = Rating::where('wine_unique_id', $wine->wine_unique_id)->where('user_id',$user_id)->with('profile')->first();
+    		if(count($rating_user) == 0) {
+            	$rating_user = "Don't have any rate !";
+            }
+            $rating = Rating::where('wine_unique_id', $wine->wine_unique_id)->whereNotIn('user_id',[$user_id])->with('profile')->get();
             if(count($rating) == 0) {
             	$rating = "Don't have any rate !";
             }
@@ -144,7 +149,7 @@ class WineController extends ApiController {
 			$error_code = ApiResponse::UNAVAILABLE_WINE;
             $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_WINE);
 		}
- 		return array("code" => $error_code, "data" => array('wine' => $wine, 'rate' => $rating ));
+ 		return array("code" => $error_code, "data" => array('wine' => $wine,'rate_user' => $rating_user ,'rate' => $rating ));
 	}
 
 
