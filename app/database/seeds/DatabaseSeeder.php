@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder {
 		$this->call('LikeTableSeeder');
 		$this->call('CommentTableSeeder');
 		$this->call('WinenoteTableSeeder');
+		$this->call('WishlistTableSeeder');
 
 	}
 

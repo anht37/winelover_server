@@ -2,7 +2,7 @@
 
 	class WishlistTableSeeder extends Seeder {
 	    public function run() {
-	        DB::table('wishlist')->delete();
+	        DB::table('wishlists')->delete();
 	        $user_id = User::where('email','testacc@gmail.com')->first()->user_id;
         	$user_1 = User::where('email','test_1@gmail.com')->first()->user_id;
         	$user_2 = User::where('email','test_2@gmail.com')->first()->user_id;
