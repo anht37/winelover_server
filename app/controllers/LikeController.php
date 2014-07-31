@@ -42,7 +42,7 @@ class LikeController extends ApiController {
 	public function store()
 	{
 			$like = new Like;
-		   
+		    $error_code = ApiResponse::OK;
 		    $like->user_id = Session::get('user_id');
 			$input = $this->_getInput();
 
@@ -64,7 +64,7 @@ class LikeController extends ApiController {
 							$like_rating->save();
 						}						
 						$like->save();
-						$error_code = ApiResponse::OK;
+						
 						$data = $like->toArray();
 					}		   
 
@@ -134,6 +134,7 @@ class LikeController extends ApiController {
 	 */
 	public function destroy($rating_id)
 	{
+		$error_code = ApiResponse::OK;
 		$user_id = Session::get('user_id');
 		$like = Like::where('rating_id', $rating_id)->where('user_id',$user_id)->first();
 	    if($like) {
@@ -145,8 +146,6 @@ class LikeController extends ApiController {
 				$like_rating->save();
 			}
  			$like->delete();
-	 		
-	 		$error_code = ApiResponse::OK;
 	 		$data = 'like deleted';
  		} else {
  			$error_code = ApiResponse::NOT_EXISTED_LIKE;

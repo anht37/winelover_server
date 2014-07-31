@@ -50,6 +50,7 @@ class CommentController extends \BaseController {
 	{
 		$comment = new Comment;
 	    $input = $this->_getInput();
+	    $error_code = ApiResponse::OK;
 	    $comment->user_id = Session::get('user_id');
 
 	    if(!empty($input['content'])) {
@@ -73,8 +74,6 @@ class CommentController extends \BaseController {
 	            }
 
 		    	$comment->save();
-				
-				$error_code = ApiResponse::OK;
 				$data = $comment;
 					    
 			} else {
@@ -98,10 +97,9 @@ class CommentController extends \BaseController {
 	 */
 	public function show($rating_id, $id)
 	{
-		
+		$error_code = ApiResponse::OK;
 		$comment = Comment::where('id', $id)->first();
 	    if($comment) {
-			$error_code = ApiResponse::OK;
 	       	$data = $comment->toArray();
 		} else {
 			$error_code = ApiResponse::UNAVAILABLE_COMMENT;
@@ -135,13 +133,14 @@ class CommentController extends \BaseController {
 	{
 	    $comment = Comment::where('id', $id)->first();
 	    $input = $this->_getInput();
+	    $error_code = ApiResponse::OK;
  		if($comment) {
  			if(!empty($input)) {
 			    if(!empty($input['content'])) {
 		    		$comment->content = $input['content'];
 		    	}
 					$comment->save();
-					$error_code = ApiResponse::OK;
+					
 					$data = $comment->toArray();	    
 			} else {
 				$error_code = ApiResponse::MISSING_PARAMS;
@@ -164,7 +163,7 @@ class CommentController extends \BaseController {
 	public function destroy($rating_id, $id)
 	{
 		$comment = Comment::where('id', '=', $id)->first();
- 
+ 		$error_code = ApiResponse::OK;
 	    if($comment) {
 	    	$comment_profile = Profile::where('user_id', $comment->user_id)->first();
             
@@ -182,7 +181,7 @@ class CommentController extends \BaseController {
  				$comment->delete();
  			}
 
-	 		$error_code = ApiResponse::OK;
+	 		
 	 		$data = 'Comment deleted';
  		} else {
  			$error_code = ApiResponse::UNAVAILABLE_COMMENT;

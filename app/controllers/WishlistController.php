@@ -48,7 +48,8 @@ class WishlistController extends ApiController {
 		$wishlist->user_id = $user_id;
 		if(!empty($input['wine_unique_id'])) {
 			$wishlist->wine_unique_id = $input['wine_unique_id'];
-			if(Wishlist::where('wine_unique_id', $wishlist->wine_unique_id)->first()) {
+			$wine_wishlist = Wishlist::where('wine_unique_id', $wishlist->wine_unique_id)->where('user_id',$user_id)->first();
+			if($wine_wishlist) {
 				$error_code = ApiResponse::DUPLICATED_WISHLIST_ADD;
 				$data = ApiResponse::getErrorContent(ApiResponse::DUPLICATED_WISHLIST_ADD);
 			} else {
@@ -110,10 +111,10 @@ class WishlistController extends ApiController {
 	public function destroy($wine_unique_id)
 	{
 		$user_id = Session::get('user_id');
+		$error_code = ApiResponse::OK;
 		$wishlist = Wishlist::where('user_id', $user_id)->where('wine_unique_id', $wine_unique_id)->first();
 	    if($wishlist) {
-	 		
-	 		$error_code = ApiResponse::OK;
+	 		$wishlist->delete();
 	 		$data = 'wine in wishlist is deleted';
 
  		} else {

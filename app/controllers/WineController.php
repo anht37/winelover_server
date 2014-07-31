@@ -10,6 +10,7 @@ class WineController extends ApiController {
 
 	public function index()
 	{
+		$error_code = ApiResponse::OK;
 		if(Input::get('page')) {
 			$getPage = Input::get('page');
 			if(Input::get('per_page')) {
@@ -45,7 +46,7 @@ class WineController extends ApiController {
             } 
 		}
 		
-		$error_code = ApiResponse::OK;
+		
         $data = $wine->toArray();
 	    
 	    return array("code" => $error_code, "data" => $data);
@@ -71,6 +72,7 @@ class WineController extends ApiController {
 
 		$wine = new Wine;
 		$input = $this->_getInput();
+		$error_code = ApiResponse::OK;
 		
 		if(!empty($input['name']) && !empty($input['year']) && !empty($input['winery_id'])) {
 			$wine->name = $input['name'];
@@ -100,7 +102,6 @@ class WineController extends ApiController {
 		 		$wine->wine_unique_id = $wine->wine_id . '_' . $wine->year;
 		    	$wine->save();
 
-		 		$error_code = ApiResponse::OK;
 	            $data = $wine;
 		 	} else {
 		 		$error_code = ApiResponse::UNAVAILABLE_WINERY;
@@ -124,6 +125,7 @@ class WineController extends ApiController {
 	public function show($wine_id)
 	{
 		$wine = Wine::where('wine_id', $wine_id)->with('winery')->first();
+		$error_code = ApiResponse::OK;
     	if($wine) {
     		$country_name = Country::where('id',$wine->winery->country_id)->first()->country_name;
     		$wine->winery->country_id = $country_name;
@@ -137,7 +139,7 @@ class WineController extends ApiController {
             if($wine->wine_flag != null) {
             	$wine->wine_flag = URL::asset($wine->wine_flag);
             } 
-			$error_code = ApiResponse::OK;
+			
 		} else {
 			$error_code = ApiResponse::UNAVAILABLE_WINE;
             $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_WINE);
@@ -165,7 +167,9 @@ class WineController extends ApiController {
 	 * @return Response
 	 */
 	public function update($wine_id)
+
 	{
+		$error_code = ApiResponse::OK;
 		$wine = Wine::where('wine_id', $wine_id)->first();
 		$input = $this->_getInput();
 		if($wine) {
@@ -195,8 +199,6 @@ class WineController extends ApiController {
 
 			    if(Winery::where('id',$wine->winery_id)->first()) {
 			 		$wine->save();
-
-			 		$error_code = ApiResponse::OK;
 		            $data = $wine;
 			 	} else {
 			 		$error_code = ApiResponse::UNAVAILABLE_WINERY;
@@ -226,10 +228,11 @@ class WineController extends ApiController {
 	public function destroy($wine_id)
 	{
 		$wine = Wine::where('wine_id', $wine_id);
+		$error_code = ApiResponse::OK;
  
 	    if($wine) {
  			$wine->delete();
-	 		$error_code = ApiResponse::OK;
+	 		
 	 		$data = 'Wine deleted';
  		} else {
  			$error_code = ApiResponse::UNAVAILABLE_WINE;

@@ -40,6 +40,7 @@ class WineryController extends ApiController {
 	public function store()
 	{
 		$winery = new Winery;
+		$error_code = ApiResponse::OK;
 		$input = $this->_getInput();
 	    
 	    if(!empty($input['brand_name'])) {
@@ -58,8 +59,6 @@ class WineryController extends ApiController {
 		    // Validation and Filtering is sorely needed!!
 		    // Seriously, I'm a bad person for leaving that out.
 		    $winery->save();
-
-		    $error_code = ApiResponse::OK;
 	        $data = $winery->toArray();
 	    } else {
 	    	$error_code = ApiResponse::MISSING_PARAMS;
@@ -77,9 +76,9 @@ class WineryController extends ApiController {
 	 */
 	public function show($id)
 	{
+		$error_code = ApiResponse::OK;
 		$winery = Winery::where('id', $id)->first();
         if($winery) {
-			$error_code = ApiResponse::OK;
        	 	$data = $winery->toArray();
 		} else {
 			$error_code = ApiResponse::UNAVAILABLE_WINERY;
@@ -112,6 +111,7 @@ class WineryController extends ApiController {
 	{
 		$winery = Winery::where('id', $id)->first();
 		$input = $this->_getInput();
+		$error_code = ApiResponse::OK;
 		if($winery) {
 	 		if(!empty($input)) {
 			    if (!empty($input['brand_name'])) {
@@ -127,7 +127,7 @@ class WineryController extends ApiController {
 			        $winery->description = $input['description'];
 			    }
 			    $winery->save();
-		 		$error_code = ApiResponse::OK;
+		 		
 		        $data = $winery->toArray();
 		    } else {
 		    	$error_code = ApiResponse::MISSING_PARAMS;
@@ -151,10 +151,10 @@ class WineryController extends ApiController {
 	public function destroy($id)
 	{
 		$winery = Winery::where('id', $id);
- 
+ 		$error_code = ApiResponse::OK;
 	    if($winery) {
  			$winery->delete();
-	 		$error_code = ApiResponse::OK;
+	 		
 	 		$data = 'Winery deleted';
  		} else {
  			$error_code = ApiResponse::UNAVAILABLE_WINERY;

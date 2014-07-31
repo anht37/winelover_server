@@ -42,7 +42,7 @@ class RatingController extends ApiController {
 	{
 		$rating = new Rating;
 	    $input = $this->_getInput();
-	    
+	    $error_code = ApiResponse::OK;
 	    $rating->user_id = Session::get('user_id');
 	    if(!empty($input['wine_unique_id'])) {
 	    	$rating->wine_unique_id = $input['wine_unique_id'];
@@ -82,7 +82,7 @@ class RatingController extends ApiController {
 		    	}
 
 		    	$rating->save();
-				$error_code = ApiResponse::OK;
+				
 				$data = $rating->toArray();	 
 
 		    } else {
@@ -109,10 +109,11 @@ class RatingController extends ApiController {
 	public function show($id)
 	{
 		$rating = Rating::where('id', $id)->first();
-
+		$error_code = ApiResponse::OK;
 		if($rating) {
-			$error_code = ApiResponse::OK;
+			
        	 	$data = $rating->toArray();
+
 		} else {
 			$error_code = ApiResponse::UNAVAILABLE_RATING;
 	        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING);
@@ -142,7 +143,7 @@ class RatingController extends ApiController {
 	public function update($id)
 	{
 		$rating = Rating::where('id', $id)->first();
-
+		$error_code = ApiResponse::OK;
 		$input = $this->_getInput();
 		if($rating) {
 			$rating_rate_old = $rating->rate;
@@ -182,7 +183,7 @@ class RatingController extends ApiController {
 			    	} 
 			    	
 					$rating->save();
-					$error_code = ApiResponse::OK;
+					
 					$data = $rating->toArray();	   
 
 			    } else {
@@ -212,6 +213,7 @@ class RatingController extends ApiController {
 	public function destroy($id)
 	{
 		$rating = Rating::where('id', $id)->first();
+		$error_code = ApiResponse::OK;
  		if($rating) {
  			$rating_profile = Profile::where('user_id',$rating->user_id)->first();
 	 		if($rating_profile != null) {
@@ -231,7 +233,7 @@ class RatingController extends ApiController {
 		    }
 
  			$rating->delete();
-	 		$error_code = ApiResponse::OK;
+	 		
 	 		$data = 'Rating Deleted';
  		} else {
  			$error_code = ApiResponse::UNAVAILABLE_RATING;
@@ -239,18 +241,19 @@ class RatingController extends ApiController {
 	    } 
 	    return array("code" => $error_code, "data" => $data);
 	}
-	public function remove($id)
-	{
-		$rating = Rating::where('id', $id)->first();
- 		if($rating) {
- 			$rating->is_my_wine = 0;
- 			$rating->save();
-	 		$error_code = ApiResponse::OK;
-	 		$data = 'Rating is removed from my wine';
- 		} else {
- 			$error_code = ApiResponse::UNAVAILABLE_RATING;
-	        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING);
-	    } 
-	    return array("code" => $error_code, "data" => $data);
-	}
+	// public function remove($id)
+	// {
+	// 	$rating = Rating::where('id', $id)->first();
+	// 	$error_code = ApiResponse::OK;
+ // 		if($rating) {
+ // 			$rating->is_my_wine = 0;
+ // 			$rating->save();
+	 		
+	//  		$data = 'Rating is removed from my wine';
+ // 		} else {
+ // 			$error_code = ApiResponse::UNAVAILABLE_RATING;
+	//         $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING);
+	//     } 
+	//     return array("code" => $error_code, "data" => $data);
+	// }
 }

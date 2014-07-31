@@ -9,6 +9,7 @@ class FollowController extends ApiController {
 	 */
 	public function index()
 	{
+        
         $user_id = Session::get('user_id');
         $error_code = ApiResponse::OK;
 		$follow = Follow::where('from_id', $user_id)->get();
@@ -40,6 +41,7 @@ class FollowController extends ApiController {
 	public function store()
 	{
 		$follow = new Follow;
+		$error_code = ApiResponse::OK;
 		$input = $this->_getInput();
 	    $follow->from_id = Session::get('user_id');
 	    if(!empty($input['follow_id'])) {
@@ -64,8 +66,6 @@ class FollowController extends ApiController {
 						$follower_profile->save();
 					}
 			 		$follow->save();
-
-				    $error_code = ApiResponse::OK;
 			        $data = $follow->toArray();
 		 		}
 
@@ -90,8 +90,8 @@ class FollowController extends ApiController {
 	public function show($id)
 	{
 		$follow = Follow::where('id', $id)->first();
+        $error_code = ApiResponse::OK;
         if($follow) {
-			$error_code = ApiResponse::OK;
        	 	$data = $follow->toArray();
 		} else {
 			$error_code = ApiResponse::NOT_EXISTED_FOLLOW;
@@ -134,6 +134,7 @@ class FollowController extends ApiController {
 	 */
 	public function destroy($id)
 	{	
+		$error_code = ApiResponse::OK;
 		$from_id = Session::get('user_id');
 		$follow = Follow::where('to_id', $id)->having('from_id', '=' , $from_id)->first();
 
@@ -150,7 +151,6 @@ class FollowController extends ApiController {
 			}
 
  			$follow->delete();
-	 		$error_code = ApiResponse::OK;
 	 		$data = 'Follow deleted';
  		} else {
  			$error_code = ApiResponse::NOT_EXISTED_FOLLOW;
