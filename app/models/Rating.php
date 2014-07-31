@@ -108,7 +108,7 @@ class Rating extends Eloquent {
                 } else {
                     $rating->liked = false;
                 }
-                $wishlist = Wishlist::where('user_id',$rating->user_id)->where('wine_unique_id',$rating->wine_unique_id)->first();
+                $wishlist = Wishlist::where('user_id',$user_id)->where('wine_unique_id',$rating->wine_unique_id)->first();
                 if($wishlist) {
                     $rating->wishlist = true;
                 } else {
