@@ -10,6 +10,21 @@ class CreateRatingTest extends ApiTestCase
     protected $_session;
     protected $_user_id;
     //test cases for Login by email - password successfully
+
+    public function __construct() {
+        
+        $this->_params = array(
+            'user_id' = '';
+            'wine_unique_id' => '1_2009',
+            'rate' => '3.5',
+            'comment_count' => '',
+            'is_my_wine' => '1',
+
+        );
+        $this->_method = 'POST';
+        $this->_uri = 'api/rating';
+        $this->_models = array('Rating', 'User', 'Login');
+    }
     protected function _getResponse ($params = null)
     {
         $_params = $this->_params;
@@ -23,31 +38,52 @@ class CreateRatingTest extends ApiTestCase
     public function setUp()
     {
         parent::setUp();
+        $user = new User();
+        $user->email = 'testacc@gmail.com';
+        $user->password = '123456';
+        $user->fb_id = '123456';
+        $user->save();
+        $user_id = User::where('email','testacc@gmail.com')->first()->user_id;
+        
+        $login = new Login();
+        $login->id = 1;
+        $login->user_id = $user_id;
+        $login->session_id = '3f9a362bb40714f77cadfd9f5b9d801b';
+        $login->expired_at = '2019-07-30';
+        $login->save();
+        
         $this->_session = '3f9a362bb40714f77cadfd9f5b9d801b';
-        $this->_user_id = Login::where('session_id', $session)->first()->user_id;
-        $this->_params = array(
-            'wine_unique_id' => '10_2009',
-            'rate' => '3.5',
-        );
-        $this->_method = 'POST';
-        $this->_uri = 'api/rating';
-        $this->_models = array('Rating');
+        $this->_user_id = Login::where('session_id', $this->_session)->first()->user_id;
 
-        $rating = new Rating();
-        $rating->user_id = $this->_user_id;
-        $rating->wine_unique_id = $this->_params['wine_unique_id'];
-        $rating->rate = $this->_params['rate'];
-        $rating->save();
+        $winery = new Winery();
+        $winery->id = 1;
+        $winery->brand_name = 'Winery 1';
+        $winery->country_id = '2';
+        $winery->region = 'Chile';
+        $winery->save();
+
+        $wine = new Wine();
+        $wine->wine_id = 1 ;
+        $wine->name = 'Wine_1';
+        $wine->winery_id = 1;
+        $wine->year = '2009';
+        $wine->wine_unique_id = '1_2009';
+        $wine->average_price = "2200.00";
+        $wine->average_rate = "3.5";
+        $wine->save();
     }
     public function testCreateRatingSuccess()
     {
-        $response = $this->_getResponse();
+        $_params = $this->_params;
+        $_params['user_id'] = $this->_user_id;
+        $response = $this->_getResponse($_params);
+        dd($response);
         //get created login information
         $rating_infor = Rating::all()->last();
         $this->assertNotNull($rating_infor);
         $this->assertEquals(json_encode(array("code" => ApiResponse::OK, "data" =>
             array(
-                "user_id" => $this->_user_id;
+                "user_id" => $this->_user_id,
                 "wine_unique_id" => $rating_infor->wine_unique_id,
                 "rate" => $rating_infor->rate,
             )
@@ -67,6 +103,7 @@ class CreateRatingTest extends ApiTestCase
         $response = $this->_getResponse($_params);
         $this->assertEquals(json_encode(array("code" => ApiResponse::UNAVAILABLE_RATING, "data" => ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING))), $response->getContent());
     }
+
     public function testCreateRatingErrorNoWine()
     {
         $_params = $this->_params;
@@ -75,7 +112,9 @@ class CreateRatingTest extends ApiTestCase
         $this->assertTrue($this->client->getResponse()->isOk());
         $this->assertEquals(json_encode(array("code" => ApiResponse::MISSING_PARAMS, "data" =>
             array(
-                'wine_unique_id' => '',
+                'rate' => '3.5',
+                'comment_count' => '',
+                'is_my_wine' => '1',
             )
         )), $response->getContent());
     }
