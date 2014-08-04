@@ -83,7 +83,7 @@ class RatingController extends ApiController {
 
 		    	$rating->save();
 				
-				$data = $rating->toArray();	 
+				$data = $rating;	 
 
 		    } else {
 				
@@ -96,7 +96,7 @@ class RatingController extends ApiController {
 	        $data = $input;
 	    }
 
-	    return array("code" => $error_code, "data" => $data);
+	    return Response::json(array("code" => $error_code, "data" => $data));
 	}
 
 
