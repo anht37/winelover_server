@@ -15,9 +15,11 @@ class ProfileController extends ApiController {
 			$profile = Profile::where('user_id', $user_id)->first();
 			if($profile) {
 				if ($profile->image != null) {
-                    $profile->image = URL::asset($profile->image);   
-                }
-				$data = $profile;
+	                $profile->image = URL::asset($profile->image);   
+	            }
+	            $wishlist = Wishlist::where('user_id', $user_id)->get();
+	            $profile->wishlist_count = count($wishlist);
+				$data = $profile->toArray();
 			} else { 
 				$error_code = ApiResponse::UNAVAILABLE_USER;
 		        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_USER);
@@ -212,7 +214,9 @@ class ProfileController extends ApiController {
 					if ($profile->image != null) {
 	                    $profile->image = URL::asset($profile->image);   
 	                }
-					$data = $profile;
+	                $wishlist = Wishlist::where('user_id', $user_id)->get();
+	                $profile->wishlist_count = count($wishlist);
+					$data = $profile->toArray();
 				} else { 
 					$error_code = ApiResponse::UNAVAILABLE_USER;
 			        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_USER);
@@ -299,8 +303,18 @@ class ProfileController extends ApiController {
 			if(User::where('user_id',$user_id)->first()) {
 				$check_paginate = Wine::paginate($page, $per_page);
 				if ($check_paginate !== false) {
-					$top_rate = Rating::where('user_id',$user_id)->orderBy('rate', 'desc')->forPage($page, $per_page)->get();
-					$data = $top_rate;
+					$top_rate = Rating::where('user_id',$user_id)->orderBy('rate', 'desc')->with('wine')->forPage($page, $per_page)->get();
+					foreach ($top_rate as $top_rates) {
+						$top_rates->winery = Winery::where('id',$top_rates->wine->winery_id)->first();
+						if($top_rates->wine->image_url != null) {
+			            	$top_rates->wine->image_url = URL::asset($top_rates->wine->image_url);
+				        }
+
+				        if($top_rates->wine->wine_flag != null) {
+				            $top_rates->wine->wine_flag = URL::asset($top_rates->wine->wine_flag);
+				        } 
+					}
+					$data = $top_rate->toArray();
 				} else {
 					$error_code = ApiResponse::URL_NOT_EXIST;
 		       		$data = ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST);

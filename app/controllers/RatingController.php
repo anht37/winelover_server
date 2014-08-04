@@ -11,9 +11,41 @@ class RatingController extends ApiController {
 	public function index() 
 	{
 		$user_id = Session::get('user_id');
-		$rating = Rating::where('user_id', $user_id)->where('is_my_wine', 1)->orderBy('updated_at', 'desc')->get();
+		if(Input::get('page')) {
+			$getPage = Input::get('page');
+			if(Input::get('per_page')) {
+				$getLimit = Input::get('per_page');
+			} else {
+				$getLimit = 10;		
+			}
+			$paginate = Wine::paginate($getPage, $getLimit);
+			if($paginate !== false) {
+				$page = $paginate['page'];
+				$limit = $paginate['limit'];
+				
+			} else {
+				$error_code = ApiResponse::URL_NOT_EXIST;
+		       	$data = ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST);
+		     	return Response::json(array("code" => $error_code, "data" => $data));
+			}
+
+		} else {
+			$page = 1;
+			$limit = 10;
+		}
+		$rating = Rating::where('user_id', $user_id)->where('is_my_wine', 1)->with('wine')->orderBy('updated_at', 'desc')->forPage($page, $limit)->get();
 		$error_code = ApiResponse::OK;
 		if(count($rating) > 0 ) {
+			foreach ($rating as $ratings) {
+				$ratings->winery = Winery::where('id',$ratings->wine->winery_id)->first();
+				if($ratings->wine->image_url != null) {
+			        $ratings->wine->image_url = URL::asset($ratings->wine->image_url);
+				}
+
+				if($ratings->wine->wine_flag != null) {
+				    $ratings->wine->wine_flag = URL::asset($ratings->wine->wine_flag);
+				} 
+			}
         	$data = $rating->toArray();
 		} else {
 			$data = "Don't have any rating !";

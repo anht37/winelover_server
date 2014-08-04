@@ -17,20 +17,13 @@ class CreateRatingTest extends ApiTestCase
             'user_id' => '',
             'wine_unique_id' => '1_2009',
             'rate' => '3.5',
+            'comment_count' => '3',
+            'like_count' => '2',
+            'is_my_wine' => '1'
         );
         $this->_method = 'POST';
         $this->_uri = 'api/rating';
         $this->_models = array('Rating', 'User', 'Login');
-    }
-    protected function _getResponse ($params = null)
-    {
-        $_params = $this->_params;
-        if($params !== null) {
-            $_params = $params;
-        }
-        $response = $this->call($this->_method, $this->_uri, array('data' => json_encode($_params)), array(), array("HTTP_session"=> $this->_session));
-        $this->assertTrue($this->client->getResponse()->isOk());
-        return $response;
     }
     public function setUp()
     {
@@ -75,9 +68,9 @@ class CreateRatingTest extends ApiTestCase
         $_params = $this->_params;
         $_params['user_id'] = $this->_user_id;
 
-        $response = $this->_getResponse($_params);
+        $response = $this->_getAuth($_params);
         //get created login information
-        $rating_infor = Rating::get(array('user_id','wine_unique_id','rate', 'updated_at', 'created_at','id'))->last();
+        $rating_infor = Rating::get(array('user_id','wine_unique_id','rate','comment_count', 'like_count', 'is_my_wine', 'updated_at', 'created_at','id'))->last();
         $this->assertNotNull($rating_infor);
         $this->assertEquals(
             array("code" => ApiResponse::OK, "data" => $rating_infor->toArray())
@@ -87,14 +80,35 @@ class CreateRatingTest extends ApiTestCase
     {
         $_params = $this->_params;
         $_params['wine_unique_id'] = 'wine_not_available';
-        $response = $this->_getResponse($_params);
+        $response = $this->_getAuth($_params);
         $this->assertEquals(json_encode(array("code" => ApiResponse::UNAVAILABLE_RATING, "data" => ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING))), $response->getContent());
     }
     public function testCreateRatingErrorWrongRate()
     {
         $_params = $this->_params;
         $_params['rate'] = 'wrong_rate';
-        $response = $this->_getResponse($_params);
+        $response = $this->_getAuth($_params);
+        $this->assertEquals(json_encode(array("code" => ApiResponse::UNAVAILABLE_RATING, "data" => ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING))), $response->getContent());
+    }
+    public function testCreateRatingErrorWrongCommentCount()
+    {
+        $_params = $this->_params;
+        $_params['comment_count'] = 'wrong_comment_count';
+        $response = $this->_getAuth($_params);
+        $this->assertEquals(json_encode(array("code" => ApiResponse::UNAVAILABLE_RATING, "data" => ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING))), $response->getContent());
+    }
+    public function testCreateRatingErrorWrongLikeCount()
+    {
+        $_params = $this->_params;
+        $_params['like_count'] = 'wrong_like_count';
+        $response = $this->_getAuth($_params);
+        $this->assertEquals(json_encode(array("code" => ApiResponse::UNAVAILABLE_RATING, "data" => ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING))), $response->getContent());
+    }
+    public function testCreateRatingErrorWrongIsMyWine()
+    {
+        $_params = $this->_params;
+        $_params['is_my_wine'] = 'wrong_is_my_wine';
+        $response = $this->_getAuth($_params);
         $this->assertEquals(json_encode(array("code" => ApiResponse::UNAVAILABLE_RATING, "data" => ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING))), $response->getContent());
     }
 
@@ -102,12 +116,15 @@ class CreateRatingTest extends ApiTestCase
     {
         $_params = $this->_params;
         unset($_params['wine_unique_id']);        
-        $response = $this->_getResponse($_params);
+        $response = $this->_getAuth($_params);
         $this->assertTrue($this->client->getResponse()->isOk());
         $this->assertEquals(json_encode(array("code" => ApiResponse::MISSING_PARAMS, "data" =>
             array(
                 'user_id' => '',
-                'rate' => '3.5'
+                'rate' => '3.5',
+                'comment_count' => '3',
+                'like_count' => '2',
+                'is_my_wine' => '1'
             )
         )), $response->getContent());
     }

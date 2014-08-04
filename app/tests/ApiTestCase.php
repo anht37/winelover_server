@@ -23,6 +23,16 @@ class ApiTestCase extends TestCase {
         $this->assertTrue($this->client->getResponse()->isOk());
         return $response;
     }
+    protected function _getAuth ($params = null)
+    {
+        $_params = $this->_params;
+        if($params !== null) {
+            $_params = $params;
+        }
+        $response = $this->call($this->_method, $this->_uri, array('data' => json_encode($_params)), array(), array("HTTP_session"=> $this->_session));
+        $this->assertTrue($this->client->getResponse()->isOk());
+        return $response;
+    }
 
     public function setUp()
     {
