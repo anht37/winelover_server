@@ -91,7 +91,8 @@ Route::filter('csrf', function()
 
 Route::filter('session', function()
 {
-    if (empty($session = Request::header('session')))
+    $session = Request::header('session');
+    if (empty($session))
     {	
     	$error_code = ApiResponse::SESSION_INVALID;
         $data = ApiResponse::getErrorContent(ApiResponse::SESSION_INVALID);

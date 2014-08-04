@@ -11,7 +11,7 @@ class RatingController extends ApiController {
 	public function index() 
 	{
 		$user_id = Session::get('user_id');
-		$rating = Rating::where('user_id', $user_id)->where('is_my_wine', 1)->get();
+		$rating = Rating::where('user_id', $user_id)->where('is_my_wine', 1)->orderBy('updated_at', 'desc')->get();
 		$error_code = ApiResponse::OK;
 		if(count($rating) > 0 ) {
         	$data = $rating->toArray();
@@ -241,19 +241,19 @@ class RatingController extends ApiController {
 	    } 
 	    return array("code" => $error_code, "data" => $data);
 	}
-	// public function remove($id)
-	// {
-	// 	$rating = Rating::where('id', $id)->first();
-	// 	$error_code = ApiResponse::OK;
- // 		if($rating) {
- // 			$rating->is_my_wine = 0;
- // 			$rating->save();
+	public function remove($id)
+	{
+		$rating = Rating::where('id', $id)->first();
+		$error_code = ApiResponse::OK;
+ 		if($rating) {
+ 			$rating->is_my_wine = 0;
+ 			$rating->save();
 	 		
-	//  		$data = 'Rating is removed from my wine';
- // 		} else {
- // 			$error_code = ApiResponse::UNAVAILABLE_RATING;
-	//         $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING);
-	//     } 
-	//     return array("code" => $error_code, "data" => $data);
-	// }
+			$data = 'Rating is removed from my wine';
+ 		} else {
+ 			$error_code = ApiResponse::UNAVAILABLE_RATING;
+	        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING);
+		} 
+			return array("code" => $error_code, "data" => $data);
+	}
 }

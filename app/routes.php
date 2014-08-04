@@ -35,6 +35,7 @@ Route::group(array('prefix' => 'api'), function()
         Route::resource('winenote', 'WinenoteController');
         Route::resource('winery', 'WineryController');
         Route::resource('rating', 'RatingController');
+        Route::delete('mywine/{rating_id}', 'RatingController@remove');
         Route::resource('like', 'LikeController');
 
         Route::get('comment/{rating_id}', 'CommentController@index');

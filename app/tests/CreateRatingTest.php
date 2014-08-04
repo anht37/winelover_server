@@ -12,13 +12,14 @@ class CreateRatingTest extends ApiTestCase
     //test cases for Login by email - password successfully
 
     public function __construct() {
-        
+        parent::__construct();
         $this->_params = array(
+<<<<<<< HEAD
+=======
+            'user_id' => '',
+>>>>>>> 4b61c64b2337cc957a7ea1ce42a4d0d5c5aed342
             'wine_unique_id' => '1_2009',
             'rate' => '3.5',
-            'comment_count' => '',
-            'is_my_wine' => '1',
-
         );
         $this->_method = 'POST';
         $this->_uri = 'api/rating';
@@ -70,6 +71,7 @@ class CreateRatingTest extends ApiTestCase
         $wine->average_price = "2200.00";
         $wine->average_rate = "3.5";
         $wine->save();
+        $this->session(array('user_id' => $this->_user_id ));
     }
     public function testCreateRatingSuccess()
     {
@@ -77,7 +79,6 @@ class CreateRatingTest extends ApiTestCase
         $_params['user_id'] = $this->_user_id;
 
         $response = $this->_getResponse($_params);
-        dd($response);
         //get created login information
         $rating_infor = Rating::all()->last();
         $this->assertNotNull($rating_infor);

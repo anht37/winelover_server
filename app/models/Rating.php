@@ -21,6 +21,7 @@ class Rating extends Eloquent {
         $validator = Validator::make(
             $input,
             array(
+                'wine_unique_id' => 'exists:wines,wine_unique_id,deleted_at,NULL',
                 'like_count' => 'integer',
                 'comment_count' => 'integer',
                 'is_my_wine' => 'in:0,1',

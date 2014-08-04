@@ -32,6 +32,7 @@ class ApiTestCase extends TestCase {
 
     public function tearDown()
     {
+
         // Truncate all tables.
         foreach ($this->_models as $model) {
             // Flush any existing listeners.
@@ -52,6 +53,5 @@ class ApiTestCase extends TestCase {
             call_user_func(array($model, 'boot'));
         }
     }
-    
 
 } 

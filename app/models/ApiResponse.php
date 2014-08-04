@@ -37,7 +37,7 @@ class ApiResponse {
 
 
     private static $ERROR_LIST = array(
-        "000" => "ok",
+        "0" => "ok",
         "100" => "Server is Maintaining",
         "101" => "Session invalid",
         "102" => "Missing parameters",
