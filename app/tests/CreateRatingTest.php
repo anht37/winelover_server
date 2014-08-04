@@ -14,10 +14,7 @@ class CreateRatingTest extends ApiTestCase
     public function __construct() {
         parent::__construct();
         $this->_params = array(
-<<<<<<< HEAD
-=======
             'user_id' => '',
->>>>>>> 4b61c64b2337cc957a7ea1ce42a4d0d5c5aed342
             'wine_unique_id' => '1_2009',
             'rate' => '3.5',
         );
@@ -80,14 +77,9 @@ class CreateRatingTest extends ApiTestCase
 
         $response = $this->_getResponse($_params);
         //get created login information
-        $rating_infor = Rating::all()->last();
+        $rating_infor = Rating::get(array('user_id','wine_unique_id','rate', 'updated_at', 'created_at','id'))->last();
         $this->assertNotNull($rating_infor);
-        $this->assertEquals(json_encode(array("code" => ApiResponse::OK, "data" =>
-            array(
-                "user_id" => $this->_user_id,
-                "wine_unique_id" => $rating_infor->wine_unique_id,
-                "rate" => $rating_infor->rate,
-            )
+        $this->assertEquals(json_encode(array("code" => ApiResponse::OK, "data" => $rating_infor
         )), $response->getContent());
     }
     public function testCreateRatingErrorWrongWine()
@@ -113,9 +105,8 @@ class CreateRatingTest extends ApiTestCase
         $this->assertTrue($this->client->getResponse()->isOk());
         $this->assertEquals(json_encode(array("code" => ApiResponse::MISSING_PARAMS, "data" =>
             array(
-                'rate' => '3.5',
-                'comment_count' => '',
-                'is_my_wine' => '1',
+                'user_id' => '',
+                'rate' => '3.5'
             )
         )), $response->getContent());
     }
