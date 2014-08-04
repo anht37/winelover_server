@@ -26,7 +26,7 @@ class CommentController extends \BaseController {
 		    $error_code = ApiResponse::UNAVAILABLE_RATING;
 		    $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING);
 		}
-	    return array("code" => $error_code, "data" => $data);
+	    return Response::json(array("code" => $error_code, "data" => $data));
 	}
 
 
@@ -85,7 +85,7 @@ class CommentController extends \BaseController {
 		    $data = "Missing content";
 	    }
 	    
-	    return array("code" => $error_code, "data" => $data);
+	    return Response::json(array("code" => $error_code, "data" => $data));
 	}
 
 
@@ -107,7 +107,7 @@ class CommentController extends \BaseController {
 		}    
 		
 		
-	    return array("code" => $error_code, "data" => $data);
+	    return Response::json(array("code" => $error_code, "data" => $data));
 	}
 
 
@@ -150,7 +150,7 @@ class CommentController extends \BaseController {
 	 		$error_code = ApiResponse::UNAVAILABLE_COMMENT;
 	        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_COMMENT);
 	 	}
-	    return array("code" => $error_code, "data" => $data);
+	    return Response::json(array("code" => $error_code, "data" => $data));
 	}
 
 
@@ -187,7 +187,7 @@ class CommentController extends \BaseController {
  			$error_code = ApiResponse::UNAVAILABLE_COMMENT;
 	        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_COMMENT);
 	    } 
-	    return array("code" => $error_code, "data" => $data);
+	    return Response::json(array("code" => $error_code, "data" => $data));
 	}
 
 	public function display_error($id) {

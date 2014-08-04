@@ -18,7 +18,7 @@ class FollowController extends ApiController {
 		} else {
 			$data = "Don't have any user is followed !";
 		} 
-	    return array("code" => $error_code, "data" => $data);
+	    return Response::json(array("code" => $error_code, "data" => $data));
 	}
 
 
@@ -77,7 +77,7 @@ class FollowController extends ApiController {
 	    	$error_code = ApiResponse::MISSING_PARAMS;
 	        $data = $input;
 	    }
-	    return array("code" => $error_code, "data" => $data);
+	    return Response::json(array("code" => $error_code, "data" => $data));
 	}
 
 
@@ -98,7 +98,7 @@ class FollowController extends ApiController {
 	        $data = ApiResponse::getErrorContent(ApiResponse::NOT_EXISTED_FOLLOW);
 		}
  		
-	    return array("code" => $error_code, "data" => $data);
+	    return Response::json(array("code" => $error_code, "data" => $data));
 	}
 
 
@@ -156,7 +156,7 @@ class FollowController extends ApiController {
  			$error_code = ApiResponse::NOT_EXISTED_FOLLOW;
 	        $data = ApiResponse::getErrorContent(ApiResponse::NOT_EXISTED_FOLLOW);
 	    } 
-	    return array("code" => $error_code, "data" => $data);
+	    return Response::json(array("code" => $error_code, "data" => $data));
 	}
 
 

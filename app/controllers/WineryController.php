@@ -16,7 +16,7 @@ class WineryController extends ApiController {
 		$error_code = ApiResponse::OK;
         $data = $winery->toArray();
 	    
-	    return array("code" => $error_code, "data" => $data);
+	    return Response::json(array("code" => $error_code, "data" => $data));
 	    
 	}
 
@@ -64,7 +64,7 @@ class WineryController extends ApiController {
 	    	$error_code = ApiResponse::MISSING_PARAMS;
 	        $data = $input;
 	    }
-	    return array("code" => $error_code, "data" => $data);
+	    return Response::json(array("code" => $error_code, "data" => $data));
 	}
 
 
@@ -85,7 +85,7 @@ class WineryController extends ApiController {
 	        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_WINERY);
 		}
  		
-	    return array("code" => $error_code, "data" => $data);
+	    return Response::json(array("code" => $error_code, "data" => $data));
 	}
 
 
@@ -137,7 +137,7 @@ class WineryController extends ApiController {
 	   		$error_code = ApiResponse::UNAVAILABLE_WINERY;
 	        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_WINERY);
 	   	}
-	    return array("code" => $error_code, "data" => $data);
+	    return Response::json(array("code" => $error_code, "data" => $data));
 	    
 	}
 
@@ -160,7 +160,7 @@ class WineryController extends ApiController {
  			$error_code = ApiResponse::UNAVAILABLE_WINERY;
 	        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_WINERY);
 	    } 
-	    return array("code" => $error_code, "data" => $data);
+	    return Response::json(array("code" => $error_code, "data" => $data));
 	}
 
 

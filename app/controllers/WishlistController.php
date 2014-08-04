@@ -18,7 +18,7 @@ class WishlistController extends ApiController {
 		} else {	
 		    $data = 'No Wine in wishlist';
 		}
-	    return array("code" => $error_code, "data" => $data);
+	    return Response::json(array("code" => $error_code, "data" => $data));
 	}
 
 
@@ -62,7 +62,7 @@ class WishlistController extends ApiController {
 	        $data = $input;
 		}
 
-	    return array("code" => $error_code, "data" => $data);
+	    return Response::json(array("code" => $error_code, "data" => $data));
 	}
 
 
@@ -121,7 +121,7 @@ class WishlistController extends ApiController {
  			$error_code = ApiResponse::NOT_EXISTED_WINE_WISHLIST;
 	        $data = ApiResponse::getErrorContent(ApiResponse::NOT_EXISTED_WINE_WISHLIST);
 	    } 
-	    return array("code" => $error_code, "data" => $data);
+	    return Response::json(array("code" => $error_code, "data" => $data));
 	}
 
 

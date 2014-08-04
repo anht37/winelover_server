@@ -60,7 +60,7 @@ class WinenoteController extends ApiController {
 	        $data = $input;
 		}
 	    
-	    return array("code" => $error_code, "data" => $data);
+	    return Response::json(array("code" => $error_code, "data" => $data));
 	}
 
 
@@ -124,7 +124,7 @@ class WinenoteController extends ApiController {
 			$error_code = ApiResponse::UNAVAILABLE_WINE;
 			$data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_WINE);
 		}
-	    return array("code" => $error_code, "data" => $data);
+	    return Response::json(array("code" => $error_code, "data" => $data));
 	}
 
 
@@ -146,7 +146,7 @@ class WinenoteController extends ApiController {
 			$error_code = ApiResponse::UNAVAILABLE_WINE_NOTE;
 		    $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_WINE_NOTE);
 		}
-		return array("code" => $error_code, "data" => $data);
+		return Response::json(array("code" => $error_code, "data" => $data));
 	}
 
 

@@ -18,7 +18,7 @@ class RatingController extends ApiController {
 		} else {
 			$data = "Don't have any rating !";
 		}
-	    return array("code" => $error_code, "data" => $data);
+	    return Response::json(array("code" => $error_code, "data" => $data));
 	}
 
 
@@ -118,7 +118,7 @@ class RatingController extends ApiController {
 			$error_code = ApiResponse::UNAVAILABLE_RATING;
 	        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING);
 		}
-	    return array("code" => $error_code, "data" => $data);
+	    return Response::json(array("code" => $error_code, "data" => $data));
 	}
 
 
@@ -200,7 +200,7 @@ class RatingController extends ApiController {
 			$error_code = ApiResponse::UNAVAILABLE_RATING;
 	        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING);
 		}
-	    return array("code" => $error_code, "data" => $data);
+	    return Response::json(array("code" => $error_code, "data" => $data));
 	}
 
 
@@ -239,7 +239,7 @@ class RatingController extends ApiController {
  			$error_code = ApiResponse::UNAVAILABLE_RATING;
 	        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING);
 	    } 
-	    return array("code" => $error_code, "data" => $data);
+	    return Response::json(array("code" => $error_code, "data" => $data));
 	}
 	public function remove($id)
 	{
@@ -254,6 +254,6 @@ class RatingController extends ApiController {
  			$error_code = ApiResponse::UNAVAILABLE_RATING;
 	        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING);
 		} 
-			return array("code" => $error_code, "data" => $data);
+			return Response::json(array("code" => $error_code, "data" => $data));
 	}
 }

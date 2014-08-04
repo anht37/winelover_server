@@ -7,4 +7,9 @@ class Wishlist extends Eloquent {
  
     protected $table = 'wishlists';
     protected $primaryKey = 'id';
+
+    public function wine()
+	{
+    	return $this->belongsTo('Wine','wine_unique_id','wine_unique_id');
+	}
 }

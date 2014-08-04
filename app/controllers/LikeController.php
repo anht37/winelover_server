@@ -19,7 +19,7 @@ class LikeController extends ApiController {
 			$data = 'No Like';
 		}
 		
-	    return array("code" => $error_code, "data" => $data);
+	    return Response::json(array("code" => $error_code, "data" => $data));
 	}
 
 
@@ -75,7 +75,7 @@ class LikeController extends ApiController {
 			
 				}
 			}
-	    return array("code" => $error_code, "data" => $data);
+	    return Response::json(array("code" => $error_code, "data" => $data));
 	}
 
 
@@ -98,7 +98,7 @@ class LikeController extends ApiController {
 		}    
 		
 		
-	    return array("code" => $error_code, "data" => $data);
+	    return Response::json(array("code" => $error_code, "data" => $data));
 	}
 
 
@@ -151,7 +151,7 @@ class LikeController extends ApiController {
  			$error_code = ApiResponse::NOT_EXISTED_LIKE;
 	        $data = ApiResponse::getErrorContent(ApiResponse::NOT_EXISTED_LIKE);
 	    } 
-	    return array("code" => $error_code, "data" => $data);
+	    return Response::json(array("code" => $error_code, "data" => $data));
 	}
 	// public function getLike_rating()
 	// {

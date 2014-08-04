@@ -79,8 +79,9 @@ class CreateRatingTest extends ApiTestCase
         //get created login information
         $rating_infor = Rating::get(array('user_id','wine_unique_id','rate', 'updated_at', 'created_at','id'))->last();
         $this->assertNotNull($rating_infor);
-        $this->assertEquals(json_encode(array("code" => ApiResponse::OK, "data" => $rating_infor
-        )), $response->getContent());
+        $this->assertEquals(
+            array("code" => ApiResponse::OK, "data" => $rating_infor->toArray())
+        , json_decode($response->getContent(), true));
     }
     public function testCreateRatingErrorWrongWine()
     {

@@ -26,7 +26,7 @@ class WineController extends ApiController {
 			} else {
 				$error_code = ApiResponse::URL_NOT_EXIST;
 		       	$data = ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST);
-		     	return array("code" => $error_code, "data" => $data);
+		     	return Response::json(array("code" => $error_code, "data" => $data));
 			}
 
 		} else {
@@ -49,7 +49,7 @@ class WineController extends ApiController {
 		
         $data = $wine->toArray();
 	    
-	    return array("code" => $error_code, "data" => $data);
+	    return Response::json(array("code" => $error_code, "data" => $data));
 	}
 	/**
 	 * Show the form for creating a new resource.
@@ -112,7 +112,7 @@ class WineController extends ApiController {
 	        $data = $input;
 		}
 	    
-	    return array("code" => $error_code, "data" => $data);
+	    return Response::json(array("code" => $error_code, "data" => $data));
 	}
 
 
@@ -155,7 +155,7 @@ class WineController extends ApiController {
 			$error_code = ApiResponse::UNAVAILABLE_WINE;
             $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_WINE);
 		}
- 		return array("code" => $error_code, "data" => array('wine' => $wine,'rate_user' => $rating_user ,'rate' => $rating ));
+ 		return Response::json(array("code" => $error_code, "data" => array('wine' => $wine,'rate_user' => $rating_user ,'rate' => $rating )));
 	}
 
 
@@ -224,7 +224,7 @@ class WineController extends ApiController {
 	        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_WINE);
 	 	}
 	    
-	    return array("code" => $error_code, "data" => $data);
+	    return Response::json(array("code" => $error_code, "data" => $data));
  
 	    
 	}
@@ -249,7 +249,7 @@ class WineController extends ApiController {
  			$error_code = ApiResponse::UNAVAILABLE_WINE;
 	        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_WINE);
 	    } 
-	 	return array("code" => $error_code, "data" => $data);
+	 	return Response::json(array("code" => $error_code, "data" => $data));
 	    
 	}
 	public function scan()
