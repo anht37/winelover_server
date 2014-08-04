@@ -14,7 +14,6 @@ class CreateRatingTest extends ApiTestCase
     public function __construct() {
         
         $this->_params = array(
-            'user_id' = '';
             'wine_unique_id' => '1_2009',
             'rate' => '3.5',
             'comment_count' => '',
@@ -43,11 +42,11 @@ class CreateRatingTest extends ApiTestCase
         $user->password = '123456';
         $user->fb_id = '123456';
         $user->save();
-        $user_id = User::where('email','testacc@gmail.com')->first()->user_id;
-        
+        $this->_user_id = User::where('email','testacc@gmail.com')->first()->user_id;
+
         $login = new Login();
         $login->id = 1;
-        $login->user_id = $user_id;
+        $login->user_id = $this->_user_id ;
         $login->session_id = '3f9a362bb40714f77cadfd9f5b9d801b';
         $login->expired_at = '2019-07-30';
         $login->save();
@@ -76,6 +75,7 @@ class CreateRatingTest extends ApiTestCase
     {
         $_params = $this->_params;
         $_params['user_id'] = $this->_user_id;
+
         $response = $this->_getResponse($_params);
         dd($response);
         //get created login information
