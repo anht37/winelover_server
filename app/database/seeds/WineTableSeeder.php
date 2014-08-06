@@ -9,63 +9,63 @@
 class WineTableSeeder extends Seeder {
     public function run() {
         DB::table('wines')->delete();
-        // Wine::create(array(
-        //     'wine_id' => '1',
-        // 	'name' => 'Gnarly Head Authentic White',
-        //     'year' => '2011',
-        //     'winery_id' => '1',
-        //     'image_url' => 'wines/1.jpg',
-        //     'wine_unique_id' => '1_2011',
-        //     'average_price' => '1200',
-        //     'average_rate' => '3.0',
-        //     'wine_type' => '2',
-        // ));
+         Wine::create(array(
+             'wine_id' => '1',
+         	'name' => 'Gnarly Head Authentic White',
+             'year' => '2011',
+             'winery_id' => '1',
+             'image_url' => 'wines/1.jpg',
+             'wine_unique_id' => '1_2011',
+             'average_price' => '1200',
+             'average_rate' => '3.0',
+             'wine_type' => '2',
+         ));
 
-        // Wine::create(array(
-        //     'wine_id' => '2',
-        //     'name' => 'Trimbach Riesling',
-        //     'year' => '2010',
-        //     'winery_id' => '2',
-        //     'image_url' => 'wines/2.png',
-        //     'wine_unique_id' => '2_2010',
-        //     'average_price' => '1700',
-        //     'average_rate' => '4.0',
-        //     'wine_type' => '2',
-        // ));
-        // Wine::create(array(
-        //     'wine_id' => '3',
-        //     'name' => 'Gruner Love Featuring the Stadlmann Gruner Veltliner ',
-        //     'year' => '2011',
-        //     'winery_id' => '3',
-        //     'image_url' => 'wines/3.png',
-        //     'wine_unique_id' => '3_2011',
-        //     'average_price' => '1600',
-        //     'average_rate' => '2.5',
-        //     'wine_type' => '1',
-        // ));
-        // Wine::create(array(
-        //     'wine_id' => '4',
-        //     'name' => 'Pine Ridge Chenin Blanc + Viognier ',
-        //     'year' => '2013',
-        //     'winery_id' => '4',
-        //     'image_url' => 'wines/4.png',
-        //     'wine_unique_id' => '4_2013',
-        //     'average_price' => '1200',
-        //     'average_rate' => '2.0',
-        //     'wine_type' => '3',
-        // ));
-        // Wine::create(array(
-        //     'wine_id' => '5',
-        //     'name' => 'Frescobaldi Nipozzano Chianti Rufina Riserva',
-        //     'year' => '2009',
-        //     'winery_id' => '5',
-        //     'image_url' => 'wines/5.png',
-        //     'wine_unique_id' => '5_2009',
-        //     'average_price' => '2200',
-        //     'average_rate' => '4.5',
-        //     'wine_type' => '1',
-        // ));
-        for ($i = 1; $i < 11; $i ++) {
+         Wine::create(array(
+             'wine_id' => '2',
+             'name' => 'Trimbach Riesling',
+             'year' => '2010',
+             'winery_id' => '2',
+             'image_url' => 'wines/2.png',
+             'wine_unique_id' => '2_2010',
+             'average_price' => '1700',
+             'average_rate' => '4.0',
+             'wine_type' => '2',
+         ));
+         Wine::create(array(
+             'wine_id' => '3',
+             'name' => 'Gruner Love Featuring the Stadlmann Gruner Veltliner ',
+             'year' => '2011',
+             'winery_id' => '3',
+             'image_url' => 'wines/3.png',
+             'wine_unique_id' => '3_2011',
+             'average_price' => '1600',
+             'average_rate' => '2.5',
+             'wine_type' => '1',
+         ));
+         Wine::create(array(
+             'wine_id' => '4',
+             'name' => 'Pine Ridge Chenin Blanc + Viognier ',
+             'year' => '2013',
+             'winery_id' => '4',
+             'image_url' => 'wines/4.png',
+             'wine_unique_id' => '4_2013',
+             'average_price' => '1200',
+             'average_rate' => '2.0',
+             'wine_type' => '3',
+         ));
+         Wine::create(array(
+             'wine_id' => '5',
+             'name' => 'Frescobaldi Nipozzano Chianti Rufina Riserva',
+             'year' => '2009',
+             'winery_id' => '5',
+             'image_url' => 'wines/5.png',
+             'wine_unique_id' => '5_2009',
+             'average_price' => '2200',
+             'average_rate' => '4.5',
+             'wine_type' => '1',
+         ));
+        for ($i = 6; $i < 11; $i ++) {
             $data = array(
                 'wine_id' => "$i",
                 'name' => "Wine_$i",
