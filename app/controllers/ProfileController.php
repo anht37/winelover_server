@@ -235,35 +235,24 @@ class ProfileController extends ApiController {
 	public function getProfile_wishlist_user($user_id)
 	{
 		$error_code = ApiResponse::OK;
-		if(Input::get('page')) {
-			$getPage = Input::get('page');
-			if(Input::get('per_page')) {
-				$getLimit = Input::get('per_page');
-			} else {
-				$getLimit = 10;		
-			}
-			$paginate = Wine::paginate($getPage, $getLimit);
-			if($paginate !== false) {
-				$page = $paginate['page'];
-				$limit = $paginate['limit'];
-				
-			} else {
-				$error_code = ApiResponse::URL_NOT_EXIST;
-		       	$data = ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST);
-		     	return Response::json(array("code" => $error_code, "data" => $data));
-			}
-
-		} else {
-			$page = 1;
-			$limit = 10;
-		}
+		$pagination = ApiResponse::pagination();
+		$page = $pagination['page'];
+		$limit = $pagination['limit'];
 		if($user_id) {
 			if(User::where('user_id',$user_id)->first()){
 				$profile = Profile::where('user_id', $user_id)->first();
 				if($profile) {
 					$wishlist = Wishlist::where('user_id', $user_id)->with('wine')->forPage($page, $limit)->get();
-					if (count($wishlist) > 0) {
-						foreach ($wishlist as $wishlists) {
+					if (count($wishlist) == 0) {
+						if($page == 1) {
+							$data = 'No Wine in wishlist';
+						} else {
+							$error_code = ApiResponse::URL_NOT_EXIST;
+           					 $data = ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST);
+						}
+						
+					} else {	
+					    foreach ($wishlist as $wishlists) {
 							$wishlists->winery = Winery::where('id', $wishlists->wine->winery_id)->first();
 
 							if($wishlists->wine->image_url != null) {
@@ -276,8 +265,6 @@ class ProfileController extends ApiController {
 						}
 						
 						$data = $wishlist->toArray();
-					} else {	
-					    $data = 'No Wine in wishlist';
 					}
 				} else { 
 					$error_code = ApiResponse::UNAVAILABLE_USER;

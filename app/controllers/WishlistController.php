@@ -11,14 +11,51 @@ class WishlistController extends ApiController {
 	{
 		$user_id = Session::get('user_id');
 		$error_code = ApiResponse::OK;
-		
-		$wishlist = Wishlist::where('user_id', $user_id)->get();
-		if (count($wishlist) > 0) {
-			$data = $wishlist->toArray();
-		} else {	
-		    $data = 'No Wine in wishlist';
+		$pagination = ApiResponse::pagination();
+		$page = $pagination['page'];
+		$limit = $pagination['limit'];
+		if ($user_id) {
+			if (User::where('user_id',$user_id)->first()){
+				$profile = Profile::where('user_id', $user_id)->first();
+				if ($profile) {
+					$wishlist = Wishlist::where('user_id', $user_id)->with('wine')->forPage($page, $limit)->get();
+					if (count($wishlist) == 0) {
+						if($page == 1) {
+							$data = 'No Wine in wishlist';
+						} else {
+							$error_code = ApiResponse::URL_NOT_EXIST;
+           					 $data = ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST);
+						}
+						
+					} else {	
+					    foreach ($wishlist as $wishlists) {
+							$wishlists->winery = Winery::where('id', $wishlists->wine->winery_id)->first();
+
+							if($wishlists->wine->image_url != null) {
+			            		$wishlists->wine->image_url = URL::asset($wishlists->wine->image_url);
+				            }
+
+				            if($wishlists->wine->wine_flag != null) {
+				            	$wishlists->wine->wine_flag = URL::asset($wishlists->wine->wine_flag);
+				            } 
+						}
+						
+						$data = $wishlist->toArray();
+					}
+				} else { 
+					$error_code = ApiResponse::UNAVAILABLE_USER;
+			        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_USER);
+				}
+			} else {
+				$error_code = ApiResponse::UNAVAILABLE_USER;
+			    $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_USER);
+			}
+		} else {
+			$error_code = ApiResponse::MISSING_PARAMS;
+	        $data = "Missing user_id";
 		}
-	    return Response::json(array("code" => $error_code, "data" => $data));
+
+		return Response::json(array("code" => $error_code, "data" => $data));
 	}
 
 
@@ -46,7 +83,7 @@ class WishlistController extends ApiController {
 
 		$wishlist = new Wishlist;
 		$wishlist->user_id = $user_id;
-		if(!empty($input['wine_unique_id'])) {
+		if (!empty($input['wine_unique_id'])) {
 			$wishlist->wine_unique_id = $input['wine_unique_id'];
 			$wine_wishlist = Wishlist::where('wine_unique_id', $wishlist->wine_unique_id)->where('user_id',$user_id)->first();
 			if($wine_wishlist) {
@@ -113,7 +150,7 @@ class WishlistController extends ApiController {
 		$user_id = Session::get('user_id');
 		$error_code = ApiResponse::OK;
 		$wishlist = Wishlist::where('user_id', $user_id)->where('wine_unique_id', $wine_unique_id)->first();
-	    if($wishlist) {
+	    if ($wishlist) {
 	 		$wishlist->delete();
 	 		$data = 'wine in wishlist is deleted';
 

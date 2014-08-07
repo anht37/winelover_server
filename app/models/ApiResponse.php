@@ -71,6 +71,53 @@ class ApiResponse {
     public static function getErrorContent($error_code) {
         return self::$ERROR_LIST[$error_code];
     }
+    public static function checkPagination($getPage, $getLimit) 
+    {
+        $paginate = array(
+            'page' => $getPage,
+            'limit' => $getLimit
+        );
+        
+        $rules = array(
+            'page' => 'integer',
+            'limit' =>'integer'
+        );
+       
+        $validator = Validator::make($paginate, $rules);
+
+        if($validator->fails()) {
+            return false;
+        } else {
+            return $paginate;
+        }
+        
+    }
+    public static function pagination() 
+    {
+        if(Input::get('page')) {
+            $getPage = Input::get('page');
+            if(Input::get('per_page')) {
+                $getLimit = Input::get('per_page');
+            } else {
+                $getLimit = 10;     
+            }
+            $paginate = ApiResponse::checkPagination($getPage, $getLimit);
+            if($paginate !== false) {
+                $page = $paginate['page'];
+                $limit = $paginate['limit'];
+                
+            } else {
+                $error_code = ApiResponse::URL_NOT_EXIST;
+                $data = ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST);
+                return Response::json(array("code" => $error_code, "data" => $data));
+            }
+
+        } else {
+            $page = 1;
+            $limit = 10;
+        }
+        return array('page' => $page, 'limit' => $limit);
+    }
 
 
 }

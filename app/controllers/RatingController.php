@@ -11,31 +11,19 @@ class RatingController extends ApiController {
 	public function index() 
 	{
 		$user_id = Session::get('user_id');
-		if(Input::get('page')) {
-			$getPage = Input::get('page');
-			if(Input::get('per_page')) {
-				$getLimit = Input::get('per_page');
-			} else {
-				$getLimit = 10;		
-			}
-			$paginate = Wine::paginate($getPage, $getLimit);
-			if($paginate !== false) {
-				$page = $paginate['page'];
-				$limit = $paginate['limit'];
-				
-			} else {
-				$error_code = ApiResponse::URL_NOT_EXIST;
-		       	$data = ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST);
-		     	return Response::json(array("code" => $error_code, "data" => $data));
-			}
-
-		} else {
-			$page = 1;
-			$limit = 10;
-		}
+		$pagination = ApiResponse::pagination();
+		$page = $pagination['page'];
+		$limit = $pagination['limit'];
 		$rating = Rating::where('user_id', $user_id)->where('is_my_wine', 1)->with('wine')->orderBy('updated_at', 'desc')->forPage($page, $limit)->get();
 		$error_code = ApiResponse::OK;
-		if(count($rating) > 0 ) {
+		if(count($rating) == 0 ) {
+			if($page == 1) {
+				$data = "Don't have any rating !";
+			} else {
+				$error_code = ApiResponse::URL_NOT_EXIST;
+            	$data = ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST);
+        	}
+		} else {
 			foreach ($rating as $ratings) {
 				$ratings->winery = Winery::where('id',$ratings->wine->winery_id)->first();
 				if($ratings->wine->image_url != null) {
@@ -47,8 +35,7 @@ class RatingController extends ApiController {
 				} 
 			}
         	$data = $rating->toArray();
-		} else {
-			$data = "Don't have any rating !";
+			
 		}
 	    return Response::json(array("code" => $error_code, "data" => $data));
 	}
@@ -140,7 +127,7 @@ class RatingController extends ApiController {
 	 */
 	public function show($id)
 	{
-		$rating = Rating::where('id', $id)->first();
+		$rating = Rating::where('id', $id)->with('wine')->first();
 		$error_code = ApiResponse::OK;
 		if($rating) {
 			
@@ -199,16 +186,20 @@ class RatingController extends ApiController {
 			        $rating->is_my_wine = $input['is_my_wine'];
 			    }
 			    
-			    $check = Rating::check_validator(Input::all());
+			    $check = Rating::check_validator($input);
 			    if($check !== false) {
 			    	if($rating->rate > 0) {
 			    		$rating_wine = Wine::where('wine_unique_id',$rating->wine_unique_id)->first();
 					    if($rating_wine != null) {
 					    	$rating_rate = $rating_wine->average_rate * $rating_wine->rate_count;
-					    	if($rating_rate == 0) {
+					    	if($rating_rate == 0 && $rating_wine->rate_count !== 0) {
 					    		$rating_wine->average_rate = ($rating_rate + $rating->rate)/ $rating_wine->rate_count;
-					    	} else {
+					    	} elseif ($rating_rate !== 0 && $rating_wine->rate_count !== 0) {
 					    		$rating_wine->average_rate = ($rating_rate - $rating_rate_old + $rating->rate)/ $rating_wine->rate_count;
+					    	} else {
+					    		$error_code = ApiResponse::UNAVAILABLE_RATING;
+			        			$data = "Don't have this rating in wine";
+			        			return Response::json(array("code" => $error_code, "data" => $data));
 					    	}
 					    	$rating_wine->save(); 
 					    }

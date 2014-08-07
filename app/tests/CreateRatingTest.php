@@ -28,40 +28,7 @@ class CreateRatingTest extends ApiTestCase
     public function setUp()
     {
         parent::setUp();
-        $user = new User();
-        $user->email = 'testacc@gmail.com';
-        $user->password = '123456';
-        $user->fb_id = '123456';
-        $user->save();
-        $this->_user_id = User::where('email','testacc@gmail.com')->first()->user_id;
-
-        $login = new Login();
-        $login->id = 1;
-        $login->user_id = $this->_user_id ;
-        $login->session_id = '3f9a362bb40714f77cadfd9f5b9d801b';
-        $login->expired_at = '2019-07-30';
-        $login->save();
-        
-        $this->_session = '3f9a362bb40714f77cadfd9f5b9d801b';
-        $this->_user_id = Login::where('session_id', $this->_session)->first()->user_id;
-
-        $winery = new Winery();
-        $winery->id = 1;
-        $winery->brand_name = 'Winery 1';
-        $winery->country_id = '2';
-        $winery->region = 'Chile';
-        $winery->save();
-
-        $wine = new Wine();
-        $wine->wine_id = 1 ;
-        $wine->name = 'Wine_1';
-        $wine->winery_id = 1;
-        $wine->year = '2009';
-        $wine->wine_unique_id = '1_2009';
-        $wine->average_price = "2200.00";
-        $wine->average_rate = "3.5";
-        $wine->save();
-        $this->session(array('user_id' => $this->_user_id ));
+        $this->setUpData();
     }
     public function testCreateRatingSuccess()
     {
@@ -118,14 +85,20 @@ class CreateRatingTest extends ApiTestCase
         unset($_params['wine_unique_id']);        
         $response = $this->_getAuth($_params);
         $this->assertTrue($this->client->getResponse()->isOk());
-        $this->assertEquals(json_encode(array("code" => ApiResponse::MISSING_PARAMS, "data" =>
-            array(
-                'user_id' => '',
-                'rate' => '3.5',
-                'comment_count' => '3',
-                'like_count' => '2',
-                'is_my_wine' => '1'
-            )
+        $this->assertEquals(json_encode(array("code" => ApiResponse::MISSING_PARAMS, "data" => $_params
         )), $response->getContent());
     }
+
+    // public function testUpdateRatingError()
+    // {
+    //     $_params = $this->_params;
+    //     $response = $this->_getAuth($_params);
+    //     dd($response);
+    //     $rating_infor = Rating::get(array('user_id','wine_unique_id','rate','comment_count', 'like_count', 'is_my_wine', 'updated_at', 'created_at','id'))->last();
+    //     $this->assertNotNull($rating_infor);
+    //     $this->assertEquals(
+    //         array("code" => ApiResponse::OK, "data" => $rating_infor->toArray())
+    //     , json_decode($response->getContent(), true));
+    // }
+
 }

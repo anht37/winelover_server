@@ -72,32 +72,22 @@ class Rating extends Eloquent {
                 $user_timeline[] = $user->to_id;
             }
         }
-        if(Input::get('page')) {
-            $getPage = Input::get('page');
-            if(Input::get('per_page')) {
-                $getLimit = Input::get('per_page');
-            } else {
-                $getLimit = 10;     
-            }
-            $paginate = Wine::paginate($getPage, $getLimit);
-            if($paginate !== false) {
-                $page = $paginate['page'];
-                $limit = $paginate['limit'];
-                
-            } else {
-                $error_code = ApiResponse::URL_NOT_EXIST;
-                $data = ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST);
-                return array("code" => $error_code, "data" => $data);
-            }
-
-        } else {
-            $page = 1;
-            $limit = 15;
-        }
+        $pagination = ApiResponse::pagination();
+        $page = $pagination['page'];
+        $limit = $pagination['limit'];
+        $wine = Wine::with('winery')->forPage($page, $limit)->get();
 
         $ratings = Rating::whereIn('user_id', $user_timeline)->whereNotNull('wine_unique_id')->with('profile')->with('wine')->forPage($page, $limit)->get();
 
-        if ($ratings) {
+        if (count($ratings) == 0) {
+            if($page == 1) {
+                $data = "Don't have any rating !";
+            } else {
+                $error_code = ApiResponse::URL_NOT_EXIST;
+                $data = ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST);
+            }
+            
+        } else {
             foreach ($ratings as $rating) {   
                 $winery = Winery::where('id', $rating->wine->winery_id)->first();
                 $rating->winery= $winery;
@@ -126,8 +116,6 @@ class Rating extends Eloquent {
                 }
             }
             $data = $ratings;
-        } else {
-            $data = "Don't have any rating !";
         }
         return array("code" => $error_code, "data" => $data);
     }
