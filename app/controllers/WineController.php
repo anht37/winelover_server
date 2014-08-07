@@ -132,12 +132,12 @@ class WineController extends ApiController {
             if($wine->wine_flag != null) {
             	$wine->wine_flag = URL::asset($wine->wine_flag);
             } 
-			
+			$data = array('wine' => $wine,'rate_user' => $rating_user ,'rate' => $rating );
 		} else {
 			$error_code = ApiResponse::UNAVAILABLE_WINE;
             $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_WINE);
 		}
- 		return Response::json(array("code" => $error_code, "data" => array('wine' => $wine,'rate_user' => $rating_user ,'rate' => $rating )));
+ 		return Response::json(array("code" => $error_code, "data" => $data));
 	}
 
 

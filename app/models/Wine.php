@@ -11,8 +11,8 @@ class Wine extends Eloquent {
 	);	 
 
 	public static function scan($file_path) {
-        $query = Config::get('winedetect.script').' predict '.Config::get('winedetect.config').' '.$file_path;
-        return exec($query);
+        $connection = new TcpConnetion();
+        return $connection->sendRequest($file_path,"PRED");
     }
     public function winery()
 	{
