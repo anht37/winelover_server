@@ -11,44 +11,26 @@ class WineController extends ApiController {
 	public function index()
 	{
 		$error_code = ApiResponse::OK;
-		if(Input::get('page')) {
-			$getPage = Input::get('page');
-			if(Input::get('per_page')) {
-				$getLimit = Input::get('per_page');
-			} else {
-				$getLimit = 10;		
-			}
-			$paginate = Wine::paginate($getPage, $getLimit);
-			if($paginate !== false) {
-				$page = $paginate['page'];
-				$limit = $paginate['limit'];
-				
-			} else {
-				$error_code = ApiResponse::URL_NOT_EXIST;
-		       	$data = ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST);
-		     	return Response::json(array("code" => $error_code, "data" => $data));
-			}
-
-		} else {
-			$page = 1;
-			$limit = 10;
-		}
-
+		$pagination = ApiResponse::pagination();
+		$page = $pagination['page'];
+		$limit = $pagination['limit'];
 		$wine = Wine::with('winery')->forPage($page, $limit)->get();
-		
-		foreach ($wine as $wines) {
-			$wines->winery_id = $wines->winery->brand_name;
-			if($wines->image_url != null) {
-            	$wines->image_url = URL::asset($wines->image_url);
-            }   
-            if($wines->wine_flag != null) {
-            	$wines->wine_flag = URL::asset($wines->wine_flag);
-            } 
+		if(count($wine) == 0) {
+			$error_code = ApiResponse::URL_NOT_EXIST;
+            $data = ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST);
+		} else {
+			foreach ($wine as $wines) {
+				$wines->winery_id = $wines->winery->brand_name;
+				if($wines->image_url != null) {
+	            	$wines->image_url = URL::asset($wines->image_url);
+	            }   
+	            if($wines->wine_flag != null) {
+	            	$wines->wine_flag = URL::asset($wines->wine_flag);
+	            } 
+			}
+			$data = $wine->toArray();
 		}
-		
-		
-        $data = $wine->toArray();
-	    
+
 	    return Response::json(array("code" => $error_code, "data" => $data));
 	}
 	/**

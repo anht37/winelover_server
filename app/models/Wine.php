@@ -19,26 +19,7 @@ class Wine extends Eloquent {
     	return $this->belongsTo('Winery','winery_id');
 	}
 
-    public static function paginate($getPage, $getLimit) {
-        $paginate = array(
-            'page' => $getPage,
-            'limit' => $getLimit
-        );
-        
-        $rules = array(
-            'page' => 'integer',
-            'limit' =>'integer'
-        );
-       
-        $validator = Validator::make($paginate, $rules);
-
-        if($validator->fails()) {
-            return false;
-        } else {
-            return $paginate;
-        }
-        
-    }
+    
     // public static function cmp($a, $b) {
     //     $a['user_id'] = Session::get('user_id');
     //     if($a['user_id'] == $b['user_id']) {
