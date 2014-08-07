@@ -20,7 +20,7 @@ class CreateWinesTable extends Migration {
 			$table->integer('winery_id');
 			$table->string('wine_flag')->nullable();
 			$table->string('image_url')->nullable();
-			$table->string('wine_unique_id');
+			$table->string('wine_unique_id')->nullable();
 			$table->float('average_price')->nullable();
 			$table->float('average_rate')->nullable();
 			$table->integer('wine_type')->default(3);
