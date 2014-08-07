@@ -86,7 +86,6 @@ class WineTableSeeder extends Seeder {
             } else {
                 $data['wine_flag'] = '';
             }
-
             Wine::create($data);
         }
 //        Wine::create(array(

@@ -40,7 +40,7 @@ class GetRatingMyWineTest extends ApiTestCase
 
         $rating_infor = Rating::with('wine')->get();
 
-        $this->assertEquals(array("code" => ApiResponse::OK, "data" => "Don't have any rating !")
+        $this->assertEquals(array("code" => ApiResponse::OK, "data" => "")
         , json_decode($response->getContent(), true));
     }
     public function testGetListRatingMyWineSuccess() 

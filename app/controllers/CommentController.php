@@ -19,7 +19,7 @@ class CommentController extends \BaseController {
 		 	if(count($comment) > 0){
 		 		$data = $comment->toArray();
 		 	} else {
-		        $data = 'No Comment';
+		        $data = '';
 		 	}
 
 		} else {

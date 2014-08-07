@@ -17,7 +17,7 @@ class WineController extends ApiController {
 		$wine = Wine::with('winery')->forPage($page, $limit)->get();
 		if(count($wine) == 0) {
 			if($page == 1) {
-				$data = "Don't have any Wine";
+				$data = "";
 			} else {
 				$error_code = ApiResponse::URL_NOT_EXIST;
             	$data = ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST);
@@ -120,16 +120,16 @@ class WineController extends ApiController {
     		if($wine_note) {
     			$wine->winenote = $wine_note->note;
     		} else {
-    			$wine->winenote = "Don't have any note";
+    			$wine->winenote = "";
     		}
     		$wine->winery->country_id = $country_name;
     		$rating_user = Rating::where('wine_unique_id', $wine->wine_unique_id)->where('user_id',$user_id)->with('profile')->first();
     		if(count($rating_user) == 0) {
-            	$rating_user = "Don't have any rate !";
+            	$rating_user = "";
             }
             $rating = Rating::where('wine_unique_id', $wine->wine_unique_id)->whereNotIn('user_id',[$user_id])->with('profile')->get();
             if(count($rating) == 0) {
-            	$rating = "Don't have any rate !";
+            	$rating = "";
             }
             if($wine->image_url != null) {
             	$wine->image_url = URL::asset($wine->image_url);

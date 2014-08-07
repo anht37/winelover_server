@@ -52,6 +52,27 @@ Route::group(array('prefix' => 'api'), function()
         Route::get('profile/top_rate/{user_id}/{per_page}', 'ProfileController@getProfile_Top_rate');
         
         Route::get('timeline', 'UserController@timeline');
+        Route::get('feature_users', function()
+        {
+            
+            $error_code = ApiResponse::OK;
+            $pagination = ApiResponse::pagination();
+            $page = $pagination['page'];
+            $limit = $pagination['limit'];
+            $user = User::forPage($page, $limit)->get();
+            if(count($user) == 0) {
+                if($page == 1) {
+                    $data = "";
+                } else {
+                    $error_code = ApiResponse::URL_NOT_EXIST;
+                    $data = ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST);
+                }   
+            } else {
+                $data = $user->toArray();
+            }
+            return Response::json(array("code" => $error_code, "data" => $data));
+
+        });
 
     });
 });

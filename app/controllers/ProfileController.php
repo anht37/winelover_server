@@ -245,7 +245,7 @@ class ProfileController extends ApiController {
 					$wishlist = Wishlist::where('user_id', $user_id)->with('wine')->forPage($page, $limit)->get();
 					if (count($wishlist) == 0) {
 						if($page == 1) {
-							$data = 'No Wine in wishlist';
+							$data = '';
 						} else {
 							$error_code = ApiResponse::URL_NOT_EXIST;
            					 $data = ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST);

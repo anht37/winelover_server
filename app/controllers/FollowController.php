@@ -16,7 +16,7 @@ class FollowController extends ApiController {
 		if($follow) {
 			$data = $follow->toArray();
 		} else {
-			$data = "Don't have any user is followed !";
+			$data = "";
 		} 
 	    return Response::json(array("code" => $error_code, "data" => $data));
 	}
