@@ -42,5 +42,29 @@ class WinenoteTableSeeder extends Seeder {
                 )
             );
         }
+        Winenote::create(
+            $data = array(
+                'id' => "32",
+                'wine_unique_id' => "1_2011",
+                'user_id' => $user_id,
+                'note' => 'This is note' . $i ,
+            )
+        );
+        Winenote::create(
+            $data = array(
+                'id' => "33",
+                'wine_unique_id' => "2_2010",
+                'user_id' => $user_id,
+                'note' => 'This is note' . $i ,
+            )
+        );
+        Winenote::create(
+            $data = array(
+                'id' => "34",
+                'wine_unique_id' => "3_2011",
+                'user_id' => $user_id,
+                'note' => 'This is note' . $i ,
+            )
+        );
  	}
 }

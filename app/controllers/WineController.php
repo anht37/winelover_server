@@ -16,8 +16,13 @@ class WineController extends ApiController {
 		$limit = $pagination['limit'];
 		$wine = Wine::with('winery')->forPage($page, $limit)->get();
 		if(count($wine) == 0) {
-			$error_code = ApiResponse::URL_NOT_EXIST;
-            $data = ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST);
+			if($page == 1) {
+				$data = "Don't have any Wine";
+			} else {
+				$error_code = ApiResponse::URL_NOT_EXIST;
+            	$data = ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST);
+			}
+			
 		} else {
 			foreach ($wine as $wines) {
 				$wines->winery_id = $wines->winery->brand_name;

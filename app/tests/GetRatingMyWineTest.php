@@ -47,8 +47,10 @@ class GetRatingMyWineTest extends ApiTestCase
     {
         $this->setUpRating();
         $response = $this->call('GET', 'api/rating');
-        
-        $rating_infor = Rating::with('wine')->get();
+        $page = 1;
+        $limit = 10;
+        $rating_infor = Rating::with('wine')->forPage($page, $limit)->get();
+        $error_code = ApiResponse::OK;
         foreach ($rating_infor as $rating) {
             $rating->winery = Winery::where('id',$rating->wine->winery_id)->first()->toArray();
         }
@@ -56,6 +58,14 @@ class GetRatingMyWineTest extends ApiTestCase
         , json_decode($response->getContent(), true));
 
             
+    }
+    public function testGetListRatingMyWineWrongPage() 
+    {
+        $this->setUpRating();
+        $response = $this->call('GET', 'api/rating?page=2');
+        
+        $this->assertEquals(array("code" => ApiResponse::URL_NOT_EXIST, "data" =>  ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST))
+        , json_decode($response->getContent(), true)); 
     }
     public function testGetRatingDetailSuccess() 
     {
