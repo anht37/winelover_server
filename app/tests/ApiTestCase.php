@@ -85,8 +85,8 @@ class ApiTestCase extends TestCase {
         $winery = new Winery();
         $winery->id = 1;
         $winery->brand_name = 'Winery 1';
-        $winery->country_id = '2';
-        $winery->region = 'Chile';
+        $winery->country_id = '1';
+        $winery->region = 'Abkhazia';
         $winery->save();
 
         $wine = new Wine();
@@ -103,6 +103,7 @@ class ApiTestCase extends TestCase {
         $this->session(array('user_id' => $this->_user_id ));
 
     }
+
     public function setUpRating()
     {
         $rating = new Rating();
@@ -113,6 +114,82 @@ class ApiTestCase extends TestCase {
         $rating->comment_count = '8';
         $rating->like_count = '6';
         $rating->save();
+
+        $rating = new Rating();
+        $rating->id = 2;
+        $rating->user_id = '3620a42d-fcbb-45eb-b3a5-36cada1b77b7';
+        $rating->wine_unique_id = '1_2009';
+        $rating->rate = '2';
+        $rating->comment_count = '18';
+        $rating->like_count = '7';
+        $rating->save();
+
+        $rating = new Rating();
+        $rating->id = 3;
+        $rating->user_id = '1803a4fd-0e90-45ae-ad75-d8d3d2448d5e';
+        $rating->wine_unique_id = '1_2009';
+        $rating->rate = '5';
+        $rating->comment_count = '3';
+        $rating->like_count = '4';
+        $rating->save();
+    }
+
+    public function setUpCountry()
+    {
+        $country = new Country();
+        $country->id = 1;
+        $country->country_name = 'Abkhazia';
+        $country->flag_url = 'flags/Abkhazia.png';
+        $country->save();
+    }
+
+    public function setUpWineNote()
+    {
+        $winenote = new Winenote();
+        $winenote->wine_unique_id = '1_2009';
+        $winenote->note = 'this is note test';
+        $winenote->user_id = $this->_user_id;
+        $winenote->save();
+    }
+
+    public function setUpProfile()
+    {
+        $profile = new Profile();
+        $profile->id = 1;
+        $profile->user_id = $this->_user_id;
+        $profile->follower_count = '3';
+        $profile->following_count = '5';
+        $profile->rate_count = '1';
+        $profile->comment_count = '2';
+        $profile->scan_count = '5';
+        $profile->last_name = 'pro1';
+        $profile->first_name = 'user login';
+        $profile->save();
+
+        $profile = new Profile();
+        $profile->id = 2;
+        $profile->user_id = '3620a42d-fcbb-45eb-b3a5-36cada1b77b7' ;
+        $profile->follower_count = '4';
+        $profile->following_count = '7';
+        $profile->rate_count = '6';
+        $profile->comment_count = '9';
+        $profile->scan_count = '15';
+        $profile->last_name = 'pro2';
+        $profile->first_name = 'user other 1';
+        $profile->save();
+
+        $profile = new Profile();
+        $profile->id = 3;
+        $profile->user_id = '1803a4fd-0e90-45ae-ad75-d8d3d2448d5e' ;
+        $profile->follower_count = '13';
+        $profile->following_count = '2';
+        $profile->rate_count = '15';
+        $profile->comment_count = '12';
+        $profile->scan_count = '8';
+        $profile->last_name = 'pro3';
+        $profile->first_name = 'user login';
+        $profile->save();
+        
     }
 
 } 

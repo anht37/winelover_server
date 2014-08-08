@@ -34,6 +34,7 @@ class ApiResponse {
     const NOT_EXISTED_FOLLOW = "118";
     const UNAVAILABLE_WINE_NOTE = "119";
     const DUPLICATED_WINE_NOTE_ADD = "120";
+    const SELF_FOLLOW_ERROR = "121";
 
 
     private static $ERROR_LIST = array(
@@ -59,6 +60,7 @@ class ApiResponse {
         "118" => "Follow not exist",
         "119" => "Wine note is not available",
         "120" => "Duplicated Wine note",
+        "121" => "Can't follow yourself",
     );
 
     public static function createResponse($response) {

@@ -43,6 +43,7 @@ class GetRatingMyWineTest extends ApiTestCase
         $this->assertEquals(array("code" => ApiResponse::OK, "data" => "")
         , json_decode($response->getContent(), true));
     }
+
     public function testGetListRatingMyWineSuccess() 
     {
         $this->setUpRating();
@@ -59,6 +60,7 @@ class GetRatingMyWineTest extends ApiTestCase
 
             
     }
+
     public function testGetListRatingMyWineWrongPage() 
     {
         $this->setUpRating();
@@ -67,6 +69,7 @@ class GetRatingMyWineTest extends ApiTestCase
         $this->assertEquals(array("code" => ApiResponse::URL_NOT_EXIST, "data" =>  ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST))
         , json_decode($response->getContent(), true)); 
     }
+
     public function testGetRatingDetailSuccess() 
     {
         $this->setUpRating();
@@ -76,6 +79,7 @@ class GetRatingMyWineTest extends ApiTestCase
         , json_decode($response->getContent(), true));
 
     }
+    
     public function testGetRatingDetailErrorNoRating() 
     {
         $response = $this->call('GET', 'api/rating/1');

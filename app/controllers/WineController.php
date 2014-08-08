@@ -123,6 +123,31 @@ class WineController extends ApiController {
     			$wine->winenote = "";
     		}
     		$wine->winery->country_id = $country_name;
+    		
+    		$all_wines_winery = Wine::where('winery_id', $wine->winery_id)->whereNotIn('wine_id', [$wine_id])->get();
+    		$wine->winery->count_wine = count($all_wines_winery) + 1 ;
+    		$rate_winery = $wine->rate_count;
+    		if(count($all_wines_winery) !== 0) {
+    			
+	    		$sum_rate_winery = $wine->average_rate;
+	    		foreach ($all_wines_winery as $wine_winery) {
+	    			$wine_on_winery = Wine::where('wine_id', $wine_winery->wine_id)->first();
+	    			
+	    			$rate_count = $wine_on_winery->rate_count;
+	    			$rate_winery = $rate_winery + $rate_count;
+	    			
+	    			$average_rate = $wine_on_winery->average_rate;
+	    			$sum_rate_winery = $sum_rate_winery + $average_rate;
+
+	    		}
+
+	    		$wine->winery->total_rate = $rate_winery;
+	    		$wine->winery->average_rate_winery = $sum_rate_winery/count($all_wines_winery);
+    		} else {
+    			$wine->winery->total_rate = $rate_winery;
+	    		$wine->winery->average_rate_winery = $wine->average_rate;
+    		}
+
     		$rating_user = Rating::where('wine_unique_id', $wine->wine_unique_id)->where('user_id',$user_id)->with('profile')->first();
     		if(count($rating_user) == 0) {
             	$rating_user = "";
@@ -130,6 +155,15 @@ class WineController extends ApiController {
             $rating = Rating::where('wine_unique_id', $wine->wine_unique_id)->whereNotIn('user_id',[$user_id])->with('profile')->get();
             if(count($rating) == 0) {
             	$rating = "";
+            } else {
+            	foreach ($rating as $ratings) {
+	            	$follow = Follow::where('from_id', $rating_user->user_id)->where('to_id', $rating->user_id)->first();
+	            	if($follow) {
+	            		$ratings->is_follow = true;
+	            	} else {
+	            		$ratings->is_follow = false;
+	            	}
+	            }
             }
             if($wine->image_url != null) {
             	$wine->image_url = URL::asset($wine->image_url);
@@ -137,7 +171,8 @@ class WineController extends ApiController {
             if($wine->wine_flag != null) {
             	$wine->wine_flag = URL::asset($wine->wine_flag);
             } 
-			$data = array('wine' => $wine,'rate_user' => $rating_user ,'rate' => $rating );
+
+			$data = array('wine' => $wine,'rate_user' => $rating_user ,'rate' => $rating ,'wine_related' => $all_wines_winery);
 		} else {
 			$error_code = ApiResponse::UNAVAILABLE_WINE;
             $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_WINE);
@@ -225,9 +260,8 @@ class WineController extends ApiController {
 	 */
 	public function destroy($wine_id)
 	{
-		$wine = Wine::where('wine_id', $wine_id);
+		$wine = Wine::where('wine_id', $wine_id)->first();
 		$error_code = ApiResponse::OK;
- 
 	    if($wine) {
  			$wine->delete();
 	 		

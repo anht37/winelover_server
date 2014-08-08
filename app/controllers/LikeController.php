@@ -52,7 +52,7 @@ class LikeController extends ApiController {
 			    $check_rating = Rating::check_rating($like->rating_id);
 			    if ($check_rating !== false) {
 
-			    	if (Like::where('rating_id', $like->rating_id)->having('user_id', '=', $like->user_id)->first()) {
+			    	if (Like::where('rating_id', $like->rating_id)->where('user_id', '=', $like->user_id)->first()) {
 						$error_code = ApiResponse::DUPLICATED_LIKE;
 					 	$data = ApiResponse::getErrorContent(ApiResponse::DUPLICATED_LIKE);
 					} else {
@@ -146,7 +146,7 @@ class LikeController extends ApiController {
 				$like_rating->save();
 			}
  			$like->delete();
-	 		$data = 'like deleted';
+	 		$data = 'Like deleted';
  		} else {
  			$error_code = ApiResponse::NOT_EXISTED_LIKE;
 	        $data = ApiResponse::getErrorContent(ApiResponse::NOT_EXISTED_LIKE);

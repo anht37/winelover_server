@@ -45,34 +45,39 @@ class FollowController extends ApiController {
 		$input = $this->_getInput();
 	    $follow->from_id = Session::get('user_id');
 	    if(!empty($input['follow_id'])) {
-	    	$follow->to_id = $input['follow_id'];
-	    	$user = User::where('user_id', $follow->to_id)->first(); 
-		 	if ($user) {
+	    	if ($input['follow_id'] == $follow->from_id) {
+	    		$error_code = ApiResponse::SELF_FOLLOW_ERROR;
+	        	$data = ApiResponse::getErrorContent(ApiResponse::SELF_FOLLOW_ERROR);
+	    	} else {
+		    	$follow->to_id = $input['follow_id'];
+		    	$user = User::where('user_id', $follow->to_id)->first(); 
+			 	if ($user) {
 
-		 		if(Follow::where('from_id',$follow->from_id)->having('to_id', '=', $follow->to_id)->first()) {
-		 			
-		 			$error_code = ApiResponse::DUPLICATED_FOLLOW;
-	        		$data = ApiResponse::getErrorContent(ApiResponse::DUPLICATED_FOLLOW);
-		 		} else {
+			 		if(Follow::where('from_id',$follow->from_id)->having('to_id', '=', $follow->to_id)->first()) {
+			 			
+			 			$error_code = ApiResponse::DUPLICATED_FOLLOW;
+		        		$data = ApiResponse::getErrorContent(ApiResponse::DUPLICATED_FOLLOW);
+			 		} else {
 
-		 			$following_profile = Profile::where('user_id', $follow->from_id)->first();
-					if($following_profile != null) {
-						$following_profile->following_count = $following_profile->following_count + 1;
-						$following_profile->save();
-					}
-					$follower_profile = Profile::where('user_id', $follow->to_id)->first();
-					if($follower_profile) {
-						$follower_profile->follower_count = $follower_profile->follower_count + 1;
-						$follower_profile->save();
-					}
-			 		$follow->save();
-			        $data = $follow->toArray();
-		 		}
+			 			$following_profile = Profile::where('user_id', $follow->from_id)->first();
+						if($following_profile != null) {
+							$following_profile->following_count = $following_profile->following_count + 1;
+							$following_profile->save();
+						}
+						$follower_profile = Profile::where('user_id', $follow->to_id)->first();
+						if($follower_profile) {
+							$follower_profile->follower_count = $follower_profile->follower_count + 1;
+							$follower_profile->save();
+						}
+				 		$follow->save();
+				        $data = $follow->toArray();
+			 		}
 
-		 	} else {
-		 		$error_code = ApiResponse::UNAVAILABLE_USER;
-	        	$data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_USER);
-		 	}
+			 	} else {
+			 		$error_code = ApiResponse::UNAVAILABLE_USER;
+		        	$data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_USER);
+			 	}
+			}
 	    } else {
 	    	$error_code = ApiResponse::MISSING_PARAMS;
 	        $data = $input;

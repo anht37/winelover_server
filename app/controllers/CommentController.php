@@ -15,8 +15,14 @@ class CommentController extends \BaseController {
 		$check_rating = Rating::check_rating($rating_id);
 		if ($check_rating !== false) {
 
-		 	$comment = Comment::where('user_id',$user_id)->where('rating_id', $rating_id)->get();
+		 	$comment = Comment::where('rating_id', $rating_id)->get();
 		 	if(count($comment) > 0){
+		 		foreach ($comment as $comments) {
+		 			$profile = Profile::where('user_id', $comments->user_id)->first();
+		 			$comments->avatar_user = URL::asset($profile->image);
+		 			$comments->first_name = $profile->first_name;
+		 			$comments->last_name = $profile->last_name;
+		 		}
 		 		$data = $comment->toArray();
 		 	} else {
 		        $data = '';
