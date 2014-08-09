@@ -110,6 +110,14 @@ class CommentController extends \BaseController {
 		$error_code = ApiResponse::OK;
 		$comment = Comment::where('id', $id)->first();
 	    if($comment) {
+	    	$profile = Profile::where('user_id', $comment->user_id)->first();
+		 	if($profile->image != null) {
+		 		$comment->avatar_user = URL::asset($profile->image);
+		 	} else {
+		 		$comment->avatar_user = $profile->image;
+		 	}
+		 	$comment->first_name = $profile->first_name;
+		 	$comment->last_name = $profile->last_name;
 	       	$data = $comment->toArray();
 		} else {
 			$error_code = ApiResponse::UNAVAILABLE_COMMENT;

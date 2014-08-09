@@ -75,10 +75,27 @@ class CommentTest extends ApiTestCase
         , json_decode($response->getContent(), true));
     }
 
+    public function testGetListCommentErrorNoRating()
+    {
+        $response = $this->call('GET', 'api/comment/5');
+
+        $this->assertEquals(
+            array("code" => ApiResponse::UNAVAILABLE_RATING, "data" => ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING))
+        , json_decode($response->getContent(), true));
+    }
+
     public function testGetCommentDetailSuccess()
     {
         $response = $this->call('GET', 'api/comment/1/1');
         $comment_infor = Comment::where('id', 1)->first();
+        $profile = Profile::where('user_id', $comment_infor->user_id)->first();
+        if($profile->image != null) {
+            $comment_infor->avatar_user = URL::asset($profile->image);
+        } else {
+            $comment_infor->avatar_user = $profile->image;
+        }
+        $comment_infor->first_name = $profile->first_name;
+        $comment_infor->last_name = $profile->last_name;
         $this->assertEquals(
             array("code" => ApiResponse::OK, "data" => $comment_infor->toArray())
         , json_decode($response->getContent(), true));
@@ -101,7 +118,7 @@ class CommentTest extends ApiTestCase
         $response = $this->_getAuth($_params);
         //get created login information
         $comment_infor = Comment::get(array('user_id','rating_id', 'content', 'updated_at', 'created_at','id'))->last();
-        $this->assertNotNull($comment_infor);
+        $this->assertNotNull($comment_infor);s
         $this->assertEquals(
             array("code" => ApiResponse::OK, "data" => $comment_infor->toArray())
         , json_decode($response->getContent(), true));
