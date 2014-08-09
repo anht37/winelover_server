@@ -26,15 +26,27 @@ class WineTest extends ApiTestCase
         $this->_uri = 'api/wine';
         $this->_models = array('Wine', 'User', 'Login');
     }
+
     public function setUp()
     {
         parent::setUp();
         $this->setUpData();
+        $wine_note = new Winenote();
+        $wine_note->wine_unique_id = "1_2009";
+        $wine_note->user_id = $this->_user_id;
+        $wine_note->note = "this is note test";
+        $wine_note->save();
+
+        $follow = new Follow();
+        $follow->from_id = $this->_user_id;
+        $follow->to_id = "3620a42d-fcbb-45eb-b3a5-36cada1b77b7";
+        $follow->save();
     }
+
     public function testCreateWineSuccess()
     {
         $_params = $this->_params;
-        // $_params['wine_unique_id'] = $_params['wine_id']."_".$_params['year']; 
+        
         $response = $this->_getAuth($_params);
         //get created login information
         $wine_infor = Wine::get(array('name','wine_unique_id','year','winery_id', 'average_price', 'average_rate', 'updated_at', 'created_at','wine_id'))->last();
@@ -43,6 +55,7 @@ class WineTest extends ApiTestCase
             array("code" => ApiResponse::OK, "data" => $wine_infor->toArray())
         , json_decode($response->getContent(), true));
     }
+
     public function testCreateWineErrorWrongWinery()
     {
         $_params = $this->_params;
@@ -64,6 +77,7 @@ class WineTest extends ApiTestCase
             array("code" => ApiResponse::MISSING_PARAMS, "data" => $_params)
         , json_decode($response->getContent(), true));
     }
+
     public function testCreateWineErrorMissingYear()
     {
         $_params = $this->_params;
@@ -74,6 +88,7 @@ class WineTest extends ApiTestCase
             array("code" => ApiResponse::MISSING_PARAMS, "data" => $_params)
         , json_decode($response->getContent(), true));
     }
+
     public function testCreateWineErrorMissingWineryId()
     {
         $_params = $this->_params;
@@ -84,12 +99,13 @@ class WineTest extends ApiTestCase
             array("code" => ApiResponse::MISSING_PARAMS, "data" => $_params)
         , json_decode($response->getContent(), true));
     }
+
     public function testGetListWineSuccess() 
     {
         $response = $this->call('GET', 'api/wine');
         $page = 1;
         $limit = 10;
-        $wine_infor =Wine::with('winery')->forPage($page, $limit)->get();
+        $wine_infor = Wine::with('winery')->forPage($page, $limit)->get();
         $error_code = ApiResponse::OK;
         foreach ($wine_infor as $wines) {
             $wines->winery_id = $wines->winery->brand_name;
@@ -102,9 +118,9 @@ class WineTest extends ApiTestCase
         }
         $this->assertEquals(array("code" => ApiResponse::OK, "data" => $wine_infor->toArray())
         , json_decode($response->getContent(), true));
-
             
     }
+
     public function testGetListWineSuccessNoWine()
     {  
         $wine_infor = Wine::destroy(1);
@@ -122,11 +138,313 @@ class WineTest extends ApiTestCase
     }
 
     public function testGetWineDetailSuccess()
-    {
+    {   
+        $this->setUpRating();
+        $this->setUpCountry();
+        $this->setUpWineNote();
+        $this->setUpProfile();
         $response = $this->call('GET', 'api/wine/1');
         $wine_infor = Wine::where('wine_id', 1)->with('winery')->first();
-        $this->assertEquals(array("code" => ApiResponse::OK, "data" => $wine_infor->toArray())
+        $country_name = Country::where('id',$wine_infor->winery->country_id)->first()->country_name;
+
+        $wine_note = Winenote::where('wine_unique_id', $wine_infor->wine_unique_id)->where('user_id',$this->_user_id)->first();
+
+        $wine_infor->winenote = $wine_note->note;
+        $wine_infor->winery->country_id = $country_name;
+
+        $all_wines_winery = Wine::where('winery_id', $wine_infor->winery_id)->whereNotIn('wine_id', [1])->get();
+        $wine_infor->winery->count_wine = count($all_wines_winery) + 1 ;
+        $rate_winery = $wine_infor->rate_count;
+        if(count($all_wines_winery) !== 0) {
+            
+            $sum_rate_winery = $wine_infor->average_rate;
+            foreach ($all_wines_winery as $wine_winery) {
+                $wine_on_winery = Wine::where('wine_id', $wine_winery->wine_id)->first();
+                
+                $rate_count = $wine_on_winery->rate_count;
+                $rate_winery = $rate_winery + $rate_count;
+                
+                $average_rate = $wine_on_winery->average_rate;
+                $sum_rate_winery = $sum_rate_winery + $average_rate;
+            }
+
+            $wine_infor->winery->total_rate = $rate_winery;
+            $wine_inforine->winery->average_rate_winery = $sum_rate_winery/count($all_wines_winery);
+        } else {
+            $wine_infor->winery->total_rate = $rate_winery;
+            $wine_infor->winery->average_rate_winery = $wine_infor->average_rate;
+        }
+
+        $rating_user = Rating::where('wine_unique_id', $wine_infor->wine_unique_id)->where('user_id',$this->_user_id)->with('profile')->first();
+        $rating = Rating::where('wine_unique_id', $wine_infor->wine_unique_id)->whereNotIn('user_id',[$this->_user_id])->with('profile')->get();
+        if(count($rating) == 0) {
+            $rating = "";
+        } else {
+            foreach ($rating as $ratings) {
+                $follow = Follow::where('from_id', $this->_user_id)->where('to_id', $ratings->user_id)->first();
+                if($follow) {
+                    $ratings->is_follow = true;
+                } else {
+                    $ratings->is_follow = false;
+                }
+            }
+        }
+        if($wine_infor->image_url != null) {
+            $wine_infor->image_url = URL::asset($wine_infor->image_url);
+        }   
+        if($wine_infor->wine_flag != null) {
+            $wine_infor->wine_flag = URL::asset($wine_infor->wine_flag);
+        } 
+
+        $data = array('wine' => $wine_infor->toArray(),'rate_user' => $rating_user->toArray() ,'rate' => $rating->toArray(), 'wine_related' => $all_wines_winery->toArray());
+
+        $this->assertEquals(array("code" => ApiResponse::OK, "data" => $data)
         , json_decode($response->getContent(), true));
 
+    }
+
+    public function testGetWineDetailSuccessNoRate_user()
+    {   
+        $this->setUpRating();
+        $this->setUpCountry();
+        $this->setUpProfile();
+        $response = $this->call('GET', 'api/wine/1');
+        $wine_infor = Wine::where('wine_id', 1)->with('winery')->first();
+
+        $country_name = Country::where('id',$wine_infor->winery->country_id)->first()->country_name;
+
+        $wine_note = Winenote::where('wine_unique_id', $wine_infor->wine_unique_id)->where('user_id',$this->_user_id)->first();
+        $wine_infor->winenote = $wine_note->note;
+          
+        $wine_infor->winery->country_id = $country_name;
+        $all_wines_winery = Wine::where('winery_id', $wine_infor->winery_id)->whereNotIn('wine_id', [1])->get();
+        $wine_infor->winery->count_wine = count($all_wines_winery) + 1 ;
+        $rate_winery = $wine_infor->rate_count;
+        if(count($all_wines_winery) !== 0) {
+            
+            $sum_rate_winery = $wine_infor->average_rate;
+            foreach ($all_wines_winery as $wine_winery) {
+                $wine_on_winery = Wine::where('wine_id', $wine_winery->wine_id)->first();
+                
+                $rate_count = $wine_on_winery->rate_count;
+                $rate_winery = $rate_winery + $rate_count;
+                
+                $average_rate = $wine_on_winery->average_rate;
+                $sum_rate_winery = $sum_rate_winery + $average_rate;
+            }
+
+            $wine_infor->winery->total_rate = $rate_winery;
+            $wine_inforine->winery->average_rate_winery = $sum_rate_winery/count($all_wines_winery);
+        } else {
+            $wine_infor->winery->total_rate = $rate_winery;
+            $wine_infor->winery->average_rate_winery = $wine_infor->average_rate;
+        }
+
+        $rating_user = Rating::where('wine_unique_id', $wine_infor->wine_unique_id)->where('user_id',$this->_user_id)->with('profile')->first();
+        $rating = Rating::where('wine_unique_id', $wine_infor->wine_unique_id)->whereNotIn('user_id',[$this->_user_id])->with('profile')->get();
+        if(count($rating) == 0) {
+            $rating = "";
+        } else {
+            foreach ($rating as $ratings) {
+                $follow = Follow::where('from_id', $this->_user_id)->where('to_id', $ratings->user_id)->first();
+                if($follow) {
+                    $ratings->is_follow = true;
+                } else {
+                    $ratings->is_follow = false;
+                }
+            }
+        }
+        if($wine_infor->image_url != null) {
+            $wine_infor->image_url = URL::asset($wine_infor->image_url);
+        }   
+        if($wine_infor->wine_flag != null) {
+            $wine_infor->wine_flag = URL::asset($wine_infor->wine_flag);
+        } 
+        $data = array('wine' => $wine_infor->toArray(),'rate_user' => $rating_user->toArray() ,'rate' => $rating->toArray(), 'wine_related' => $all_wines_winery->toArray());
+
+        $this->assertEquals(array("code" => ApiResponse::OK, "data" => $data)
+        , json_decode($response->getContent(), true));
+
+    }
+    public function testGetWineDetailNoRatingOtherUser()
+    {   
+        $this->setUpRating();
+        $this->setUpCountry();
+        $this->setUpWineNote();
+        $this->setUpProfile();
+        $rate_user1 = Rating::destroy(2);
+        $rate_user2= Rating::destroy(3);
+        $response = $this->call('GET', 'api/wine/1');
+        $wine_infor = Wine::where('wine_id', 1)->with('winery')->first();
+
+        $country_name = Country::where('id',$wine_infor->winery->country_id)->first()->country_name;
+
+        $wine_note = Winenote::where('wine_unique_id', $wine_infor->wine_unique_id)->where('user_id',$this->_user_id)->first();
+
+        $wine_infor->winenote = $wine_note->note;
+        $wine_infor->winery->country_id = $country_name;
+
+        $all_wines_winery = Wine::where('winery_id', $wine_infor->winery_id)->whereNotIn('wine_id', [1])->get();
+        $wine_infor->winery->count_wine = count($all_wines_winery) + 1 ;
+        $rate_winery = $wine_infor->rate_count;
+        if(count($all_wines_winery) !== 0) {
+            
+            $sum_rate_winery = $wine_infor->average_rate;
+            foreach ($all_wines_winery as $wine_winery) {
+                $wine_on_winery = Wine::where('wine_id', $wine_winery->wine_id)->first();
+                
+                $rate_count = $wine_on_winery->rate_count;
+                $rate_winery = $rate_winery + $rate_count;
+                
+                $average_rate = $wine_on_winery->average_rate;
+                $sum_rate_winery = $sum_rate_winery + $average_rate;
+            }
+
+            $wine_infor->winery->total_rate = $rate_winery;
+            $wine_infor->winery->average_rate_winery = $sum_rate_winery/count($all_wines_winery);
+        } else {
+            $wine_infor->winery->total_rate = $rate_winery;
+            $wine_infor->winery->average_rate_winery = $wine_infor->average_rate;
+        }
+
+        $rating_user = Rating::where('wine_unique_id', $wine_infor->wine_unique_id)->where('user_id',$this->_user_id)->with('profile')->first();
+        $rating = Rating::where('wine_unique_id', $wine_infor->wine_unique_id)->whereNotIn('user_id',[$this->_user_id])->with('profile')->get();
+        if(count($rating) == 0) {
+                $rating = "";
+        }
+        if($wine_infor->image_url != null) {
+            $wine_infor->image_url = URL::asset($wine_infor->image_url);
+        }   
+        if($wine_infor->wine_flag != null) {
+            $wine_infor->wine_flag = URL::asset($wine_infor->wine_flag);
+        } 
+
+        $data = array('wine' => $wine_infor->toArray(),'rate_user' => $rating_user->toArray() ,'rate' => $rating, 'wine_related' => $all_wines_winery->toArray());
+
+        $this->assertEquals(array("code" => ApiResponse::OK, "data" => $data)
+        , json_decode($response->getContent(), true));
+
+    }
+    public function testGetWineDetailNoWineNote()
+    {   
+        $this->setUpRating();
+        $this->setUpCountry();
+        $this->setUpProfile();
+        $wine_note = Winenote::destroy(1);
+        $response = $this->call('GET', 'api/wine/1');
+        $wine_infor = Wine::where('wine_id', 1)->with('winery')->first();
+
+        $country_name = Country::where('id',$wine_infor->winery->country_id)->first()->country_name;
+
+        $wine_infor->winenote = "";
+        $wine_infor->winery->country_id = $country_name;
+        $all_wines_winery = Wine::where('winery_id', $wine_infor->winery_id)->whereNotIn('wine_id', [1])->get();
+        $wine_infor->winery->count_wine = count($all_wines_winery) + 1 ;
+        $rate_winery = $wine_infor->rate_count;
+        if(count($all_wines_winery) !== 0) {
+            
+            $sum_rate_winery = $wine_infor->average_rate;
+            foreach ($all_wines_winery as $wine_winery) {
+                $wine_on_winery = Wine::where('wine_id', $wine_winery->wine_id)->first();
+                
+                $rate_count = $wine_on_winery->rate_count;
+                $rate_winery = $rate_winery + $rate_count;
+                
+                $average_rate = $wine_on_winery->average_rate;
+                $sum_rate_winery = $sum_rate_winery + $average_rate;
+            }
+
+            $wine_infor->winery->total_rate = $rate_winery;
+            $wine_inforine->winery->average_rate_winery = $sum_rate_winery/count($all_wines_winery);
+        } else {
+            $wine_infor->winery->total_rate = $rate_winery;
+            $wine_infor->winery->average_rate_winery = $wine_infor->average_rate;
+        }
+
+        $rating_user = Rating::where('wine_unique_id', $wine_infor->wine_unique_id)->where('user_id',$this->_user_id)->with('profile')->first();
+        $rating = Rating::where('wine_unique_id', $wine_infor->wine_unique_id)->whereNotIn('user_id',[$this->_user_id])->with('profile')->get();
+        if(count($rating) == 0) {
+            $rating = "";
+        } else {
+            foreach ($rating as $ratings) {
+                $follow = Follow::where('from_id', $this->_user_id)->where('to_id', $ratings->user_id)->first();
+                if($follow) {
+                    $ratings->is_follow = true;
+                } else {
+                    $ratings->is_follow = false;
+                }
+            }
+        }
+        if($wine_infor->image_url != null) {
+            $wine_infor->image_url = URL::asset($wine_infor->image_url);
+        }   
+        if($wine_infor->wine_flag != null) {
+            $wine_infor->wine_flag = URL::asset($wine_infor->wine_flag);
+        } 
+        $data = array('wine' => $wine_infor->toArray(),'rate_user' => $rating_user->toArray() ,'rate' => $rating->toArray(), 'wine_related' => $all_wines_winery->toArray());
+
+        $this->assertEquals(array("code" => ApiResponse::OK, "data" => $data)
+        , json_decode($response->getContent(), true));
+
+    }
+
+    public function testGetWineDetailError()
+    {
+        $wine_infor = Wine::destroy(1);
+        $response = $this->call('GET', 'api/wine/1');
+        $this->assertEquals(array("code" => ApiResponse::UNAVAILABLE_WINE, "data" => ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_WINE))
+        , json_decode($response->getContent(), true));
+
+    }
+    public function testUpdateWineSuccess()
+    {
+        $_params = $this->_params;
+        $response = $this->action('POST', 'WineController@update', array('wine_id' => 1), array('data' => json_encode($_params), '_method' => 'PUT'));
+        //get created login information
+        $wine_infor = Wine::where('wine_id', 1)->first();
+        $this->assertEquals(
+            array("code" => ApiResponse::OK, "data" => $wine_infor->toArray())
+        , json_decode($response->getContent(), true));
+    }
+
+    public function testUpdateWineErrorWrongWinery_id()
+    {
+        $_params = $this->_params;
+        $_params['winery_id'] = 'wrong_winery_id';
+        $response = $this->action('POST', 'WineController@update', array('wine_id' => 1), array('data' => json_encode($_params), '_method' => 'PUT'));
+        $this->assertEquals(json_encode(array("code" => ApiResponse::UNAVAILABLE_WINERY, "data" => ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_WINERY))), $response->getContent());
+    }
+
+    public function testUpdateWineErrorNoWine()
+    {
+        $_params = $this->_params;
+        $wine_infor = Wine::destroy(1);
+        $response = $this->action('POST', 'WineController@update', array('wine_id' => 1), array('data' => json_encode($_params), '_method' => 'PUT'));
+        $this->assertEquals(array("code" => ApiResponse::UNAVAILABLE_WINE, "data" => ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_WINE))
+        , json_decode($response->getContent(), true));
+    }
+
+    public function testUpdateWineErrorNoInput()
+    {
+        $data = array();
+        $response = $this->action('POST', 'WineController@update', array('wine_id' => 1), array('data' => json_encode($data), '_method' => 'PUT'));
+        $this->assertEquals(array("code" => ApiResponse::MISSING_PARAMS, "data" => $data)
+        , json_decode($response->getContent(), true));
+    }
+
+     public function testDeleteWineNoWine()
+    {  
+        $wine_infor = Wine::destroy(1);
+        $wine = Wine::where('wine_id', 1)->first();
+        $response = $this->action('delete', 'WineController@destroy', array('wine_id' => 1));
+        $this->assertEquals(array("code" => ApiResponse::UNAVAILABLE_WINE, "data" => ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_WINE))
+        , json_decode($response->getContent(), true));
+    }
+
+    public function testDeleteWineSuccess() 
+    {
+        $response = $this->action('delete', 'WineController@destroy', array('wine_id' => 1));
+        $this->assertEquals(array("code" => ApiResponse::OK, "data" => "Wine deleted")
+         , json_decode($response->getContent(), true));
     }
 }

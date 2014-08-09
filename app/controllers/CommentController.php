@@ -19,7 +19,11 @@ class CommentController extends \BaseController {
 		 	if(count($comment) > 0){
 		 		foreach ($comment as $comments) {
 		 			$profile = Profile::where('user_id', $comments->user_id)->first();
-		 			$comments->avatar_user = URL::asset($profile->image);
+		 			if($profile->image != null) {
+		 				$comments->avatar_user = URL::asset($profile->image);
+		 			} else {
+		 				$comments->avatar_user = $profile->image;
+		 			}
 		 			$comments->first_name = $profile->first_name;
 		 			$comments->last_name = $profile->last_name;
 		 		}

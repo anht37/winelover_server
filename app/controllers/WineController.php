@@ -157,7 +157,7 @@ class WineController extends ApiController {
             	$rating = "";
             } else {
             	foreach ($rating as $ratings) {
-	            	$follow = Follow::where('from_id', $rating_user->user_id)->where('to_id', $rating->user_id)->first();
+	            	$follow = Follow::where('from_id', $rating_user->user_id)->where('to_id', $ratings->user_id)->first();
 	            	if($follow) {
 	            		$ratings->is_follow = true;
 	            	} else {
