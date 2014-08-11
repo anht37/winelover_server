@@ -47,7 +47,11 @@ class WineryController extends ApiController {
 	    	$winery->brand_name = $input['brand_name'];
 
 		    if (!empty($input['country_id'])) {
-		        $winery->country_id = $input['country_id'];
+		    	if( Country::where('id' , $input['country_id']->first())) {
+		    		$winery->country_id = $input['country_id'];
+		    	} else {
+		    		$winery->country_id = "";
+		    	}
 		    }
 		 	if (!empty($input['region'])) {
 		        $winery->region = $input['region'];
@@ -118,7 +122,11 @@ class WineryController extends ApiController {
 			        $winery->brand_name = $input['brand_name'];
 			    }
 			    if (!empty($input['country_id'])) {
-			        $winery->country_id = $input['country_id'];
+			        if( Country::where('id' , $input['country_id']->first())) {
+		    			$winery->country_id = $input['country_id'];
+			    	} else {
+			    		$winery->country_id = "";
+			    	}
 			    }
 			 	if (!empty($input['region'])) {
 			        $winery->region = $input['region'];

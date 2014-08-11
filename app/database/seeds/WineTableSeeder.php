@@ -70,7 +70,7 @@ class WineTableSeeder extends Seeder {
                 'wine_id' => "$i",
                 'name' => "Wine_$i",
                 'year' => '2009',
-                'winery_id' => "$i",
+                'winery_id' => "1",
                 'wine_flag' => '',
                 'image_url' =>  'wines/'.$i.'.png',
                 'wine_unique_id' => $i . "_2009",

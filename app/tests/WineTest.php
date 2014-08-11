@@ -208,7 +208,9 @@ class WineTest extends ApiTestCase
         $this->setUpRating();
         $this->setUpCountry();
         $this->setUpProfile();
+        $rating_user_destroy = Rating::destroy(1);
         $response = $this->call('GET', 'api/wine/1');
+        //dd($response);
         $wine_infor = Wine::where('wine_id', 1)->with('winery')->first();
 
         $country_name = Country::where('id',$wine_infor->winery->country_id)->first()->country_name;
@@ -260,8 +262,8 @@ class WineTest extends ApiTestCase
         if($wine_infor->wine_flag != null) {
             $wine_infor->wine_flag = URL::asset($wine_infor->wine_flag);
         } 
-        $data = array('wine' => $wine_infor->toArray(),'rate_user' => $rating_user->toArray() ,'rate' => $rating->toArray(), 'wine_related' => $all_wines_winery->toArray());
-
+        $data = array('wine' => $wine_infor->toArray(),'rate_user' => $rating_user ,'rate' => $rating->toArray(), 'wine_related' => $all_wines_winery->toArray());
+        //dd($data);
         $this->assertEquals(array("code" => ApiResponse::OK, "data" => $data)
         , json_decode($response->getContent(), true));
 

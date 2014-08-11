@@ -76,5 +76,25 @@ class RatingTableSeeder extends Seeder {
             'comment_count' => '5',
             'is_my_wine' => '1',
         ));
+        Rating::create(array(
+            'id' => '7',
+            'user_id' => $user_1,
+            'wine_unique_id' => '1_2011',
+            'rate' => '5',
+            'content' => 'this is rating 7',
+            'like_count' => '6',
+            'comment_count' => '15',
+            'is_my_wine' => '1',
+        ));
+        Rating::create(array(
+            'id' => '8',
+            'user_id' => $user_2,
+            'wine_unique_id' => '1_2011',
+            'rate' => '5',
+            'content' => 'this is rating 8',
+            'like_count' => '14',
+            'comment_count' => '8',
+            'is_my_wine' => '1',
+        ));
     }
 } 
