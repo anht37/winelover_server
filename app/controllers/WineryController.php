@@ -47,7 +47,7 @@ class WineryController extends ApiController {
 	    	$winery->brand_name = $input['brand_name'];
 
 		    if (!empty($input['country_id'])) {
-		    	if( Country::where('id' , $input['country_id']->first())) {
+		    	if( Country::where('id' , $input['country_id'])->first()) {
 		    		$winery->country_id = $input['country_id'];
 		    	} else {
 		    		$winery->country_id = "";
@@ -122,7 +122,7 @@ class WineryController extends ApiController {
 			        $winery->brand_name = $input['brand_name'];
 			    }
 			    if (!empty($input['country_id'])) {
-			        if( Country::where('id' , $input['country_id']->first())) {
+			        if( Country::where('id' , $input['country_id'])->first()) {
 		    			$winery->country_id = $input['country_id'];
 			    	} else {
 			    		$winery->country_id = "";
@@ -158,7 +158,7 @@ class WineryController extends ApiController {
 	 */
 	public function destroy($id)
 	{
-		$winery = Winery::where('id', $id);
+		$winery = Winery::where('id', $id)->first();
  		$error_code = ApiResponse::OK;
 	    if($winery) {
  			$winery->delete();

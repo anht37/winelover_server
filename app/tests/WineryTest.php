@@ -27,6 +27,7 @@ class WineryTest extends ApiTestCase
     {
         parent::setUp();
         $this->setUpData();
+        $this->setUpCountry();
     }
 
     public function testGetListWinerySuccess()
@@ -68,6 +69,7 @@ class WineryTest extends ApiTestCase
 
     public function testCreateWinerySuccess()
     {
+        
         $_params = $this->_params;
         $response = $this->_getAuth($_params);
         $winery_infor = Winery::get(array('brand_name','country_id', 'region', 'updated_at', 'created_at','id'))->last();   
@@ -76,10 +78,11 @@ class WineryTest extends ApiTestCase
         , json_decode($response->getContent(), true));
     }
 
-    public function testCreateWinerySuccessNoCountryId()
+    public function testCreateWinerySuccessWrongCountryId()
     {
+        
         $_params = $this->_params;
-        $_params['country_id'] = "";
+        $_params['country_id'] = "wrong_country_id";
         $response = $this->_getAuth($_params);
         $winery_infor = Winery::get(array('brand_name','country_id', 'region', 'updated_at', 'created_at','id'))->last();   
         $this->assertEquals(
@@ -102,33 +105,53 @@ class WineryTest extends ApiTestCase
         $_params = $this->_params;
         $response = $this->action('POST', 'WineryController@update', array('id' => 1), array('data' => json_encode($_params), '_method' => 'PUT'));
         //get created login information
-        $winery_infor = Wine::where('wine_id', 1)->first();
+        $winery_infor = Winery::where('id', 1)->first();
         $this->assertEquals(
             array("code" => ApiResponse::OK, "data" => $winery_infor->toArray())
         , json_decode($response->getContent(), true));
        
     }
 
-    public function testUpdateWinerySuccessNoCountryId()
+    public function testUpdateWinerySuccessWrongCountryId()
     {
-   
+        $_params = $this->_params;
+        $_params['country_id'] = "wrong_country_id";
+        $response = $this->action('POST', 'WineryController@update', array('id' => 1), array('data' => json_encode($_params), '_method' => 'PUT'));
+        //get created login information
+        $winery_infor = Winery::where('id', 1)->first();
+        $this->assertEquals(
+            array("code" => ApiResponse::OK, "data" => $winery_infor->toArray())
+        , json_decode($response->getContent(), true));
        
     }
 
     public function testUpdateWineryErrorNoWinery()
     {
-   
+        $_params = $this->_params;
+        $response = $this->action('POST', 'WineryController@update', array('id' => 2), array('data' => json_encode($_params), '_method' => 'PUT'));
+        //get created login information
+        $this->assertEquals(
+            array("code" => ApiResponse::UNAVAILABLE_WINERY, "data" => ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_WINERY))
+        , json_decode($response->getContent(), true));
        
     }
 
     public function testDeleteWinerySuccess()
     {
-       
+       $response = $this->action('delete', 'WineryController@destroy', array('id' => 1));
+        //get created login information
+        $this->assertEquals(
+            array("code" => ApiResponse::OK, "data" => 'Winery deleted')
+        , json_decode($response->getContent(), true));
     }
 
     public function testDeleteWineryErrorNoWinery()
     {
-       
+        $response = $this->action('delete', 'WineryController@destroy', array('id' => 2));
+        //get created login information
+        $this->assertEquals(
+            array("code" => ApiResponse::UNAVAILABLE_WINERY, "data" => ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_WINERY))
+        , json_decode($response->getContent(), true));
     }
 
 }
