@@ -53,7 +53,7 @@ class FollowController extends ApiController {
 		    	$user = User::where('user_id', $follow->to_id)->first(); 
 			 	if ($user) {
 
-			 		if(Follow::where('from_id',$follow->from_id)->having('to_id', '=', $follow->to_id)->first()) {
+			 		if(Follow::where('from_id',$follow->from_id)->where('to_id', '=', $follow->to_id)->first()) {
 			 			
 			 			$error_code = ApiResponse::DUPLICATED_FOLLOW;
 		        		$data = ApiResponse::getErrorContent(ApiResponse::DUPLICATED_FOLLOW);
@@ -137,30 +137,34 @@ class FollowController extends ApiController {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function destroy($id)
+	public function destroy($follow_id)
 	{	
 		$error_code = ApiResponse::OK;
 		$from_id = Session::get('user_id');
-		$follow = Follow::where('to_id', $id)->having('from_id', '=' , $from_id)->first();
+		$follow = Follow::where('to_id', $follow_id)->where('from_id', '=' , $from_id)->first();
+		if(User::where('user_id', $follow_id)->first()) {
+		    if($follow) {
+		    	$following_profile = Profile::where('user_id', $follow->from_id)->first();
+				if($following_profile != null) {
+					$following_profile->following_count = $following_profile->following_count + 1;
+					$following_profile->save();
+				}
+				$follower_profile = Profile::where('user_id', $follow->to_id)->first();
+				if($follower_profile) {
+					$follower_profile->follower_count = $follower_profile->follower_count + 1;
+					$follower_profile->save();
+				}
 
-	    if($follow) {
-	    	$following_profile = Profile::where('user_id', $follow->from_id)->first();
-			if($following_profile != null) {
-				$following_profile->following_count = $following_profile->following_count + 1;
-				$following_profile->save();
-			}
-			$follower_profile = Profile::where('user_id', $follow->to_id)->first();
-			if($follower_profile) {
-				$follower_profile->follower_count = $follower_profile->follower_count + 1;
-				$follower_profile->save();
-			}
-
- 			$follow->delete();
-	 		$data = 'Follow deleted';
- 		} else {
- 			$error_code = ApiResponse::NOT_EXISTED_FOLLOW;
-	        $data = ApiResponse::getErrorContent(ApiResponse::NOT_EXISTED_FOLLOW);
-	    } 
+	 			$follow->delete();
+		 		$data = 'Follow deleted';
+	 		} else {
+	 			$error_code = ApiResponse::NOT_EXISTED_FOLLOW;
+		        $data = ApiResponse::getErrorContent(ApiResponse::NOT_EXISTED_FOLLOW);
+		    } 
+		} else {
+			$error_code = ApiResponse::UNAVAILABLE_USER;
+		    $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_USER);
+		}
 	    return Response::json(array("code" => $error_code, "data" => $data));
 	}
 

@@ -75,7 +75,6 @@ class Rating extends Eloquent {
         $pagination = ApiResponse::pagination();
         $page = $pagination['page'];
         $limit = $pagination['limit'];
-        $wine = Wine::with('winery')->forPage($page, $limit)->get();
 
         $ratings = Rating::whereIn('user_id', $user_timeline)->whereNotNull('wine_unique_id')->with('profile')->with('wine')->forPage($page, $limit)->get();
 
@@ -90,9 +89,9 @@ class Rating extends Eloquent {
         } else {
             foreach ($ratings as $rating) {   
                 $winery = Winery::where('id', $rating->wine->winery_id)->first();
-                $rating->winery= $winery;
+                $rating->winery = $winery;
                 $country = Country::where('id', $rating->winery->country_id)->first();
-                $winery->country_name = $country->country_name; 
+                $rating->winery->country_name = $country->country_name; 
                 $like = Like::where('user_id',$user_id)->where('rating_id', $rating->id)->first();
                 if($like) {
                     $rating->liked = true;

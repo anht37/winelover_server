@@ -136,21 +136,26 @@ class LikeController extends ApiController {
 	{
 		$error_code = ApiResponse::OK;
 		$user_id = Session::get('user_id');
-		$like = Like::where('rating_id', $rating_id)->where('user_id',$user_id)->first();
-	    if($like) {
+		if(Rating::where('id',$rating_id)->first()) {
+			$like = Like::where('rating_id', $rating_id)->where('user_id',$user_id)->first();
+		    if($like) {
 
-	    	//update like_count on rating
- 			$like_rating = Rating::where('id', $like->rating_id)->first();
-			if($like_rating != null) {
-				$like_rating->like_count = $like_rating->like_count - 1;
-				$like_rating->save();
-			}
- 			$like->delete();
-	 		$data = 'Like deleted';
- 		} else {
- 			$error_code = ApiResponse::NOT_EXISTED_LIKE;
-	        $data = ApiResponse::getErrorContent(ApiResponse::NOT_EXISTED_LIKE);
-	    } 
+		    	//update like_count on rating
+	 			$like_rating = Rating::where('id', $like->rating_id)->first();
+				if($like_rating != null) {
+					$like_rating->like_count = $like_rating->like_count - 1;
+					$like_rating->save();
+				}
+	 			$like->delete();
+		 		$data = 'Like deleted';
+	 		} else {
+	 			$error_code = ApiResponse::NOT_EXISTED_LIKE;
+		        $data = ApiResponse::getErrorContent(ApiResponse::NOT_EXISTED_LIKE);
+		    } 
+		} else {
+		 	$error_code = ApiResponse::UNAVAILABLE_RATING;
+		    $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING);
+		}
 	    return Response::json(array("code" => $error_code, "data" => $data));
 	}
 	// public function getLike_rating()

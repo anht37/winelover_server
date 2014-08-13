@@ -39,7 +39,7 @@ class LikeTest extends ApiTestCase
     {
         $response = $this->call('GET', 'api/like');
 
-        $like_infor = Like::all();
+        $like_infor = Like::where('user_id', $this->_user_id)->get();;
         $this->assertEquals(
             array("code" => ApiResponse::OK, "data" => $like_infor->toArray())
         , json_decode($response->getContent(), true));
@@ -49,7 +49,7 @@ class LikeTest extends ApiTestCase
         $like = Like::destroy(1);
         $response = $this->call('GET', 'api/like');
 
-        $like_infor = Like::all();
+        $like_infor = Like::where('user_id', $this->_user_id)->get();;
         $this->assertEquals(
             array("code" => ApiResponse::OK, "data" => "")
         , json_decode($response->getContent(), true));
@@ -79,10 +79,8 @@ class LikeTest extends ApiTestCase
 
         $response = $this->_getAuth($_params);
         //get created login information
-        $like_infor = Like::get(array('user_id','rating_id', 'updated_at', 'created_at','id'))->last();
-        $this->assertNotNull($like_infor);
         $this->assertEquals(
-            array("code" => ApiResponse::OK, "data" => $like_infor->toArray())
+            array("code" => ApiResponse::UNAVAILABLE_RATING, "data" => ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING))
         , json_decode($response->getContent(), true));
     }
 
@@ -104,6 +102,14 @@ class LikeTest extends ApiTestCase
         $response = $this->action('delete', 'LikeController@destroy', array('rating_id' => 1));
         $this->assertEquals(array("code" => ApiResponse::OK, "data" => "Like deleted")
          , json_decode($response->getContent(), true));
+    }
+
+    public function testDeleteLikeWrongRating()
+    {
+        $response = $this->action('delete', 'LikeController@destroy', array('rating_id' => "wrong_rating_id"));
+        $this->assertEquals(
+            array("code" => ApiResponse::UNAVAILABLE_RATING, "data" => ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING))
+        , json_decode($response->getContent(), true));
     }
 
     public function testDeleteLikeErrorNoLike()

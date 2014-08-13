@@ -109,6 +109,13 @@ class CommentTest extends ApiTestCase
         , json_decode($response->getContent(), true));
 
     }
+     public function testGetCommentDetailErrorWrongRating() 
+    {
+        $response = $this->call('GET', 'api/comment/wrong_rating_id/1');
+        $this->assertEquals(array("code" => ApiResponse::UNAVAILABLE_RATING, "data" => ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING))
+        , json_decode($response->getContent(), true));
+
+    }
 
     public function testCreateCommentSuccess()
     {
@@ -118,17 +125,90 @@ class CommentTest extends ApiTestCase
         $response = $this->_getAuth($_params);
         //get created login information
         $comment_infor = Comment::get(array('user_id','rating_id', 'content', 'updated_at', 'created_at','id'))->last();
-        $this->assertNotNull($comment_infor);s
+        $this->assertNotNull($comment_infor);
         $this->assertEquals(
             array("code" => ApiResponse::OK, "data" => $comment_infor->toArray())
         , json_decode($response->getContent(), true));
     }
+    public function testCreateCommentErrorWrongRating()
+    {
+        $_params = $this->_params;
+        $_params['user_id'] = $this->_user_id;
+        $this->_uri = 'api/comment/wrong_rating_id';
+        $response = $this->_getAuth($_params);
+        //get created login information
+        $this->assertEquals(
+            array("code" => ApiResponse::UNAVAILABLE_RATING, "data" => ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING))
+        , json_decode($response->getContent(), true));
+    }
     
+    public function testCreateCommentErrorMissingContent()
+    {
+        $_params = $this->_params;
+        $_params['user_id'] = $this->_user_id;
+        unset($_params['content']);
+        $response = $this->_getAuth($_params);
+        //get created login information
+        $this->assertEquals(
+            array("code" => ApiResponse::MISSING_PARAMS, "data" => $_params)
+        , json_decode($response->getContent(), true));
+    }
+
+    public function testUpdateCommentSuccess()
+    {
+        $_params = $this->_params;
+        $response = $this->action('POST', 'CommentController@update', array('rating_id' => 1, 'id' => 1), array('data' => json_encode($_params), '_method' => 'PUT'));
+        //get created login information
+        $comment_infor = Comment::where('id', 1)->first();
+        $this->assertEquals(
+            array("code" => ApiResponse::OK, "data" => $comment_infor->toArray())
+        , json_decode($response->getContent(), true));
+    }
+
+    public function testUpdateCommentErrorWrongRating()
+    {
+        $_params = $this->_params;
+        $response = $this->action('POST', 'CommentController@update', array('rating_id' => "wrong_rating_id",'id' => 1), array('data' => json_encode($_params), '_method' => 'PUT'));
+        //get created login information
+       $this->assertEquals(array("code" => ApiResponse::UNAVAILABLE_RATING, "data" => ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING))
+        , json_decode($response->getContent(), true));
+    }
+
+    public function testUpdateCommentErrorNoComment()
+    {
+        $Comment_destroy = Comment::destroy(1);
+        $_params = $this->_params;
+        $response = $this->action('POST', 'CommentController@update', array('rating_id' => 1, 'id' => 1), array('data' => json_encode($_params), '_method' => 'PUT'));
+        //get created login information
+       $this->assertEquals(array("code" => ApiResponse::UNAVAILABLE_COMMENT, "data" => ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_COMMENT))
+        , json_decode($response->getContent(), true));
+    }
+
+    public function testUpdateCommentErrorMissingContent()
+    {
+        $_params = $this->_params;
+        $_params['user_id'] = $this->_user_id;
+        unset($_params['content']);
+        $response = $this->action('POST', 'CommentController@update', array('rating_id' => 1, 'id' => 1), array('data' => json_encode($_params), '_method' => 'PUT'));
+        //get created login information
+        $this->assertEquals(
+            array("code" => ApiResponse::MISSING_PARAMS, "data" => $_params)
+        , json_decode($response->getContent(), true));
+    }
+
     public function testDeleteCommentSuccess()
     {
         $response = $this->action('delete', 'CommentController@destroy', array('rating_id' => 1, 'id' => 1));
         $this->assertEquals(array("code" => ApiResponse::OK, "data" => "Comment deleted")
          , json_decode($response->getContent(), true));
+    }
+
+    public function testDeleteCommentWrongRating()
+    {
+        $response = $this->action('delete', 'CommentController@destroy', array('rating_id' => "wrong_rating_id", 'id' => 1));
+        $this->assertEquals(
+            array("code" => ApiResponse::UNAVAILABLE_RATING, "data" => ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING))
+        , json_decode($response->getContent(), true));
     }
 
     public function testDeleteCommentErrorNoComment()

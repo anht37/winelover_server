@@ -92,7 +92,7 @@ class CommentController extends \BaseController {
 			}
 	    } else {
 	    	$error_code = ApiResponse::MISSING_PARAMS;
-		    $data = "Missing content";
+		    $data = $input;
 	    }
 	    
 	    return Response::json(array("code" => $error_code, "data" => $data));
@@ -109,21 +109,25 @@ class CommentController extends \BaseController {
 	{
 		$error_code = ApiResponse::OK;
 		$comment = Comment::where('id', $id)->first();
-	    if($comment) {
-	    	$profile = Profile::where('user_id', $comment->user_id)->first();
-		 	if($profile->image != null) {
-		 		$comment->avatar_user = URL::asset($profile->image);
-		 	} else {
-		 		$comment->avatar_user = $profile->image;
-		 	}
-		 	$comment->first_name = $profile->first_name;
-		 	$comment->last_name = $profile->last_name;
-	       	$data = $comment->toArray();
+		if(Rating::where('id',$rating_id)->first()) {
+		    if($comment) {
+		    	$profile = Profile::where('user_id', $comment->user_id)->first();
+			 	if($profile->image != null) {
+			 		$comment->avatar_user = URL::asset($profile->image);
+			 	} else {
+			 		$comment->avatar_user = $profile->image;
+			 	}
+			 	$comment->first_name = $profile->first_name;
+			 	$comment->last_name = $profile->last_name;
+		       	$data = $comment->toArray();
+			} else {
+				$error_code = ApiResponse::UNAVAILABLE_COMMENT;
+			    $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_COMMENT);
+			}    
 		} else {
-			$error_code = ApiResponse::UNAVAILABLE_COMMENT;
-		    $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_COMMENT);
-		}    
-		
+			$error_code = ApiResponse::UNAVAILABLE_RATING;
+		    $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING);
+		}
 		
 	    return Response::json(array("code" => $error_code, "data" => $data));
 	}
@@ -152,22 +156,24 @@ class CommentController extends \BaseController {
 	    $comment = Comment::where('id', $id)->first();
 	    $input = $this->_getInput();
 	    $error_code = ApiResponse::OK;
- 		if($comment) {
- 			if(!empty($input)) {
-			    if(!empty($input['content'])) {
-		    		$comment->content = $input['content'];
-		    	}
+	    if(Rating::where('id',$rating_id)->first()) {
+	 		if($comment) {
+				if(!empty($input['content'])) {
+			    	$comment->content = $input['content'];
 					$comment->save();
-					
 					$data = $comment->toArray();	    
-			} else {
-				$error_code = ApiResponse::MISSING_PARAMS;
-		        $data = $input;
-			}
-	 	} else {
-	 		$error_code = ApiResponse::UNAVAILABLE_COMMENT;
-	        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_COMMENT);
-	 	}
+				} else {
+					$error_code = ApiResponse::MISSING_PARAMS;
+			        $data = $input;
+				}
+		 	} else {
+		 		$error_code = ApiResponse::UNAVAILABLE_COMMENT;
+		        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_COMMENT);
+		 	}
+		 } else {
+		 	$error_code = ApiResponse::UNAVAILABLE_RATING;
+		    $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING);
+		 }
 	    return Response::json(array("code" => $error_code, "data" => $data));
 	}
 
@@ -182,29 +188,34 @@ class CommentController extends \BaseController {
 	{
 		$comment = Comment::where('id', '=', $id)->first();
  		$error_code = ApiResponse::OK;
-	    if($comment) {
-	    	$comment_profile = Profile::where('user_id', $comment->user_id)->first();
-            
-            if($comment_profile != null) {
-                $comment_profile->comment_count = $comment_profile->comment_count - 1;
-                $comment_profile->save();
-            }
+ 		if(Rating::where('id',$rating_id)->first()) {
+		    if($comment) {
+		    	$comment_profile = Profile::where('user_id', $comment->user_id)->first();
+	            
+	            if($comment_profile != null) {
+	                $comment_profile->comment_count = $comment_profile->comment_count - 1;
+	                $comment_profile->save();
+	            }
 
-	    	//update comment_count on rating
+		    	//update comment_count on rating
 
- 			$comment_rating = Rating::where('id', $comment->rating_id)->first();
-			if($comment_rating != null) {
-				$comment_rating->comment_count = $comment_rating->comment_count - 1;
-				$comment_rating->save();
- 				$comment->delete();
- 			}
+	 			$comment_rating = Rating::where('id', $comment->rating_id)->first();
+				if($comment_rating != null) {
+					$comment_rating->comment_count = $comment_rating->comment_count - 1;
+					$comment_rating->save();
+	 				$comment->delete();
+	 			}
 
-	 		
-	 		$data = 'Comment deleted';
- 		} else {
- 			$error_code = ApiResponse::UNAVAILABLE_COMMENT;
-	        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_COMMENT);
-	    } 
+		 		
+		 		$data = 'Comment deleted';
+	 		} else {
+	 			$error_code = ApiResponse::UNAVAILABLE_COMMENT;
+		        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_COMMENT);
+		    } 
+		} else {
+		 	$error_code = ApiResponse::UNAVAILABLE_RATING;
+		    $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING);
+		}
 	    return Response::json(array("code" => $error_code, "data" => $data));
 	}
 

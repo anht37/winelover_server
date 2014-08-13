@@ -9,7 +9,15 @@ class WinenoteController extends ApiController {
 	 */
 	public function index()
 	{
-		//
+		$user_id = Session::get('user_id');
+    	$winenote = Winenote::where('user_id', $user_id)->get();
+		$error_code = ApiResponse::OK;
+		if($winenote) {
+			$data = $winenote->toArray();
+		} else {
+		    $data = "";
+		}
+		return Response::json(array("code" => $error_code, "data" => $data));
 	}
 
 
@@ -70,9 +78,19 @@ class WinenoteController extends ApiController {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function show($id)
+	public function show($wine_unique_id)
 	{
-		//
+		$user_id = Session::get('user_id');
+    	$winenote = Winenote::where('user_id', $user_id)->where('wine_unique_id', $wine_unique_id)->first();
+		$error_code = ApiResponse::OK;
+		if($winenote) {
+			
+			$data = $winenote->toArray();
+		} else {
+			$error_code = ApiResponse::UNAVAILABLE_WINE_NOTE;
+		    $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_WINE_NOTE);
+		}
+		return Response::json(array("code" => $error_code, "data" => $data));
 	}
 
 
@@ -139,12 +157,17 @@ class WinenoteController extends ApiController {
 		$user_id = Session::get('user_id');
     	$winenote = Winenote::where('user_id', $user_id)->where('wine_unique_id', $wine_unique_id)->first();
 		$error_code = ApiResponse::OK;
-		if($winenote) {
-			$winenote->delete();
-			$data = 'Wine note is deleted';
+		if(Wine::where('wine_unique_id',$wine_unique_id)->first()) {
+			if($winenote) {
+				$winenote->delete();
+				$data = 'Wine note is deleted';
+			} else {
+				$error_code = ApiResponse::UNAVAILABLE_WINE_NOTE;
+			    $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_WINE_NOTE);
+			}
 		} else {
-			$error_code = ApiResponse::UNAVAILABLE_WINE_NOTE;
-		    $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_WINE_NOTE);
+			$error_code = ApiResponse::UNAVAILABLE_WINE;
+			$data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_WINE);
 		}
 		return Response::json(array("code" => $error_code, "data" => $data));
 	}
