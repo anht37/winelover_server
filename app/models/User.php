@@ -143,4 +143,30 @@ class User extends Eloquent
         }
         return array("code" => $error_code, "data" => $data);
     }
+    public function profile()
+    {
+        return $this->belongsTo('Profile','user_id', 'user_id');
+    }
+
+    public static function feature_users($user_id)
+    {
+        $error_code = ApiResponse::OK;
+        $pagination = ApiResponse::pagination();
+        $page = $pagination['page'];
+        $limit = $pagination['limit'];
+        $user = User::whereNotIn('user_id', [$user_id])->with('profile')->forPage($page, $limit)->get();
+        if(count($user) == 0) {
+            if($page == 1) {
+                $data = "";
+            } else {
+                $error_code = ApiResponse::URL_NOT_EXIST;
+                $data = ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST);
+            }   
+        } else {
+            $data = $user;
+        }
+        return array("code" => $error_code, "data" => $data);
+    }
+
+    
 }

@@ -105,5 +105,10 @@ class UserController extends ApiController {
     	$result = Rating::timeline($user_id);
         return Response::json($result);
     }
+    public function feature_users() {
+    	$user_id = Session::get('user_id');
+    	$result = User::feature_users($user_id);
+        return Response::json($result);
+    }
 
 }
