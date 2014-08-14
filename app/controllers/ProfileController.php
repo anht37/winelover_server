@@ -9,27 +9,27 @@ class ProfileController extends ApiController {
 	 */
 	public function index()
 	{
-		$error_code = ApiResponse::OK;
-		$user_id = Session::get('user_id');
-		if(User::where('user_id',$user_id)->first()){
-			$profile = Profile::where('user_id', $user_id)->first();
-			if($profile) {
-				if ($profile->image != null) {
-	                $profile->image = URL::asset($profile->image);   
-	            }
-	            $wishlist = Wishlist::where('user_id', $user_id)->get();
-	            $profile->wishlist_count = count($wishlist);
-				$data = $profile->toArray();
-			} else { 
-				$error_code = ApiResponse::UNAVAILABLE_USER;
-		        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_USER);
-			}
-		} else {
-			$error_code = ApiResponse::UNAVAILABLE_USER;
-		    $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_USER);
-		}
+		// $error_code = ApiResponse::OK;
+		// $user_id = Session::get('user_id');
+		// if(User::where('user_id',$user_id)->first()){
+		// 	$profile = Profile::where('user_id', $user_id)->first();
+		// 	if($profile) {
+		// 		if ($profile->image != null) {
+	 //                $profile->image = URL::asset($profile->image);   
+	 //            }
+	 //            $wishlist = Wishlist::where('user_id', $user_id)->get();
+	 //            $profile->wishlist_count = count($wishlist);
+		// 		$data = $profile->toArray();
+		// 	} else { 
+		// 		$error_code = ApiResponse::UNAVAILABLE_USER;
+		//         $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_USER);
+		// 	}
+		// } else {
+		// 	$error_code = ApiResponse::UNAVAILABLE_USER;
+		//     $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_USER);
+		// }
 
-		return Response::json(array("code" => $error_code, "data" => $data));
+		// return Response::json(array("code" => $error_code, "data" => $data));
 	}
 
 
@@ -207,6 +207,7 @@ class ProfileController extends ApiController {
 	public function getProfile_basic_user($user_id)
 	{
 		$error_code = ApiResponse::OK;
+		$user_login = Session::get('user_id');
 		if($user_id) {
 			if(User::where('user_id',$user_id)->first()){
 				$profile = Profile::where('user_id', $user_id)->first();
@@ -216,6 +217,14 @@ class ProfileController extends ApiController {
 	                }
 	                $wishlist = Wishlist::where('user_id', $user_id)->get();
 	                $profile->wishlist_count = count($wishlist);
+	                if ($user_id != $user_login) {
+	                	$follow = Follow::where('from_id', $user_login)->where('to_id', $user_id)->first();
+		            	if($follow) {
+		            		$profile->is_follow = true;
+		            	} else {
+		            		$profile->is_follow = false;
+		            	}
+	                }
 					$data = $profile->toArray();
 				} else { 
 					$error_code = ApiResponse::UNAVAILABLE_USER;
@@ -242,6 +251,9 @@ class ProfileController extends ApiController {
 			if(User::where('user_id',$user_id)->first()){
 				$profile = Profile::where('user_id', $user_id)->first();
 				if($profile) {
+					if ($profile->image != null) {
+	                    $profile->image = URL::asset($profile->image);   
+	                }
 					$wishlist = Wishlist::where('user_id', $user_id)->with('wine')->forPage($page, $limit)->get();
 					if (count($wishlist) == 0) {
 						if($page == 1) {
