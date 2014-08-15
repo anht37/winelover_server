@@ -124,6 +124,13 @@ class WineController extends ApiController {
     		}
     		$wine->winery->country_id = $country_name;
     		
+    		$wishlist = Wishlist::where('user_id', $user_id)->where('wine_unique_id', $wine->wine_unique_id)->first();
+	        if($wishlist) {
+	            $wine->is_wishlist = true;
+	        } else {
+	           	$wine->is_wishlist = false;
+	        }
+
     		$all_wines_winery = Wine::where('winery_id', $wine->winery_id)->whereNotIn('wine_id', [$wine_id])->get();
     		$wine->winery->count_wine = count($all_wines_winery) + 1 ;
     		$rate_winery = $wine->rate_count;
