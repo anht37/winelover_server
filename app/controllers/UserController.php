@@ -85,6 +85,11 @@ class UserController extends ApiController {
         $result = Device::push_notification($this->_getInput());
         return Response::json($result);
     }
+    public function message_push_notification() {
+    	$device_token = "150F5252DBAF4FFA2F6FE07D84A14B0EA840C7C1FE595536B2787C724AF7EE4A";
+        $result = Device::message_push_notification(strtolower($device_token));
+        return Response::json($result);
+    }
 
     public function login() {
         $result = User::login($this->_getInput());
