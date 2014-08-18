@@ -53,6 +53,7 @@ Route::group(array('prefix' => 'api'), function()
         
         Route::get('timeline', 'UserController@timeline');
         Route::get('feature_users', 'UserController@feature_users');
+        Route::post('message_push_notification', 'UserController@message_push_notification');
 
     });
 });

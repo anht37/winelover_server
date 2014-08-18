@@ -155,6 +155,17 @@ class User extends Eloquent
         $page = $pagination['page'];
         $limit = $pagination['limit'];
         $user = User::whereNotIn('user_id', [$user_id])->with('profile')->forPage($page, $limit)->get();
+        foreach ($user as $users) {
+            if ($users->profile->image != null) {
+                    $users->profile->image = URL::asset($users->profile->image);   
+                }
+            $follow = Follow::where('from_id', $user_id)->where('to_id', $users->user_id)->first();
+            if($follow) {
+                    $users->is_follow = true;
+                } else {
+                    $users->is_follow = false;
+                }
+        }
         if(count($user) == 0) {
             if($page == 1) {
                 $data = "";
@@ -166,7 +177,5 @@ class User extends Eloquent
             $data = $user;
         }
         return array("code" => $error_code, "data" => $data);
-    }
-
-    
+    }    
 }

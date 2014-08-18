@@ -208,35 +208,31 @@ class ProfileController extends ApiController {
 	{
 		$error_code = ApiResponse::OK;
 		$user_login = Session::get('user_id');
-		if($user_id) {
-			if(User::where('user_id',$user_id)->first()){
-				$profile = Profile::where('user_id', $user_id)->first();
-				if($profile) {
-					if ($profile->image != null) {
-	                    $profile->image = URL::asset($profile->image);   
-	                }
-	                $wishlist = Wishlist::where('user_id', $user_id)->get();
-	                $profile->wishlist_count = count($wishlist);
-	                if ($user_id != $user_login) {
-	                	$follow = Follow::where('from_id', $user_login)->where('to_id', $user_id)->first();
-		            	if($follow) {
-		            		$profile->is_follow = true;
-		            	} else {
-		            		$profile->is_follow = false;
-		            	}
-	                }
-					$data = $profile->toArray();
-				} else { 
-					$error_code = ApiResponse::UNAVAILABLE_USER;
-			        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_USER);
-				}
-			} else {
-				$error_code = ApiResponse::UNAVAILABLE_USER;
-			    $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_USER);
-			}
+
+		if(User::where('user_id',$user_id)->first()){
+		$profile = Profile::where('user_id', $user_id)->first();
+	
+			if ($profile->image != null) {
+	            $profile->image = URL::asset($profile->image);   
+	        }
+	        $wishlist = Wishlist::where('user_id', $user_id)->get();
+	        if($wishlist){
+	            $profile->wishlist_count = count($wishlist);
+	        } else {
+	            $profile->wishlist_count = 0;
+	        }
+	        if ($user_id != $user_login) {
+	            $follow = Follow::where('from_id', $user_login)->where('to_id', $user_id)->first();
+		        if($follow) {
+		            $profile->is_follow = true;
+		        } else {
+		            $profile->is_follow = false;
+		        }
+	        }
+			$data = $profile->toArray();
 		} else {
-			$error_code = ApiResponse::MISSING_PARAMS;
-	        $data = "Missing user_id";
+			$error_code = ApiResponse::UNAVAILABLE_USER;
+			$data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_USER);
 		}
 		return Response::json(array("code" => $error_code, "data" => $data));
 	}
@@ -247,48 +243,40 @@ class ProfileController extends ApiController {
 		$pagination = ApiResponse::pagination();
 		$page = $pagination['page'];
 		$limit = $pagination['limit'];
-		if($user_id) {
-			if(User::where('user_id',$user_id)->first()){
-				$profile = Profile::where('user_id', $user_id)->first();
-				if($profile) {
-					if ($profile->image != null) {
-	                    $profile->image = URL::asset($profile->image);   
-	                }
-					$wishlist = Wishlist::where('user_id', $user_id)->with('wine')->forPage($page, $limit)->get();
-					if (count($wishlist) == 0) {
-						if($page == 1) {
-							$data = '';
-						} else {
-							$error_code = ApiResponse::URL_NOT_EXIST;
-           					 $data = ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST);
-						}
-						
-					} else {	
-					    foreach ($wishlist as $wishlists) {
-							$wishlists->winery = Winery::where('id', $wishlists->wine->winery_id)->first();
-
-							if($wishlists->wine->image_url != null) {
-			            		$wishlists->wine->image_url = URL::asset($wishlists->wine->image_url);
-				            }
-
-				            if($wishlists->wine->wine_flag != null) {
-				            	$wishlists->wine->wine_flag = URL::asset($wishlists->wine->wine_flag);
-				            } 
-						}
-						
-						$data = $wishlist->toArray();
-					}
-				} else { 
-					$error_code = ApiResponse::UNAVAILABLE_USER;
-			        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_USER);
+		
+		if(User::where('user_id',$user_id)->first()){
+			$profile = Profile::where('user_id', $user_id)->first();
+			
+			if ($profile->image != null) {
+	            $profile->image = URL::asset($profile->image);   
+	        }
+			$wishlist = Wishlist::where('user_id', $user_id)->with('wine')->forPage($page, $limit)->get();
+			if (count($wishlist) == 0) {
+				if($page == 1) {
+					$data = '';
+				} else {
+					$error_code = ApiResponse::URL_NOT_EXIST;
+    				 $data = ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST);
 				}
-			} else {
-				$error_code = ApiResponse::UNAVAILABLE_USER;
-			    $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_USER);
+				
+			} else {	
+			    foreach ($wishlist as $wishlists) {
+					$wishlists->winery = Winery::where('id', $wishlists->wine->winery_id)->first();
+
+					if($wishlists->wine->image_url != null) {
+	            		$wishlists->wine->image_url = URL::asset($wishlists->wine->image_url);
+		            }
+
+		            if($wishlists->wine->wine_flag != null) {
+		            	$wishlists->wine->wine_flag = URL::asset($wishlists->wine->wine_flag);
+		            } 
+				}
+				
+				$data = $wishlist->toArray();
 			}
-		} else {
-			$error_code = ApiResponse::MISSING_PARAMS;
-	        $data = "Missing user_id";
+		} else { 
+			$error_code = ApiResponse::UNAVAILABLE_USER;
+		    $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_USER);
 		}
 
 		return Response::json(array("code" => $error_code, "data" => $data));
@@ -298,9 +286,9 @@ class ProfileController extends ApiController {
 	{	
 		$error_code = ApiResponse::OK;
 		$page = 1;
-		if($user_id && $per_page) {
+
 			if(User::where('user_id',$user_id)->first()) {
-				$check_paginate = Wine::paginate($page, $per_page);
+				$check_paginate = ApiResponse::checkPagination($page, $per_page);
 				if ($check_paginate !== false) {
 					$top_rate = Rating::where('user_id',$user_id)->orderBy('rate', 'desc')->with('wine')->forPage($page, $per_page)->get();
 					foreach ($top_rate as $top_rates) {
@@ -322,10 +310,6 @@ class ProfileController extends ApiController {
 				$error_code = ApiResponse::UNAVAILABLE_USER;
 		        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_USER);
 			}
-		} else {
-			$error_code = ApiResponse::MISSING_PARAMS;
-	        $data = "Missing user_id or per_page";
-		}
 		return Response::json(array("code" => $error_code, "data" => $data));
 	}
 

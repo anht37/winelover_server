@@ -152,6 +152,13 @@ class WineTest extends ApiTestCase
         $wine_infor->winenote = $wine_note->note;
         $wine_infor->winery->country_id = $country_name;
 
+        $wishlist = Wishlist::where('user_id', $this->_user_id)->where('wine_unique_id', $wine_infor->wine_unique_id)->first();
+        if($wishlist) {
+            $wine_infor->is_wishlist = true;
+        } else {
+            $wine_infor->is_wishlist = false;
+        }
+
         $all_wines_winery = Wine::where('winery_id', $wine_infor->winery_id)->whereNotIn('wine_id', [1])->get();
         $wine_infor->winery->count_wine = count($all_wines_winery) + 1 ;
         $rate_winery = $wine_infor->rate_count;
@@ -217,7 +224,14 @@ class WineTest extends ApiTestCase
 
         $wine_note = Winenote::where('wine_unique_id', $wine_infor->wine_unique_id)->where('user_id',$this->_user_id)->first();
         $wine_infor->winenote = $wine_note->note;
-          
+        
+        $wishlist = Wishlist::where('user_id', $this->_user_id)->where('wine_unique_id', $wine_infor->wine_unique_id)->first();
+        if($wishlist) {
+            $wine_infor->is_wishlist = true;
+        } else {
+            $wine_infor->is_wishlist = false;
+        }
+
         $wine_infor->winery->country_id = $country_name;
         $all_wines_winery = Wine::where('winery_id', $wine_infor->winery_id)->whereNotIn('wine_id', [1])->get();
         $wine_infor->winery->count_wine = count($all_wines_winery) + 1 ;
@@ -278,13 +292,19 @@ class WineTest extends ApiTestCase
         $rate_user2= Rating::destroy(3);
         $response = $this->call('GET', 'api/wine/1');
         $wine_infor = Wine::where('wine_id', 1)->with('winery')->first();
-
         $country_name = Country::where('id',$wine_infor->winery->country_id)->first()->country_name;
 
         $wine_note = Winenote::where('wine_unique_id', $wine_infor->wine_unique_id)->where('user_id',$this->_user_id)->first();
 
         $wine_infor->winenote = $wine_note->note;
         $wine_infor->winery->country_id = $country_name;
+
+        $wishlist = Wishlist::where('user_id', $this->_user_id)->where('wine_unique_id', $wine_infor->wine_unique_id)->first();
+        if($wishlist) {
+            $wine_infor->is_wishlist = true;
+        } else {
+            $wine_infor->is_wishlist = false;
+        }
 
         $all_wines_winery = Wine::where('winery_id', $wine_infor->winery_id)->whereNotIn('wine_id', [1])->get();
         $wine_infor->winery->count_wine = count($all_wines_winery) + 1 ;
@@ -340,6 +360,14 @@ class WineTest extends ApiTestCase
 
         $wine_infor->winenote = "";
         $wine_infor->winery->country_id = $country_name;
+        
+        $wishlist = Wishlist::where('user_id', $this->_user_id)->where('wine_unique_id', $wine_infor->wine_unique_id)->first();
+        if($wishlist) {
+            $wine_infor->is_wishlist = true;
+        } else {
+            $wine_infor->is_wishlist = false;
+        }
+        
         $all_wines_winery = Wine::where('winery_id', $wine_infor->winery_id)->whereNotIn('wine_id', [1])->get();
         $wine_infor->winery->count_wine = count($all_wines_winery) + 1 ;
         $rate_winery = $wine_infor->rate_count;

@@ -191,5 +191,12 @@ class ApiTestCase extends TestCase {
         $profile->save();
         
     }
+    public function setUpWishlist()
+    {
+        $wishlist = new Wishlist();
+        $wishlist->wine_unique_id = '1_2009';
+        $wishlist->user_id = $this->_user_id;
+        $wishlist->save();
+    }
 
 } 
