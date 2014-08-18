@@ -121,18 +121,15 @@ class WinenoteController extends ApiController {
 			$error_code = ApiResponse::OK;
 			if ($winenote) {
 				if(!empty($input)) {
-					if(!empty($input['note'])) {
+					if(!empty($input['note']) || $input['note'] == null) {
 						$winenote->note = $input['note'];
-						$winenote->save();
-				        $data = $winenote;
-					 	
-					} else {
-						$error_code = ApiResponse::MISSING_PARAMS;
-				        $data = $input;
 					}
+					$winenote->save();
+				    $data = $winenote; 	
+					
 				} else {
 					$error_code = ApiResponse::MISSING_PARAMS;
-				    $data = "Missing note";
+				    $data = $input;
 				}
 			} else {
 				$error_code = ApiResponse::UNAVAILABLE_WINE_NOTE;

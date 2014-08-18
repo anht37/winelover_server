@@ -150,15 +150,16 @@ class WinenoteTest extends ApiTestCase
         , json_decode($response->getContent(), true));
     }
 
-    public function testUpdateWinenoteErrorMissingNote()
+    public function testUpdateWinenoteNoNote()
     {
         $_params = $this->_params;
         $_params['user_id'] = $this->_user_id;
-        unset($_params['note']);
+        $_params['note'] = "";
         $response = $this->action('POST', 'WinenoteController@update', array('wine_unique_id' => "1_2009"), array('data' => json_encode($_params), '_method' => 'PUT'));
         //get created login information
+        $winenote_infor = Winenote::where('user_id', $this->_user_id)->where('wine_unique_id',  "1_2009")->first();
         $this->assertEquals(
-            array("code" => ApiResponse::MISSING_PARAMS, "data" => $_params)
+            array("code" => ApiResponse::OK, "data" => $winenote_infor->toArray())
         , json_decode($response->getContent(), true));
     }
 

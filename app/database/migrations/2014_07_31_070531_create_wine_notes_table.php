@@ -16,7 +16,7 @@ class CreateWineNotesTable extends Migration {
 		{
 			$table->increments('id');
 			$table->string('wine_unique_id');
-			$table->string('user_id');
+			$table->string('user_id')->nullable();
 			$table->text('note');
 			$table->softDeletes();
 			$table->timestamps();
