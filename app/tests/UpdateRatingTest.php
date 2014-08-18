@@ -5,7 +5,7 @@
  * Date: 01/07/2014
  * Time: 15:13
  */
-class CreateRatingTest extends ApiTestCase
+class UpdateRatingTest extends ApiTestCase
 {
     protected $_session;
     protected $_user_id;
@@ -44,6 +44,7 @@ class CreateRatingTest extends ApiTestCase
     }
     public function testUpdateNoRating()
     {  
+        $_params = $this->_params;
         $response = $this->action('POST', 'RatingController@update', array('id' => 1), array('data' => json_encode($_params), '_method' => 'PUT'));
         $this->assertEquals(array("code" => ApiResponse::UNAVAILABLE_RATING, "data" => ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING))
         , json_decode($response->getContent(), true));

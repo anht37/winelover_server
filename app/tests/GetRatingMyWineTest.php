@@ -48,16 +48,26 @@ class GetRatingMyWineTest extends ApiTestCase
     {
         $this->setUpRating();
         $response = $this->call('GET', 'api/rating');
+        
         $page = 1;
         $limit = 10;
-        $rating_infor = Rating::with('wine')->forPage($page, $limit)->get();
-        $error_code = ApiResponse::OK;
-        foreach ($rating_infor as $rating) {
-            $rating->winery = Winery::where('id',$rating->wine->winery_id)->first()->toArray();
-        }
-        $this->assertEquals(array("code" => ApiResponse::OK, "data" => $rating_infor->toArray())
-        , json_decode($response->getContent(), true));
+        $rating = Rating::where('user_id', $this->_user_id)->where('is_my_wine', 1)->with('wine')->orderBy('updated_at', 'desc')->forPage($page, $limit)->get();
+        
+        foreach ($rating as $ratings) {
+            $ratings->winery = Winery::where('id',$ratings->wine->winery_id)->first()->toArray();
+            if($ratings->wine->image_url != null) {
+                $ratings->wine->image_url = URL::asset($ratings->wine->image_url);
+            }
 
+            if($ratings->wine->wine_flag != null) {
+                $ratings->wine->wine_flag = URL::asset($ratings->wine->wine_flag);
+            }
+        } 
+        $data = $rating;
+            
+    
+        $this->assertEquals(array("code" => ApiResponse::OK, "data" => $data->toArray())
+        , json_decode($response->getContent(), true));
             
     }
 
