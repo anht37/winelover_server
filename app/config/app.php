@@ -121,6 +121,7 @@ return array(
 		'Illuminate\Validation\ValidationServiceProvider',
 		'Illuminate\View\ViewServiceProvider',
 		'Illuminate\Workbench\WorkbenchServiceProvider',
+		'Davibennun\LaravelPushNotification\LaravelPushNotificationServiceProvider',
 
 	),
 
@@ -189,6 +190,9 @@ return array(
 		'Validator'       => 'Illuminate\Support\Facades\Validator',
 		'View'            => 'Illuminate\Support\Facades\View',
         'Uuid'            => 'Webpatser\Uuid\Uuid',
+        'PushNotification' => 'Davibennun\LaravelPushNotification\Facades\PushNotification',
 	),
+
+	'pem' => app_path().'/ck.pem',
 
 );

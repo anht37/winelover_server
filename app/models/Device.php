@@ -37,8 +37,31 @@ class Device extends Eloquent
                 if($device){
                     $data = "ok";
                 }
+
             }
         }
         return array("code" => $error_code, "data" => $data);
     }
+
+    public static function message_push_notification($device_token)
+    {
+        $error_code = ApiResponse::OK;       
+        $devices = PushNotification::DeviceCollection(array(
+            PushNotification::Device($device_token, array('badge' => 5)),
+        ));
+        $message = PushNotification::Message('This is message test',array(
+            'badge' => 1,
+
+            'actionLocKey' => 'Action button title!',
+            'locKey' => 'localized key',
+            'custom' => array('custom data' => array(
+                'we' => 'want', 'send to app'
+            ))
+        ));
+        $data = PushNotification::app('YineLover')
+                ->to($devices)
+                ->send($message);
+        return $data;
+
+    } 
 }
