@@ -84,6 +84,14 @@ class CommentController extends \BaseController {
 	            }
 
 		    	$comment->save();
+		    	$profile = Profile::where('user_id', $comment->user_id)->first();
+		 		if($profile->image != null) {
+		 			$comment->avatar_user = URL::asset($profile->image);
+		 		} else {
+		 			$comment->avatar_user = $profile->image;
+		 		}
+		 		$comment->first_name = $profile->first_name;
+		 		$comment->last_name = $profile->last_name;
 				$data = $comment;
 					    
 			} else {

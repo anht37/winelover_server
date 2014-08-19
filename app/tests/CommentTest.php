@@ -125,6 +125,14 @@ class CommentTest extends ApiTestCase
         $response = $this->_getAuth($_params);
         //get created login information
         $comment_infor = Comment::get(array('user_id','rating_id', 'content', 'updated_at', 'created_at','id'))->last();
+        $profile = Profile::where('user_id', $comment_infor->user_id)->first();
+        if($profile->image != null) {
+            $comment_infor->avatar_user = URL::asset($profile->image);
+        } else {
+            $comment_infor->avatar_user = $profile->image;
+        }
+        $comment_infor->first_name = $profile->first_name;
+        $comment_infor->last_name = $profile->last_name;
         $this->assertNotNull($comment_infor);
         $this->assertEquals(
             array("code" => ApiResponse::OK, "data" => $comment_infor->toArray())
