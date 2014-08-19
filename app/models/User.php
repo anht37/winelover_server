@@ -151,31 +151,24 @@ class User extends Eloquent
     public static function feature_users($user_id)
     {
         $error_code = ApiResponse::OK;
-        $pagination = ApiResponse::pagination();
-        $page = $pagination['page'];
-        $limit = $pagination['limit'];
-        $user = User::whereNotIn('user_id', [$user_id])->with('profile')->forPage($page, $limit)->get();
-        foreach ($user as $users) {
-            if ($users->profile->image != null) {
-                    $users->profile->image = URL::asset($users->profile->image);   
-                }
-            $follow = Follow::where('from_id', $user_id)->where('to_id', $users->user_id)->first();
-            if($follow) {
-                    $users->is_follow = true;
-                } else {
-                    $users->is_follow = false;
-                }
-        }
-        if(count($user) == 0) {
-            if($page == 1) {
-                $data = "";
-            } else {
-                $error_code = ApiResponse::URL_NOT_EXIST;
-                $data = ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST);
-            }   
-        } else {
-            $data = $user;
-        }
+        // $pagination = ApiResponse::pagination();
+        // $page = $pagination['page'];
+        // $limit = $pagination['limit'];
+        $user = User::whereNotIn('user_id', [$user_id])->orderByRaw("RAND()")->with('profile')->take(10)->get();
+        if($user) {
+            foreach ($user as $users) {
+                if ($users->profile->image != null) {
+                        $users->profile->image = URL::asset($users->profile->image);   
+                    }
+                $follow = Follow::where('from_id', $user_id)->where('to_id', $users->user_id)->first();
+                if($follow) {
+                        $users->is_follow = true;
+                    } else {
+                        $users->is_follow = false;
+                    }
+            }  
+        } 
+        $data = $user;
         return array("code" => $error_code, "data" => $data);
     }    
 }
