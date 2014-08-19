@@ -158,12 +158,19 @@ class WineController extends ApiController {
     		$rating_user = Rating::where('wine_unique_id', $wine->wine_unique_id)->where('user_id',$user_id)->with('profile')->first();
     		if(count($rating_user) == 0) {
             	$rating_user = "";
+            } else {
+            	if ($rating_user->profile->image != null) {
+	            	$rating_user->profile->image = URL::asset($rating_user->profile->image);   
+	        	}
             }
             $rating = Rating::where('wine_unique_id', $wine->wine_unique_id)->whereNotIn('user_id',[$user_id])->with('profile')->get();
             if(count($rating) == 0) {
             	$rating = "";
             } else {
             	foreach ($rating as $ratings) {
+            		if ($ratings->profile->image != null) {
+	            		$ratings->profile->image = URL::asset($ratings->profile->image);   
+	        		}
 	            	$follow = Follow::where('from_id', $user_id)->where('to_id', $ratings->user_id)->first();
 	            	if($follow) {
 	            		$ratings->is_follow = true;
