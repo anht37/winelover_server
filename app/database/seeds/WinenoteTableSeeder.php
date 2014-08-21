@@ -12,59 +12,37 @@ class WinenoteTableSeeder extends Seeder {
         $user_id = User::where('email','testacc@gmail.com')->first()->user_id;
         $user_1 = User::where('email','test_1@gmail.com')->first()->user_id;
         $user_2 = User::where('email','test_2@gmail.com')->first()->user_id;
-        for ($i = 1; $i < 11; $i ++) {
+        $wine_1 = Wine::where('wine_id', 1)->first()->wine_unique_id;
+        $wine_2 = Wine::where('wine_id', 2)->first()->wine_unique_id;
+        $wine_3 = Wine::where('wine_id', 3)->first()->wine_unique_id;
+        
         Winenote::create(
 	            $data = array(
-	                'id' => "$i",
-	                'wine_unique_id' => $i . "_2009",
+	                'id' => 1,
+	                'wine_unique_id' => $wine_1,
 	                'user_id' => $user_id,
-	                'note' => 'This is note' . $i ,
+	                'note' => 'This is note 1' ,
 	            )
         	);
-        }
-        for ($i = 11; $i < 21; $i ++) {
+        
+        
         Winenote::create(
                 $data = array(
-                    'id' => $i ,
-                    'wine_unique_id' => $i . "_2009",
+                    'id' => 2 ,
+                    'wine_unique_id' => $wine_2,
                     'user_id' => $user_1,
-                    'note' => 'This is note' . $i ,
+                    'note' => 'This is note 2',
                 )
             );
-        }
-        for ($i = 21; $i < 31; $i ++) {
+        
         Winenote::create(
                 $data = array(
-                    'id' => $i ,
-                    'wine_unique_id' => $i . "_2009",
+                    'id' => 3,
+                    'wine_unique_id' => $wine_3,
                     'user_id' => $user_2,
-                    'note' => 'This is note' . $i ,
+                    'note' => 'This is note 3',
                 )
             );
-        }
-        Winenote::create(
-            $data = array(
-                'id' => "32",
-                'wine_unique_id' => "1_2011",
-                'user_id' => $user_id,
-                'note' => 'This is note' . $i ,
-            )
-        );
-        Winenote::create(
-            $data = array(
-                'id' => "33",
-                'wine_unique_id' => "2_2010",
-                'user_id' => $user_id,
-                'note' => 'This is note' . $i ,
-            )
-        );
-        Winenote::create(
-            $data = array(
-                'id' => "34",
-                'wine_unique_id' => "3_2011",
-                'user_id' => $user_id,
-                'note' => 'This is note' . $i ,
-            )
-        );
+        
  	}
 }

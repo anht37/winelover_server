@@ -16,7 +16,7 @@ class FollowController extends ApiController {
 		if($follow) {
 			$data = $follow->toArray();
 		} else {
-			$data = "";
+			$data = array();
 		} 
 	    return Response::json(array("code" => $error_code, "data" => $data));
 	}

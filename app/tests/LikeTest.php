@@ -51,7 +51,7 @@ class LikeTest extends ApiTestCase
 
         $like_infor = Like::where('user_id', $this->_user_id)->get();;
         $this->assertEquals(
-            array("code" => ApiResponse::OK, "data" => "")
+            array("code" => ApiResponse::OK, "data" => $like_infor->toArray())
         , json_decode($response->getContent(), true));
     }
 

@@ -155,7 +155,8 @@ class ProfileTest extends ApiTestCase
         $user_id = $this->_user_id;
         $response = $this->action('GET', 'ProfileController@getProfile_wishlist_user', array('user_id' => $user_id));
 
-        $this->assertEquals(array("code" => ApiResponse::OK, "data" => "")
+        $wishlist = Wishlist::where('user_id', $user_id)->with('wine')->get();
+        $this->assertEquals(array("code" => ApiResponse::OK, "data" => $wishlist->toArray())
         , json_decode($response->getContent(), true));
     }
 

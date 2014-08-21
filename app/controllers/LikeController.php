@@ -16,7 +16,7 @@ class LikeController extends ApiController {
 		if (count($like) > 0) {
 			$data = $like->toArray();
 		} else {	
-			$data = '';
+			$data = array();
 		}
 		
 	    return Response::json(array("code" => $error_code, "data" => $data));

@@ -17,7 +17,7 @@ class WineController extends ApiController {
 		$wine = Wine::with('winery')->forPage($page, $limit)->get();
 		if(count($wine) == 0) {
 			if($page == 1) {
-				$data = "";
+				$data = array();
 			} else {
 				$error_code = ApiResponse::URL_NOT_EXIST;
             	$data = ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST);
@@ -120,7 +120,7 @@ class WineController extends ApiController {
     		if($wine_note) {
     			$wine->winenote = $wine_note->note;
     		} else {
-    			$wine->winenote = "";
+    			$wine->winenote = null;
     		}
     		$wine->winery->country_id = $country_name;
     		
@@ -157,7 +157,7 @@ class WineController extends ApiController {
 
     		$rating_user = Rating::where('wine_unique_id', $wine->wine_unique_id)->where('user_id',$user_id)->with('profile')->first();
     		if(count($rating_user) == 0) {
-            	$rating_user = "";
+            	$rating_user = array();
             } else {
             	if ($rating_user->profile->image != null) {
 	            	$rating_user->profile->image = URL::asset($rating_user->profile->image);   
@@ -165,7 +165,7 @@ class WineController extends ApiController {
             }
             $rating = Rating::where('wine_unique_id', $wine->wine_unique_id)->whereNotIn('user_id',[$user_id])->with('profile')->get();
             if(count($rating) == 0) {
-            	$rating = "";
+            	$rating = array();
             } else {
             	foreach ($rating as $ratings) {
             		if ($ratings->profile->image != null) {
@@ -322,5 +322,48 @@ class WineController extends ApiController {
 		// }
  	// 	return array("code" => $error_code, "data" => array('wine' => $wine, 'rate' => $rating ));
   //   }
+ //    public function read_csv()
+ //    {
+ //   //  	$c = 0;
+ //   //  	try{
+	//      	$file = app_path() . '/rakuten_wine_data.csv';
+	// 		// $data = fopen($file,'r');
+	// 		// $err_msg = array();
+ //   //  		echo "<pre>";
+	// 		// while ($row = fgets($data)) {
+	// 		//     //$row is your line as a string
+	// 		//     // if ($c != 0) {
+	// 		//     //do something with it
+	// 		//     //$data_wine[$c] = $row . "\n";
+	// 		// 	print_r($row);
+	// 		// 	die;
+	// 		//   	$column_wine = explode('","', $row);
+	// 		//   	$column_wine[0] = explode('"', $column_wine[0], +1);
+	// 		//   	$column_wine[0] = $column_wine[0][0];
+	// 		//   	$column_wine[28] = explode('"', $column_wine[28], -1);
+	// 		//   	$column_wine[28] = $column_wine[28][0];
+	// 		//   	// processing
+	// 		//   	// transaction...
+	// 		//   	// error --> ? 
+	// 		//   	// 1. break;
+	// 		//   	// 2. insert vao err_msg -->xu ly tiep row
+	// 		// 	print_r($column_wine);
+	// 		// }
+	// 		// fclose($file);
+	// 		// //dd($wine_all);
+	// 		// die();
 
+ //   //  	}catch(Exception $e){
+ //   //  		echo "<pre>";
+ //   //  		print_r($e);
+ //   //  	}
+
+ //    	$parser = \KzykHys\CsvParser\CsvParser::fromFile($file);
+
+	// 	foreach ($parser as $record) {
+ //    	// handles each record
+ //    		var_dump($record);
+	// 	}
+
+	// }
 }

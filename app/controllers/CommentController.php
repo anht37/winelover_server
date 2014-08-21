@@ -29,7 +29,7 @@ class CommentController extends \BaseController {
 		 		}
 		 		$data = $comment->toArray();
 		 	} else {
-		        $data = '';
+		        $data = array();
 		 	}
 
 		} else {

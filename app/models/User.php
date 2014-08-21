@@ -1,5 +1,6 @@
 <?php
 
+
 class User extends Eloquent
 {
 
@@ -154,7 +155,7 @@ class User extends Eloquent
         // $pagination = ApiResponse::pagination();
         // $page = $pagination['page'];
         // $limit = $pagination['limit'];
-        $user = User::whereNotIn('user_id', [$user_id])->orderByRaw("RAND()")->with('profile')->take(10)->get();
+        $user = User::whereNotIn('user_id', [$user_id])->orderBy(DB::raw("RAND()"))->with('profile')->take(10)->get();
         if($user) {
             foreach ($user as $users) {
                 if ($users->profile->image != null) {
@@ -167,7 +168,7 @@ class User extends Eloquent
                         $users->is_follow = false;
                     }
             }  
-        } 
+        }
         $data = $user;
         return array("code" => $error_code, "data" => $data);
     }    

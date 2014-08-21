@@ -106,7 +106,8 @@ class TimelineTest extends ApiTestCase
         $_params['user_id'] = "user_id";
         $response = $this->_getAuth($_params);
 
-        $this->assertEquals(array("code" => ApiResponse::OK, "data" => "")
+        $rating = Rating::all();
+        $this->assertEquals(array("code" => ApiResponse::OK, "data" => $rating->toArray())
         , json_decode($response->getContent(), true));
     }
     

@@ -80,7 +80,7 @@ class Rating extends Eloquent {
 
         if (count($ratings) == 0) {
             if($page == 1) {
-                $data = "";
+                $data = array();
             } else {
                 $error_code = ApiResponse::URL_NOT_EXIST;
                 $data = ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST);

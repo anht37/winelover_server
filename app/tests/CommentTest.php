@@ -71,7 +71,7 @@ class CommentTest extends ApiTestCase
 
         $comment_infor = Comment::all();
         $this->assertEquals(
-            array("code" => ApiResponse::OK, "data" => "")
+            array("code" => ApiResponse::OK, "data" => $comment_infor->toArray())
         , json_decode($response->getContent(), true));
     }
 

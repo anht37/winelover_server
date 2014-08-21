@@ -61,14 +61,14 @@ class WishlistTest extends ApiTestCase
             array("code" => ApiResponse::OK, "data" => $wishlist_infor->toArray())
         , json_decode($response->getContent(), true));
     }
-    public function testGetListWishlistSuccessNoLike()
+    public function testGetListWishlistSuccessNoWishlist()
     {
         $wishlist = Wishlist::destroy(1);
         $response = $this->call('GET', 'api/wishlist');
 
         $wishlist_infor = Wishlist::all();
         $this->assertEquals(
-            array("code" => ApiResponse::OK, "data" => "")
+            array("code" => ApiResponse::OK, "data" => $wishlist_infor->toArray())
         , json_decode($response->getContent(), true));
     }
 

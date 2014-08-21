@@ -92,6 +92,9 @@ class ApiTestCase extends TestCase {
         $wine = new Wine();
         $wine->wine_id = 1 ;
         $wine->name = 'Wine_1';
+        $wine->rakuten_id = 'rakuten_drinkshop_10508227';
+        $wine->original_name = "this is wine_1";
+        $wine->original_name_2 = "wine_1";
         $wine->winery_id = 1;
         $wine->year = '2009';
         $wine->wine_unique_id = '1_2009';

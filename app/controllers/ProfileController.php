@@ -148,7 +148,7 @@ class ProfileController extends ApiController {
 			$profile = Profile::where('user_id', $user_id)->first();
 
 			if($profile) {
-		 		if(!empty($input)) {
+		 		if(!empty($input) || Input::hasFile('file')) {
 		 			if (!empty($input['last_name'])) { 
 				    	$profile->last_name = $input['last_name'];
 			    	}
@@ -167,9 +167,15 @@ class ProfileController extends ApiController {
 				    if (!empty($input['alias'])) {
 				        $profile->alias = $input['alias'];
 				    }
-				    if (!empty($input['image'])) {
-				        $profile->image = $input['image'];
-				    }
+				    if (Input::hasFile('file')) {
+					    $file = Input::file('file');
+					    $destinationPath    = public_path() . '/images/';
+						$filename           = $file->getClientOriginalName();
+						$extension          = $file->getClientOriginalExtension();
+						$upload_success     = $file->move($destinationPath, $filename);
+					    $profile->image = 'images/' . $filename;
+					}
+				    
 				    if (!empty($input['website'])) {
 				        $profile->website = $input['website'];
 				    }
@@ -215,6 +221,12 @@ class ProfileController extends ApiController {
 			if ($profile->image != null) {
 	            $profile->image = URL::asset($profile->image);   
 	        }
+	        if ($profile->country_id != null) {
+	            $country = Country::where('id', $profile->country_id)->first();
+	            $profile->country_name = $country->country_name;
+	            $profile->country_flag = URL::asset($country->flag_url);   
+	        }
+
 	        $wishlist = Wishlist::where('user_id', $user_id)->get();
 	        if($wishlist){
 	            $profile->wishlist_count = count($wishlist);
@@ -253,7 +265,7 @@ class ProfileController extends ApiController {
 			$wishlist = Wishlist::where('user_id', $user_id)->with('wine')->forPage($page, $limit)->get();
 			if (count($wishlist) == 0) {
 				if($page == 1) {
-					$data = '';
+					$data = array();
 				} else {
 					$error_code = ApiResponse::URL_NOT_EXIST;
     				 $data = ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST);

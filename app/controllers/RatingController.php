@@ -18,7 +18,7 @@ class RatingController extends ApiController {
 		$error_code = ApiResponse::OK;
 		if(count($rating) == 0 ) {
 			if($page == 1) {
-				$data = "";
+				$data = array();
 			} else {
 				$error_code = ApiResponse::URL_NOT_EXIST;
             	$data = ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST);
@@ -198,7 +198,7 @@ class RatingController extends ApiController {
 					    		$rating_wine->average_rate = ($rating_rate - $rating_rate_old + $rating->rate)/ $rating_wine->rate_count;
 					    	} else {
 					    		$error_code = ApiResponse::UNAVAILABLE_RATING;
-			        			$data = "";
+			        			$data = array();
 			        			return Response::json(array("code" => $error_code, "data" => $data));
 					    	}
 					    	$rating_wine->save(); 

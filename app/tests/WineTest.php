@@ -125,8 +125,8 @@ class WineTest extends ApiTestCase
     {  
         $wine_infor = Wine::destroy(1);
         $response = $this->call('GET', 'api/wine');
-
-        $this->assertEquals(array("code" => ApiResponse::OK, "data" => "")
+        $wine = Wine::all();
+        $this->assertEquals(array("code" => ApiResponse::OK, "data" => $wine->toArray())
         , json_decode($response->getContent(), true));
     }
 
@@ -188,7 +188,7 @@ class WineTest extends ApiTestCase
             }
         $rating = Rating::where('wine_unique_id', $wine_infor->wine_unique_id)->whereNotIn('user_id',[$this->_user_id])->with('profile')->get();
         if(count($rating) == 0) {
-            $rating = "";
+            $rating = array();
         } else {
             foreach ($rating as $ratings) {
                 if ($ratings->profile->image != null) {
@@ -262,7 +262,7 @@ class WineTest extends ApiTestCase
             $wine_infor->winery->average_rate_winery = $wine_infor->average_rate;
         }
 
-        $rating_user = Rating::where('wine_unique_id', $wine_infor->wine_unique_id)->where('user_id',$this->_user_id)->with('profile')->first();
+        $rating_user = Rating::where('wine_unique_id', $wine_infor->wine_unique_id)->where('user_id',$this->_user_id)->with('profile')->get();
         $rating = Rating::where('wine_unique_id', $wine_infor->wine_unique_id)->whereNotIn('user_id',[$this->_user_id])->with('profile')->get();
         if(count($rating) == 0) {
             $rating = "";
@@ -285,7 +285,7 @@ class WineTest extends ApiTestCase
         if($wine_infor->wine_flag != null) {
             $wine_infor->wine_flag = URL::asset($wine_infor->wine_flag);
         } 
-        $data = array('wine' => $wine_infor->toArray(),'rate_user' => $rating_user ,'rate' => $rating->toArray(), 'wine_related' => $all_wines_winery->toArray());
+        $data = array('wine' => $wine_infor->toArray(),'rate_user' => array() ,'rate' => $rating->toArray(), 'wine_related' => $all_wines_winery->toArray());
         //dd($data);
         $this->assertEquals(array("code" => ApiResponse::OK, "data" => $data)
         , json_decode($response->getContent(), true));
@@ -344,7 +344,7 @@ class WineTest extends ApiTestCase
             }
         $rating = Rating::where('wine_unique_id', $wine_infor->wine_unique_id)->whereNotIn('user_id',[$this->_user_id])->with('profile')->get();
         if(count($rating) == 0) {
-                $rating = "";
+                $rating = array();
         }
         if($wine_infor->image_url != null) {
             $wine_infor->image_url = URL::asset($wine_infor->image_url);
@@ -370,7 +370,7 @@ class WineTest extends ApiTestCase
 
         $country_name = Country::where('id',$wine_infor->winery->country_id)->first()->country_name;
 
-        $wine_infor->winenote = "";
+        $wine_infor->winenote = null;
         $wine_infor->winery->country_id = $country_name;
         
         $wishlist = Wishlist::where('user_id', $this->_user_id)->where('wine_unique_id', $wine_infor->wine_unique_id)->first();
@@ -409,7 +409,7 @@ class WineTest extends ApiTestCase
             }
         $rating = Rating::where('wine_unique_id', $wine_infor->wine_unique_id)->whereNotIn('user_id',[$this->_user_id])->with('profile')->get();
         if(count($rating) == 0) {
-            $rating = "";
+            $rating = array();
         } else {
             foreach ($rating as $ratings) {
                 if ($ratings->profile->image != null) {

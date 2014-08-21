@@ -15,7 +15,7 @@ class WinenoteController extends ApiController {
 		if($winenote) {
 			$data = $winenote->toArray();
 		} else {
-		    $data = "";
+		    $data = array();
 		}
 		return Response::json(array("code" => $error_code, "data" => $data));
 	}
