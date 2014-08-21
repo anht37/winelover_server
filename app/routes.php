@@ -36,6 +36,7 @@ Route::group(array('prefix' => 'api'), function()
         Route::resource('winery', 'WineryController');
         Route::resource('rating', 'RatingController');
         Route::delete('mywine/{rating_id}', 'RatingController@remove');
+        Route::post('wine/search', 'WineController@search');
         Route::resource('like', 'LikeController');
 
         Route::get('comment/{rating_id}', 'CommentController@index');
@@ -54,6 +55,7 @@ Route::group(array('prefix' => 'api'), function()
         Route::get('timeline', 'UserController@timeline');
         Route::get('feature_users', 'UserController@feature_users');
         Route::post('message_push_notification', 'UserController@message_push_notification');
+
 
     });
 });

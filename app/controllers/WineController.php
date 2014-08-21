@@ -302,68 +302,16 @@ class WineController extends ApiController {
         }
         return Response::json(array("result" => $result));
     }
-
-  //   public function getWine_detail($wine_unique_id)
-  //   {
-  //   	$wine = Wine::where('wine_unique_id', $wine_unique_id)->with('winery')->first();
-  //   	if($wine) {
-  //           $rating = Rating::where('wine_unique_id', $wine_unique_id)->with('profile')->get();
-  //           if(count($rating) == 0) {
-  //           	$rating = "Don't have any rate !";
-  //           }
-  //           if($wine->image_url != null) {
-  //           	$wine->image_url = URL::asset($wine->image_url);
-  //           }   
-            
-		// 	$error_code = ApiResponse::OK;
-		// } else {
-		// 	$error_code = ApiResponse::UNAVAILABLE_WINE;
-  //           $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_WINE);
-		// }
- 	// 	return array("code" => $error_code, "data" => array('wine' => $wine, 'rate' => $rating ));
-  //   }
- //    public function read_csv()
- //    {
- //   //  	$c = 0;
- //   //  	try{
-	//      	$file = app_path() . '/rakuten_wine_data.csv';
-	// 		// $data = fopen($file,'r');file
-	// 		// $err_msg = array();
- //   //  		echo "<pre>";
-	// 		// while ($row = fgets($data)) {
-	// 		//     //$row is your line as a string
-	// 		//     // if ($c != 0) {
-	// 		//     //do something with it
-	// 		//     //$data_wine[$c] = $row . "\n";
-	// 		// 	print_r($row);
-	// 		// 	die;
-	// 		//   	$column_wine = explode('","', $row);
-	// 		//   	$column_wine[0] = explode('"', $column_wine[0], +1);
-	// 		//   	$column_wine[0] = $column_wine[0][0];
-	// 		//   	$column_wine[28] = explode('"', $column_wine[28], -1);
-	// 		//   	$column_wine[28] = $column_wine[28][0];
-	// 		//   	// processing
-	// 		//   	// transaction...
-	// 		//   	// error --> ? 
-	// 		//   	// 1. break;
-	// 		//   	// 2. insert vao err_msg -->xu ly tiep row
-	// 		// 	print_r($column_wine);
-	// 		// }
-	// 		// fclose($file);
-	// 		// //dd($wine_all);
-	// 		// die();
-
- //   //  	}catch(Exception $e){
- //   //  		echo "<pre>";
- //   //  		print_r($e);
- //   //  	}
-
- //    	$parser = \KzykHys\CsvParser\CsvParser::fromFile($file);
-
-	// 	foreach ($parser as $record) {
- //    	// handles each record
- //    		var_dump($record);
-	// 	}
-
-	// }
+    public function search()
+	{
+		$input = $this->_getInput();
+		if (!empty($input['text'])) { 
+		  	$result = Rating::searchWinefromMywine($input['text']);
+		  	return Response::json($result);
+		} else {
+			$error_code = ApiResponse::MISSING_PARAMS;
+		    $data = $input;
+		    return Response::json(array("code" => $error_code, "data" => $data));
+		}
+	}
 }
