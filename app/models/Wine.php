@@ -23,11 +23,9 @@ class Wine extends Eloquent {
     {   
         $error_code = ApiResponse::OK;
         $data = array();
-        $page = 1;
-        $limit = 10;
         $user_id = Session::get('user_id');
         
-        $wine = Wine::where('name','LIKE','%'.$wine_name.'%')->with('winery')->forPage($page, $limit)->get();
+        $wine = Wine::where('name','LIKE','%'.$wine_name.'%')->with('winery')->get();
         if($wine) {
             foreach ($wine as $wines) {
                 if($wines->image_url != null) {

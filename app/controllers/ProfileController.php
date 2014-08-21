@@ -9,27 +9,7 @@ class ProfileController extends ApiController {
 	 */
 	public function index()
 	{
-		// $error_code = ApiResponse::OK;
-		// $user_id = Session::get('user_id');
-		// if(User::where('user_id',$user_id)->first()){
-		// 	$profile = Profile::where('user_id', $user_id)->first();
-		// 	if($profile) {
-		// 		if ($profile->image != null) {
-	 //                $profile->image = URL::asset($profile->image);   
-	 //            }
-	 //            $wishlist = Wishlist::where('user_id', $user_id)->get();
-	 //            $profile->wishlist_count = count($wishlist);
-		// 		$data = $profile->toArray();
-		// 	} else { 
-		// 		$error_code = ApiResponse::UNAVAILABLE_USER;
-		//         $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_USER);
-		// 	}
-		// } else {
-		// 	$error_code = ApiResponse::UNAVAILABLE_USER;
-		//     $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_USER);
-		// }
-
-		// return Response::json(array("code" => $error_code, "data" => $data));
+		
 	}
 
 
@@ -51,61 +31,7 @@ class ProfileController extends ApiController {
 	 */
 	public function store()
 	{
-		// $input = $this->_getInput();
-		// $error_code = ApiResponse::OK;
-		// $user_id = Session::get('user_id');
-		// $profile = Profile::where('user_id', $user_id)->first();
-
-		// if($profile) {
-		// 	$error_code = ApiResponse::UNAVAILABLE_USER;
-	 //        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_USER);
-
-		// } else {
-		// 	if (!empty($input['follower_count'])) { 
-		// 	    $profile->follower_count = $input['follower_count'];
-		//     }
-		//     if (!empty($input['following_count'])) { 
-		// 	    $profile->following_count = $input['following_count'];
-		//     }
-		//     if (!empty($input['rate_count'])) { 
-		// 	    $profile->rate_count = $input['rate_count'];
-		//     }
-		//     if (!empty($input['comment_count'])) { 
-		// 	    $profile->comment_count = $input['comment_count'];
-		//     }
-		//     if (!empty($input['scan_count'])) { 
-		// 	    $profile->scan_count = $input['scan_count'];
-		//     }
-	 // 		if (!empty($input['last_name'])) { 
-		// 	    $profile->last_name = $input['last_name'];
-		//     }
-		// 	if (!empty($input['first_name'])) {  
-		// 	    $profile->first_name = $input['first_name'];
-		// 	}
-		// 	if (!empty($input['bio'])) {  
-		// 	    $profile->bio = $input['bio'];
-		// 	}	    
-		// 	if (!empty($input['country_id'])) {
-		// 	    $profile->country_id = $input['country_id'];
-		// 	}
-		// 	if (!empty($input['pref_id'])) {
-		// 	    $profile->pref_id = $input['pref_id'];
-		// 	}
-		// 	if (!empty($input['alias'])) {
-		// 	    $profile->alias = $input['alias'];
-		// 	}
-		// 	if (!empty($input['image'])) {
-		// 	    $profile->image = $input['image'];
-		// 	}
-		// 	if (!empty($input['website'])) {
-		// 	    $profile->website = $input['website'];
-		// 	}
-
-		// 	$profile->save();
-		// 	$error_code = ApiResponse::OK;
-		// 	$data = $profile->toArray();
-		// }
-	 //    return array("code" => $error_code, "data" => $data);
+		
 	}
 
 
@@ -253,6 +179,9 @@ class ProfileController extends ApiController {
 	{
 		$error_code = ApiResponse::OK;
 		$pagination = ApiResponse::pagination();
+		if($pagination == false) {
+			return Response::json(array("code" => ApiResponse::URL_NOT_EXIST, "data" => ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST)));
+		}
 		$page = $pagination['page'];
 		$limit = $pagination['limit'];
 		
@@ -294,34 +223,33 @@ class ProfileController extends ApiController {
 		return Response::json(array("code" => $error_code, "data" => $data));
 	}
 
-	public function getProfile_Top_rate($user_id, $per_page)
+	public function getProfile_Top_rate($user_id)
 	{	
 		$error_code = ApiResponse::OK;
-		$page = 1;
+		$pagination = ApiResponse::pagination();
+		if($pagination == false) {
+			return Response::json(array("code" => ApiResponse::URL_NOT_EXIST, "data" => ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST)));
+		}
+		$page = $pagination['page'];
+		$limit = $pagination['limit'];
 
-			if(User::where('user_id',$user_id)->first()) {
-				$check_paginate = ApiResponse::checkPagination($page, $per_page);
-				if ($check_paginate !== false) {
-					$top_rate = Rating::where('user_id',$user_id)->orderBy('rate', 'desc')->with('wine')->forPage($page, $per_page)->get();
-					foreach ($top_rate as $top_rates) {
-						$top_rates->winery = Winery::where('id',$top_rates->wine->winery_id)->first();
-						if($top_rates->wine->image_url != null) {
-			            	$top_rates->wine->image_url = URL::asset($top_rates->wine->image_url);
-				        }
+		if(User::where('user_id',$user_id)->first()) {
+			$top_rate = Rating::where('user_id',$user_id)->orderBy('rate', 'desc')->with('wine')->forPage($page, $limit)->get();
+			foreach ($top_rate as $top_rates) {
+				$top_rates->winery = Winery::where('id',$top_rates->wine->winery_id)->first();
+				if($top_rates->wine->image_url != null) {
+		            $top_rates->wine->image_url = URL::asset($top_rates->wine->image_url);
+			    }
 
-				        if($top_rates->wine->wine_flag != null) {
-				            $top_rates->wine->wine_flag = URL::asset($top_rates->wine->wine_flag);
-				        } 
-					}
-					$data = $top_rate->toArray();
-				} else {
-					$error_code = ApiResponse::URL_NOT_EXIST;
-		       		$data = ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST);
-				}
-			} else {
-				$error_code = ApiResponse::UNAVAILABLE_USER;
-		        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_USER);
+			    if($top_rates->wine->wine_flag != null) {
+			        $top_rates->wine->wine_flag = URL::asset($top_rates->wine->wine_flag);
+			    } 
 			}
+			$data = $top_rate->toArray();
+		} else {
+			$error_code = ApiResponse::UNAVAILABLE_USER;
+	        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_USER);
+		}
 		return Response::json(array("code" => $error_code, "data" => $data));
 	}
 

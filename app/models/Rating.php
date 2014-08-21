@@ -73,6 +73,9 @@ class Rating extends Eloquent {
             }
         }
         $pagination = ApiResponse::pagination();
+        if($pagination == false) {
+            return Response::json(array("code" => ApiResponse::URL_NOT_EXIST, "data" => ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST)));
+        }
         $page = $pagination['page'];
         $limit = $pagination['limit'];
 

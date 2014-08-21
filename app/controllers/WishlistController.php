@@ -12,6 +12,9 @@ class WishlistController extends ApiController {
 		$user_id = Session::get('user_id');
 		$error_code = ApiResponse::OK;
 		$pagination = ApiResponse::pagination();
+		if($pagination == false) {
+			return Response::json(array("code" => ApiResponse::URL_NOT_EXIST, "data" => ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST)));
+		}
 		$page = $pagination['page'];
 		$limit = $pagination['limit'];
 		

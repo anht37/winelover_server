@@ -12,6 +12,9 @@ class RatingController extends ApiController {
 	{
 		$user_id = Session::get('user_id');
 		$pagination = ApiResponse::pagination();
+		if($pagination == false) {
+			return Response::json(array("code" => ApiResponse::URL_NOT_EXIST, "data" => ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST)));
+		}
 		$page = $pagination['page'];
 		$limit = $pagination['limit'];
 		$rating = Rating::where('user_id', $user_id)->where('is_my_wine', 1)->with('wine')->orderBy('updated_at', 'desc')->forPage($page, $limit)->get();

@@ -109,9 +109,7 @@ class ApiResponse {
                 $limit = $paginate['limit'];
                 
             } else {
-                $error_code = ApiResponse::URL_NOT_EXIST;
-                $data = ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST);
-                return Response::json(array("code" => $error_code, "data" => $data));
+                return false;
             }
 
         } else {
