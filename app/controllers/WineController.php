@@ -327,7 +327,7 @@ class WineController extends ApiController {
  //   //  	$c = 0;
  //   //  	try{
 	//      	$file = app_path() . '/rakuten_wine_data.csv';
-	// 		// $data = fopen($file,'r');
+	// 		// $data = fopen($file,'r');file
 	// 		// $err_msg = array();
  //   //  		echo "<pre>";
 	// 		// while ($row = fgets($data)) {

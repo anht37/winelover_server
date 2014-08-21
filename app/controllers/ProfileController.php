@@ -143,7 +143,7 @@ class ProfileController extends ApiController {
 	{
 		$input = $this->_getInput();
 		$error_code = ApiResponse::OK;
-		// $user_id = Session::get('user_id');
+		$user_id = Session::get('user_id');
 		if(User::where('user_id',$user_id)->first()){
 			$profile = Profile::where('user_id', $user_id)->first();
 
