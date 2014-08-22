@@ -5,6 +5,7 @@ class Wine extends Eloquent {
     use SoftDeletingTrait;
     protected $table = 'wines';
     protected $primaryKey = 'wine_id';
+    protected $guarded = array();
 
     public static $rules = array(
 		'year' => 'required',
