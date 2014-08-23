@@ -134,6 +134,8 @@ class WinenoteTest extends ApiTestCase
     public function testUpdateWinenoteErrorWine()
     {
         $_params = $this->_params;
+        $_params['user_id'] = $this->_user_id;
+        $_params['wine_unique_id'] = '';
         $response = $this->action('POST', 'WinenoteController@update', array('wine_unique_id' => "wrong_wine_unique_id"), array('data' => json_encode($_params), '_method' => 'PUT'));
         //get created login information
        $this->assertEquals(array("code" => ApiResponse::UNAVAILABLE_WINE, "data" => ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_WINE))

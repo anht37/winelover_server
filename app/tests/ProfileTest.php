@@ -184,17 +184,6 @@ class ProfileTest extends ApiTestCase
         $this->assertEquals(array("code" => ApiResponse::OK, "data" => $data->toArray())
         , json_decode($response->getContent(), true));
     }
-    public function testGetProfileTopRateErrorWrongPerPage()
-    {
-        $this->setUpRating();
-        $user_id = $this->_user_id;
-        $per_page =  "wrong_per_page";
-        $page = 1;
-        $response = $this->action('GET', 'ProfileController@getProfile_Top_rate', array('user_id' => $user_id, 'per_page' => $per_page));
-
-        $this->assertEquals(array("code" => ApiResponse::URL_NOT_EXIST, "data" => ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST))
-        , json_decode($response->getContent(), true));
-    }
     
     public function testGetProfileTopRateErrorWrongUserId()
     {
