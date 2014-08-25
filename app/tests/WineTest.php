@@ -20,7 +20,8 @@ class WineTest extends ApiTestCase
             'winery_id' => '1',
             'wine_unique_id' => '',
             'average_price' => '2',
-            'average_rate' => '1'
+            'average_rate' => '1',
+            'text' => 'wi'
         );
         $this->_method = 'POST';
         $this->_uri = 'api/wine';
@@ -496,6 +497,49 @@ class WineTest extends ApiTestCase
     {
         $response = $this->action('delete', 'WineController@destroy', array('wine_id' => 1));
         $this->assertEquals(array("code" => ApiResponse::OK, "data" => "Wine deleted")
+         , json_decode($response->getContent(), true));
+    }
+
+    public function testSearchWineSuccess()
+    {
+        $data = array();
+        $_params = $this->_params;
+        $response = $this->action('POST', 'WineController@search', array(), array('data' => json_encode($_params) ));
+        $user_id = $this->_user_id;
+        
+        $wine = Wine::where('name','LIKE','%wi%')->with('winery')->get();
+        if($wine) {
+            foreach ($wine as $wines) {
+                if($wines->image_url != null) {
+                    $wines->image_url = URL::asset($wines->image_url);
+                }
+
+                if($wines->wine_flag != null) {
+                    $wines->wine_flag = URL::asset($wines->wine_flag);
+                } 
+
+                $ratings = Rating::where('user_id', $user_id)->where('wine_unique_id',$wines->wine_unique_id)->where('is_my_wine', 1)->first();
+                if($ratings) {
+                    $data[] = $wines;
+                } else {
+                    $wishlist = Wishlist::where('user_id', $user_id)->where('wine_unique_id',$wines->wine_unique_id)->first();
+                    if ($wishlist) {
+                        $data[] = $wines;
+                    }
+                }
+            }
+        }
+        $this->assertEquals(array("code" => ApiResponse::OK, "data" => $data)
+         , json_decode($response->getContent(), true));
+    }
+
+    public function testSearchWineErrorNoInput()
+    {
+        $_params = $this->_params;
+        unset($_params['text']);
+        $response = $this->action('POST', 'WineController@search', array(), array('data' => json_encode($_params)));       
+
+        $this->assertEquals(array("code" => ApiResponse::MISSING_PARAMS, "data" => $_params)
          , json_decode($response->getContent(), true));
     }
 }

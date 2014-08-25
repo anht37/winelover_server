@@ -101,4 +101,9 @@ class ProfileController extends ApiController {
         return Response::json($result);
 	}
 
+	public function getProfile_Last_rate($user_id)
+	{	
+		$result = Profile::getProfieLastRate($user_id);
+        return Response::json($result);
+	}
 }

@@ -166,7 +166,7 @@ class ProfileTest extends ApiTestCase
         $user_id = $this->_user_id;
         $per_page = 10;
         $page = 1;
-        $response = $this->action('GET', 'ProfileController@getProfile_Top_rate', array('user_id' => $user_id, 'per_page' => $per_page));
+        $response = $this->action('GET', 'ProfileController@getProfile_Top_rate', array('user_id' => $user_id));
 
         $top_rate = Rating::where('user_id',$user_id)->orderBy('rate', 'desc')->with('wine')->forPage($page, $per_page)->get();
         foreach ($top_rate as $top_rates) {
@@ -191,7 +191,44 @@ class ProfileTest extends ApiTestCase
         $user_id = "wrong_user_id";
         $per_page = 10;
         $page = 1;
-        $response = $this->action('GET', 'ProfileController@getProfile_Top_rate', array('user_id' => $user_id, 'per_page' => $per_page));
+        $response = $this->action('GET', 'ProfileController@getProfile_Top_rate', array('user_id' => $user_id));
+
+        $this->assertEquals(array("code" => ApiResponse::UNAVAILABLE_USER, "data" => ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_USER))
+        , json_decode($response->getContent(), true));
+    }
+
+    public function testGetProfileLastRateSucess()
+    {
+        $this->setUpRating();
+        $user_id = $this->_user_id;
+        $per_page = 10;
+        $page = 1;
+        $response = $this->action('GET', 'ProfileController@getProfile_Last_rate', array('user_id' => $user_id));
+
+        $last_rate = Rating::where('user_id',$user_id)->orderBy('updated_at', 'desc')->with('wine')->forPage($page, $per_page)->get();
+        foreach ($last_rate as $last_rates) {
+            $last_rates->winery = Winery::where('id',$last_rates->wine->winery_id)->first()->toArray();
+            if($last_rates->wine->image_url != null) {
+                $last_rates->wine->image_url = URL::asset($last_rates->wine->image_url);
+            }
+
+            if($last_rates->wine->wine_flag != null) {
+                $last_rates->wine->wine_flag = URL::asset($last_rates->wine->wine_flag);
+            } 
+        }
+        $data = $last_rate;
+
+        $this->assertEquals(array("code" => ApiResponse::OK, "data" => $data->toArray())
+        , json_decode($response->getContent(), true));
+    }
+    
+    public function testGetProfileLastRateErrorWrongUserId()
+    {
+        $this->setUpRating();
+        $user_id = "wrong_user_id";
+        $per_page = 10;
+        $page = 1;
+        $response = $this->action('GET', 'ProfileController@getProfile_Last_rate', array('user_id' => $user_id));
 
         $this->assertEquals(array("code" => ApiResponse::UNAVAILABLE_USER, "data" => ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_USER))
         , json_decode($response->getContent(), true));

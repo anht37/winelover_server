@@ -181,5 +181,35 @@ class Profile extends Eloquent {
 		}
 		return array("code" => $error_code, "data" => $data);
     }
+
+    public static function getProfieLastRate($user_id) 
+    {
+    	$error_code = ApiResponse::OK;
+		$pagination = ApiResponse::pagination();
+		if($pagination == false) {
+			return array("code" => ApiResponse::URL_NOT_EXIST, "data" => ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST));
+		}
+		$page = $pagination['page'];
+		$limit = $pagination['limit'];
+
+		if(User::where('user_id',$user_id)->first()) {
+			$last_rate = Rating::where('user_id',$user_id)->orderBy('updated_at', 'desc')->with('wine')->forPage($page, $limit)->get();
+			foreach ($last_rate as $last_rates) {
+				$last_rates->winery = Winery::where('id',$last_rates->wine->winery_id)->first();
+				if($last_rates->wine->image_url != null) {
+		            $last_rates->wine->image_url = URL::asset($last_rates->wine->image_url);
+			    }
+
+			    if($last_rates->wine->wine_flag != null) {
+			        $last_rates->wine->wine_flag = URL::asset($last_rates->wine->wine_flag);
+			    } 
+			}
+			$data = $last_rate->toArray();
+		} else {
+			$error_code = ApiResponse::UNAVAILABLE_USER;
+	        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_USER);
+		}
+		return array("code" => $error_code, "data" => $data);
+    }
     
 }

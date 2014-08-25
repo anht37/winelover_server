@@ -51,6 +51,7 @@ Route::group(array('prefix' => 'api'), function()
         Route::get('profile/basic/{user_id}', 'ProfileController@getProfile_basic_user');
         Route::get('profile/wishlist/{user_id}', 'ProfileController@getProfile_wishlist_user');
         Route::get('profile/top_rate/{user_id}', 'ProfileController@getProfile_Top_rate');
+        Route::get('profile/last_rate/{user_id}', 'ProfileController@getProfile_Last_rate');
         
         Route::get('timeline', 'UserController@timeline');
         Route::get('feature_users', 'UserController@feature_users');
