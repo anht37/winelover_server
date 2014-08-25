@@ -10,6 +10,7 @@ class User extends Eloquent
      * @var string
      */
     protected $table = 'users';
+    protected $guarded = array();
     /**
      * The attributes excluded from the model's JSON form.
      *
@@ -172,4 +173,22 @@ class User extends Eloquent
         $data = $user;
         return array("code" => $error_code, "data" => $data);
     }    
+
+    public static function getFriendFB($input)
+    {
+        $user_id = Session::get('user_id');
+        $error_code = ApiResponse::OK;
+        $data = array();
+        if(!empty($input)) {
+            foreach ($input as $fb_id) {
+                $user = User::where('fb_id', $fb_id)->with('profile')->first();
+                if($user && $user->user_id != $user_id) {
+                    $data[] = $user->toArray();
+                }
+            }
+        } else {
+            $error_code = ApiResponse::MISSING_PARAMS;
+        }
+        return array("code" => $error_code, "data" => $data);
+    }
 }

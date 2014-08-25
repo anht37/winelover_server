@@ -90,6 +90,7 @@ class WineController extends ApiController {
 
 	public function scan()
     {
+    	$user_id = Session::get('user_id');
         if(!Input::hasFile('file')) {
             return Response::json(array("result" => "No file"));
         }
@@ -100,6 +101,25 @@ class WineController extends ApiController {
         $uploadSuccess = $file->move($destinationPath,$file_name);
         if($uploadSuccess) {
             $result = Wine::scan($destinationPath.$file_name);
+            if($result > 0) 
+            {
+            	$wine = Wine::where('wine_id', $result)->first();
+            	$rating = new Rating;
+            	$rating->user_id = $user_id;
+            	$rating->wine_unique_id = $wine->wine_unique_id;
+
+            	$rating_profile = Profile::where('user_id',$rating->user_id)->first();
+                if($rating_profile != null) {
+                    $rating_profile->rate_count = $rating_profile->rate_count + 1;
+                    $rating_profile->save(); 
+                }
+                
+                $rating_rate = $wine->average_rate * $wine->rate_count;
+                $wine->rate_count = $wine->rate_count + 1;
+                $wine->save(); 
+
+            	$rating->save();
+            }
         }
         return Response::json(array("result" => $result));
     }

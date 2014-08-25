@@ -86,6 +86,7 @@ class UserController extends ApiController {
         return Response::json($result);
     }
     public function message_push_notification() {
+    	$input = Input::get("data");
     	$device_token = "150F5252DBAF4FFA2F6FE07D84A14B0EA840C7C1FE595536B2787C724AF7EE4A";
         $result = Device::message_push_notification(strtolower($device_token));
         return Response::json($result);
@@ -113,6 +114,11 @@ class UserController extends ApiController {
     public function feature_users() {
     	$user_id = Session::get('user_id');
     	$result = User::feature_users($user_id);
+        return Response::json($result);
+    }
+    public function get_friend_fb() {
+    	$input = $this->_getInput();
+    	$result = User::getFriendFB($input);
         return Response::json($result);
     }
 

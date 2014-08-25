@@ -25,13 +25,13 @@ Route::group(array('prefix' => 'api'), function()
     Route::post('logout', 'UserController@logout');
     Route::post('forgot_password', 'UserController@forgot_password');
     Route::post('push_notification', 'UserController@push_notification');
-    Route::post('scan', 'WineController@scan');
     Route::resource('user', 'UserController');
     
     Route::group(array('before' => 'session'), function()
     {
 
         Route::resource('wine', 'WineController');
+        Route::post('scan', 'WineController@scan');
         Route::resource('winenote', 'WinenoteController');
         Route::resource('winery', 'WineryController');
         Route::resource('rating', 'RatingController');
@@ -56,7 +56,7 @@ Route::group(array('prefix' => 'api'), function()
         Route::get('timeline', 'UserController@timeline');
         Route::get('feature_users', 'UserController@feature_users');
         Route::post('message_push_notification', 'UserController@message_push_notification');
-
+        Route::post('user/friend_fb','UserController@get_friend_fb');
 
     });
 });
