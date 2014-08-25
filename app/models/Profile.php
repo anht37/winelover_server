@@ -115,7 +115,7 @@ class Profile extends Eloquent {
     	$error_code = ApiResponse::OK;
 		$pagination = ApiResponse::pagination();
 		if($pagination == false) {
-			return Response::json(array("code" => ApiResponse::URL_NOT_EXIST, "data" => ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST)));
+			return array("code" => ApiResponse::URL_NOT_EXIST, "data" => ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST));
 		}
 		$page = $pagination['page'];
 		$limit = $pagination['limit'];
@@ -128,13 +128,7 @@ class Profile extends Eloquent {
 	        }
 			$wishlist = Wishlist::where('user_id', $user_id)->with('wine')->forPage($page, $limit)->get();
 			if (count($wishlist) == 0) {
-				if($page == 1) {
 					$data = array();
-				} else {
-					$error_code = ApiResponse::URL_NOT_EXIST;
-    				 $data = ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST);
-				}
-				
 			} else {	
 			    foreach ($wishlist as $wishlists) {
 					$wishlists->winery = Winery::where('id', $wishlists->wine->winery_id)->first();
@@ -163,7 +157,7 @@ class Profile extends Eloquent {
     	$error_code = ApiResponse::OK;
 		$pagination = ApiResponse::pagination();
 		if($pagination == false) {
-			return Response::json(array("code" => ApiResponse::URL_NOT_EXIST, "data" => ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST)));
+			return array("code" => ApiResponse::URL_NOT_EXIST, "data" => ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST));
 		}
 		$page = $pagination['page'];
 		$limit = $pagination['limit'];

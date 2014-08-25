@@ -81,8 +81,8 @@ class ApiResponse {
         );
         
         $rules = array(
-            'page' => 'integer',
-            'limit' =>'integer'
+            'page' => 'required|integer|min:1',
+            'limit' =>'required|integer|min:1'
         );
        
         $validator = Validator::make($paginate, $rules);
@@ -96,7 +96,8 @@ class ApiResponse {
     }
     public static function pagination() 
     {
-        if(Input::get('page')) {
+
+        if(Input::has('page')) {
             $getPage = Input::get('page');
             if(Input::get('per_page')) {
                 $getLimit = Input::get('per_page');

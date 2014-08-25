@@ -74,7 +74,7 @@ class Rating extends Eloquent {
         }
         $pagination = ApiResponse::pagination();
         if($pagination == false) {
-            return Response::json(array("code" => ApiResponse::URL_NOT_EXIST, "data" => ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST)));
+            return array("code" => ApiResponse::URL_NOT_EXIST, "data" => ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST));
         }
         $page = $pagination['page'];
         $limit = $pagination['limit'];
@@ -82,12 +82,7 @@ class Rating extends Eloquent {
         $ratings = Rating::whereIn('user_id', $user_timeline)->whereNotNull('wine_unique_id')->with('profile')->with('wine')->forPage($page, $limit)->get();
 
         if (count($ratings) == 0) {
-            if($page == 1) {
                 $data = array();
-            } else {
-                $error_code = ApiResponse::URL_NOT_EXIST;
-                $data = ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST);
-            }
             
         } else {
             foreach ($ratings as $rating) {   
@@ -127,19 +122,14 @@ class Rating extends Eloquent {
         $user_id = Session::get('user_id');
         $pagination = ApiResponse::pagination();
         if($pagination == false) {
-            return Response::json(array("code" => ApiResponse::URL_NOT_EXIST, "data" => ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST)));
+            return array("code" => ApiResponse::URL_NOT_EXIST, "data" => ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST));
         }
         $page = $pagination['page'];
         $limit = $pagination['limit'];
         $rating = Rating::where('user_id', $user_id)->where('is_my_wine', 1)->with('wine')->orderBy('updated_at', 'desc')->forPage($page, $limit)->get();
         $error_code = ApiResponse::OK;
         if(count($rating) == 0 ) {
-            if($page == 1) {
                 $data = array();
-            } else {
-                $error_code = ApiResponse::URL_NOT_EXIST;
-                $data = ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST);
-            }
         } else {
             foreach ($rating as $ratings) {
                 $ratings->winery = Winery::where('id',$ratings->wine->winery_id)->first();
@@ -152,7 +142,6 @@ class Rating extends Eloquent {
                 } 
             }
             $data = $rating->toArray();
-            
         }
         return array("code" => $error_code, "data" => $data);
     }

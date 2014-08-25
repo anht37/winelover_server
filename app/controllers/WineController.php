@@ -108,7 +108,7 @@ class WineController extends ApiController {
 	{
 		$input = $this->_getInput();
 		if (!empty($input['text'])) { 
-		  	$result = Rating::searchWinefromMywine($input['text']);
+		  	$result = Wine::searchWinefromMywine($input['text']);
 		  	return Response::json($result);
 		} else {
 			$error_code = ApiResponse::MISSING_PARAMS;

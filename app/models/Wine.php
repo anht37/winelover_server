@@ -31,13 +31,7 @@ class Wine extends Eloquent {
         $limit = $pagination['limit'];
         $wine = Wine::with('winery')->forPage($page, $limit)->get();
         if(count($wine) == 0) {
-            if($page == 1) {
                 $data = array();
-            } else {
-                $error_code = ApiResponse::URL_NOT_EXIST;
-                $data = ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST);
-            }
-            
         } else {
             foreach ($wine as $wines) {
                 $wines->winery_id = $wines->winery->brand_name;
