@@ -123,7 +123,7 @@ class TimelineTest extends ApiTestCase
         $this->_uri = 'api/timeline?page=2';
         $response = $this->_getAuth($_params);
 
-        $this->assertEquals(array("code" => ApiResponse::URL_NOT_EXIST, "data" => ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST))
+        $this->assertEquals(array("code" => ApiResponse::OK, "data" => array())
         , json_decode($response->getContent(), true));
     }
 }

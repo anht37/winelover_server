@@ -156,6 +156,7 @@ class CommentTest extends ApiTestCase
         $_params['user_id'] = $this->_user_id;
         unset($_params['content']);
         $response = $this->_getAuth($_params);
+        empty($_params);
         //get created login information
         $this->assertEquals(
             array("code" => ApiResponse::MISSING_PARAMS, "data" => $_params)

@@ -75,8 +75,12 @@ class GetRatingMyWineTest extends ApiTestCase
     {
         $this->setUpRating();
         $response = $this->call('GET', 'api/rating?page=2');
+
+        $page = 2;
+        $limit = 10;
+        $rating = Rating::where('user_id', $this->_user_id)->where('is_my_wine', 1)->with('wine')->orderBy('updated_at', 'desc')->forPage($page, $limit)->get()->toArray();
         
-        $this->assertEquals(array("code" => ApiResponse::URL_NOT_EXIST, "data" =>  ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST))
+        $this->assertEquals(array("code" => ApiResponse::OK, "data" => $rating)
         , json_decode($response->getContent(), true)); 
     }
 

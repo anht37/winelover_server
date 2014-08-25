@@ -130,10 +130,13 @@ class WineTest extends ApiTestCase
         , json_decode($response->getContent(), true));
     }
 
-    public function testGetListRatingMyWineWrongPage() 
+    public function testGetListWineWrongPage() 
     {
         $response = $this->call('GET', 'api/wine?page=2');
-        $this->assertEquals(array("code" => ApiResponse::URL_NOT_EXIST, "data" =>  ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST))
+        $page = 2;
+        $limit = 10;
+        $wine_infor = Wine::with('winery')->forPage($page, $limit)->get()->toArray();
+        $this->assertEquals(array("code" => ApiResponse::OK, "data" => $wine_infor)
         , json_decode($response->getContent(), true)); 
     }
 
