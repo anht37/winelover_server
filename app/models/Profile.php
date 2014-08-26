@@ -69,13 +69,17 @@ class Profile extends Eloquent {
 				$profile = Profile::where('user_id', $user_id)->first();
 	    	if (Input::hasFile('file')) {
 			    $file = Input::file('file');
-			    $destinationPath    = public_path() . '/images/' . $user_id;
-			    File::makeDirectory($destinationPath, $mode = 0777, true, true);
+			    $destinationPath = public_path() . '/images/' . $user_id;
+			    $filename = date('YmdHis').'_'.$file->getClientOriginalName();
+				$extension = $file->getClientOriginalExtension();
 
-				$filename           = date('YmdHis').'_'.$file->getClientOriginalName();
-				$extension          = $file->getClientOriginalExtension();
-				$upload_success     = $file->move($destinationPath, $filename);
-			    
+			    if (File::isDirectory($destinationPath))
+				{
+				    $upload_success = $file->move($destinationPath, $filename);
+				} else {
+				    File::makeDirectory($destinationPath, $mode = 0777, true, true);	
+					$upload_success     = $file->move($destinationPath, $filename);
+			    }
 			    $profile->image = 'images/'. $user_id . '/' . $filename;
 			    $profile->save();
 			    $data = URL::asset($profile->image);
