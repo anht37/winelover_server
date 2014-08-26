@@ -198,6 +198,12 @@ class User extends Eloquent
         $user = Profile::where('first_name','LIKE','%'.$text.'%')->orWhere('last_name', 'LIKE', '%'.$text.'%')->get();
         if($user) {
             foreach ($user as $users) {
+                $follow = Follow::where('from_id', $user_id)->where('to_id', $users->user_id)->first();
+                if($follow) {
+                        $users->is_follow = true;
+                    } else {
+                        $users->is_follow = false;
+                    }
                 if($users->image != null) {
                     $users->image = URL::asset($users->image);
                 }
@@ -222,8 +228,20 @@ class User extends Eloquent
         }
         $user = Profile::orderBy('rate_count', 'desc')->forPage($page, $limit)->get();
         if(count($user) != 0) {
+            foreach ($user as $users) {
+                $follow = Follow::where('from_id', $user_id)->where('to_id', $users->user_id)->first();
+                if($follow) {
+                        $users->is_follow = true;
+                    } else {
+                        $users->is_follow = false;
+                    }
+                if($users->image != null) {
+                    $users->image = URL::asset($users->image);
+                }
+            }
+
             $data = $user->toArray();
-        }
+        } 
         return array("code" => $error_code, "data" => $data);
     }
 }

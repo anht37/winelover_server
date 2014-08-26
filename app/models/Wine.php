@@ -100,14 +100,19 @@ class Wine extends Eloquent {
         $wine = Wine::where('wine_id', $wine_id)->with('winery')->first();
         $error_code = ApiResponse::OK;
         if($wine) {
-            $country_name = Country::where('id',$wine->winery->country_id)->first()->country_name;
+            $country = Country::where('id',$wine->winery->country_id)->first();
+            if($country) {
+                $wine->winery->country_id = $country_name;
+            } else {
+                $wine->winery->country_id = null;
+            }
             $wine_note = Winenote::where('wine_unique_id', $wine->wine_unique_id)->where('user_id',$user_id)->first();
             if($wine_note) {
                 $wine->winenote = $wine_note->note;
             } else {
                 $wine->winenote = null;
             }
-            $wine->winery->country_id = $country_name;
+            
             
             $wishlist = Wishlist::where('user_id', $user_id)->where('wine_unique_id', $wine->wine_unique_id)->first();
             if($wishlist) {
@@ -143,7 +148,7 @@ class Wine extends Eloquent {
 
             $rating_user = Rating::where('wine_unique_id', $wine->wine_unique_id)->where('user_id',$user_id)->with('profile')->first();
             if(count($rating_user) == 0) {
-                $rating_user = array();
+                $rating_user = null;
             } else {
                 if ($rating_user->profile->image != null) {
                     $rating_user->profile->image = URL::asset($rating_user->profile->image);   
