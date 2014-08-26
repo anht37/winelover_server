@@ -76,6 +76,9 @@ class Profile extends Eloquent {
 			    $profile->image = 'images/' . $filename;
 			    $profile->save();
 			    $data = URL::asset($profile->image);
+			} else {
+				$error_code = ApiResponse::MISSING_PARAMS;
+			    $data = array()
 			}
 		} else {
 			$error_code = ApiResponse::UNAVAILABLE_USER;

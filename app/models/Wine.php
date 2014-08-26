@@ -139,6 +139,7 @@ class Wine extends Eloquent {
                 $wine->winery->total_rate = $rate_winery;
                 $wine->winery->average_rate_winery = $wine->average_rate;
             }
+            $wine->total_like = 0;
 
             $rating_user = Rating::where('wine_unique_id', $wine->wine_unique_id)->where('user_id',$user_id)->with('profile')->first();
             if(count($rating_user) == 0) {
@@ -147,6 +148,7 @@ class Wine extends Eloquent {
                 if ($rating_user->profile->image != null) {
                     $rating_user->profile->image = URL::asset($rating_user->profile->image);   
                 }
+                $wine->total_like = $wine->total_like + $rating_user->like_count;
             }
             $rating = Rating::where('wine_unique_id', $wine->wine_unique_id)->whereNotIn('user_id',[$user_id])->with('profile')->get();
             if(count($rating) == 0) {
@@ -162,6 +164,7 @@ class Wine extends Eloquent {
                     } else {
                         $ratings->is_follow = false;
                     }
+                    $wine->total_like = $wine->total_like + $ratings->like_count;
                 }
             }
             if($wine->image_url != null) {
