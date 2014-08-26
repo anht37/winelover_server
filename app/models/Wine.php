@@ -102,7 +102,7 @@ class Wine extends Eloquent {
         if($wine) {
             $country = Country::where('id',$wine->winery->country_id)->first();
             if($country) {
-                $wine->winery->country_id = $country_name;
+                $wine->winery->country_id = $country->country_name;
             } else {
                 $wine->winery->country_id = null;
             }
