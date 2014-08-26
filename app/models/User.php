@@ -153,9 +153,6 @@ class User extends Eloquent
     public static function feature_users($user_id)
     {
         $error_code = ApiResponse::OK;
-        // $pagination = ApiResponse::pagination();
-        // $page = $pagination['page'];
-        // $limit = $pagination['limit'];
         $user = User::whereNotIn('user_id', [$user_id])->orderBy(DB::raw("RAND()"))->with('profile')->take(10)->get();
         if($user) {
             foreach ($user as $users) {
@@ -188,6 +185,44 @@ class User extends Eloquent
             }
         } else {
             $error_code = ApiResponse::MISSING_PARAMS;
+        }
+        return array("code" => $error_code, "data" => $data);
+    }
+
+    public static function searchUserFromUserName($text)
+    {   
+        $error_code = ApiResponse::OK;
+        $data = array();
+        $user_id = Session::get('user_id');
+        
+        $user = Profile::where('first_name','LIKE','%'.$text.'%')->orWhere('last_name', 'LIKE', '%'.$text.'%')->get();
+        if($user) {
+            foreach ($user as $users) {
+                if($users->image != null) {
+                    $users->image = URL::asset($users->image);
+                }
+                if($users->user_id != $user_id) {
+                    $data[] = $users->toArray();
+                }
+            }
+        } 
+        return array("code" => $error_code, "data" => $data);
+    }
+
+    public static function ranking()
+    {
+
+        $error_code = ApiResponse::OK;
+        $data = array();
+        $pagination = ApiResponse::pagination();
+        $page = $pagination['page'];
+        $limit = $pagination['limit'];
+        if($pagination == false) {
+            return array("code" => ApiResponse::URL_NOT_EXIST, "data" => ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST));
+        }
+        $user = Profile::orderBy('rate_count', 'desc')->forPage($page, $limit)->get();
+        if(count($user) != 0) {
+            $data = $user->toArray();
         }
         return array("code" => $error_code, "data" => $data);
     }

@@ -58,6 +58,8 @@ Route::group(array('prefix' => 'api'), function()
         Route::get('feature_users', 'UserController@feature_users');
         Route::post('message_push_notification', 'UserController@message_push_notification');
         Route::post('user/friend_fb','UserController@get_friend_fb');
+        Route::post('user/search','UserController@search_user_from_name');
+        Route::get('ranking','UserController@get_ranking');
 
     });
 });
