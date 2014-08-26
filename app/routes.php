@@ -48,6 +48,7 @@ Route::group(array('prefix' => 'api'), function()
         Route::resource('follow', 'FollowController');
         Route::resource('wishlist', 'WishlistController');
         Route::resource('profile', 'ProfileController');
+        Route::post('profile/{user_id}', 'ProfileController@uploadImage');
         Route::get('profile/basic/{user_id}', 'ProfileController@getProfile_basic_user');
         Route::get('profile/wishlist/{user_id}', 'ProfileController@getProfile_wishlist_user');
         Route::get('profile/top_rate/{user_id}', 'ProfileController@getProfile_Top_rate');

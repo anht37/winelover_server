@@ -21,7 +21,7 @@ class Profile extends Eloquent {
 			$profile = Profile::where('user_id', $user_id)->first();
 
 			if($profile) {
-		 		if (!empty($input) || Input::hasFile('file')) {
+		 		if (!empty($input)) {
 		 			if (!empty($input['last_name'])) { 
 				    	$profile->last_name = $input['last_name'];
 			    	}
@@ -40,15 +40,6 @@ class Profile extends Eloquent {
 				    if (!empty($input['alias'])) {
 				        $profile->alias = $input['alias'];
 				    }
-				    if (Input::hasFile('file')) {
-					    $file = Input::file('file');
-					    $destinationPath    = public_path() . '/images/';
-						$filename           = $file->getClientOriginalName();
-						$extension          = $file->getClientOriginalExtension();
-						$upload_success     = $file->move($destinationPath, $filename);
-					    $profile->image = 'images/' . $filename;
-					}
-				    
 				    if (!empty($input['website'])) {
 				        $profile->website = $input['website'];
 				    }
@@ -69,6 +60,28 @@ class Profile extends Eloquent {
 		    $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_USER);
 		}
 	    return array("code" => $error_code, "data" => $data);
+    }
+
+    public static function uploadImage($user_id) 
+    {
+    	$error_code = ApiResponse::OK;
+    	if(User::where('user_id',$user_id)->first()){
+				$profile = Profile::where('user_id', $user_id)->first();
+	    	if (Input::hasFile('file')) {
+			    $file = Input::file('file');
+			    $destinationPath    = public_path() . '/images/';
+				$filename           = $file->getClientOriginalName();
+				$extension          = $file->getClientOriginalExtension();
+				$upload_success     = $file->move($destinationPath, $filename);
+			    $profile->image = 'images/' . $filename;
+			    $profile->save();
+			    $data = URL::asset($profile->image);
+			}
+		} else {
+			$error_code = ApiResponse::UNAVAILABLE_USER;
+		    $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_USER);
+		}
+		return array("code" => $error_code, "data" => $data);
     }
     
     public static function getProfileBasicUser($user_id)

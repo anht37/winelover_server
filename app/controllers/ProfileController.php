@@ -71,6 +71,11 @@ class ProfileController extends ApiController {
         return Response::json($result);
 	}
 
+	public function uploadImage($user_id)
+	{
+		$result = Profile::uploadImage($user_id);
+        return Response::json($result);
+	}
 
 	/**
 	 * Remove the specified resource from storage.
