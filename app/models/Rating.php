@@ -250,7 +250,7 @@ class Rating extends Eloquent {
                             } else {
                                 $error_code = ApiResponse::UNAVAILABLE_RATING;
                                 $data = null;
-                                return array("code" => $error_code, "data" => $data));
+                                return array("code" => $error_code, "data" => $data);
                             }
                             $rating_wine->save(); 
                         }
