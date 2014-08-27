@@ -227,6 +227,7 @@ class User extends Eloquent
     public static function ranking()
     {
 
+        $user_id = Session::get('user_id');
         $error_code = ApiResponse::OK;
         $data = array();
         $pagination = ApiResponse::pagination();
@@ -236,13 +237,16 @@ class User extends Eloquent
             return array("code" => ApiResponse::URL_NOT_EXIST, "data" => ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST));
         }
         $user = Profile::orderBy('rate_count', 'desc')->forPage($page, $limit)->get();
+
         if(count($user) != 0) {
             foreach ($user as $users) {
                 $follow = Follow::where('from_id', $user_id)->where('to_id', $users->user_id)->first();
                 if($follow) {
                         $users->is_follow = true;
                     } else {
-                        $users->is_follow = false;
+                        if($users->user_id != $user_id) {
+                            $users->is_follow = false;
+                        }
                     }
                 if($users->image != null) {
                     $users->image = URL::asset($users->image);

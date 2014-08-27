@@ -104,21 +104,8 @@ class WineController extends ApiController {
             if($result > 0) 
             {
             	$wine = Wine::where('wine_id', $result)->first();
-            	$rating = new Rating;
-            	$rating->user_id = $user_id;
-            	$rating->wine_unique_id = $wine->wine_unique_id;
-
-            	$rating_profile = Profile::where('user_id',$rating->user_id)->first();
-                if($rating_profile != null) {
-                    $rating_profile->rate_count = $rating_profile->rate_count + 1;
-                    $rating_profile->save(); 
-                }
-                
-                $rating_rate = $wine->average_rate * $wine->rate_count;
-                $wine->rate_count = $wine->rate_count + 1;
-                $wine->save(); 
-
-            	$rating->save();
+            	$input = $wine->toArray();
+            	$rating = Rating::createNewRating($input);
             }
         }
         return Response::json(array("result" => $result));

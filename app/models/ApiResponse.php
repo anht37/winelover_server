@@ -35,6 +35,7 @@ class ApiResponse {
     const UNAVAILABLE_WINE_NOTE = "119";
     const DUPLICATED_WINE_NOTE_ADD = "120";
     const SELF_FOLLOW_ERROR = "121";
+    const DUPLICATED_RATING = "122";
 
 
     private static $ERROR_LIST = array(
@@ -61,6 +62,7 @@ class ApiResponse {
         "119" => "Wine note is not available",
         "120" => "Duplicated Wine note",
         "121" => "Can't follow yourself",
+        "122" => "Already Rating",
     );
 
     public static function createResponse($response) {
