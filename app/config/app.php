@@ -122,8 +122,7 @@ return array(
 		'Illuminate\View\ViewServiceProvider',
 		'Illuminate\Workbench\WorkbenchServiceProvider',
 		'Davibennun\LaravelPushNotification\LaravelPushNotificationServiceProvider',
-		'Maatwebsite\Excel\ExcelServiceProvider',
-
+		
 	),
 
 	/*
@@ -192,7 +191,6 @@ return array(
 		'View'            => 'Illuminate\Support\Facades\View',
         'Uuid'            => 'Webpatser\Uuid\Uuid',
         'PushNotification' => 'Davibennun\LaravelPushNotification\Facades\PushNotification',
-        'Excel' => 'Maatwebsite\Excel\Facades\Excel',
 	),
 
 	'pem' => app_path().'/ck.pem',
