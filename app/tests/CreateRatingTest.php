@@ -48,7 +48,7 @@ class CreateRatingTest extends ApiTestCase
         $_params = $this->_params;
         $_params['wine_unique_id'] = 'wine_not_available';
         $response = $this->_getAuth($_params);
-        $this->assertEquals(json_encode(array("code" => ApiResponse::UNAVAILABLE_RATING, "data" => ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING))), $response->getContent());
+        $this->assertEquals(json_encode(array("code" => ApiResponse::UNAVAILABLE_WINE, "data" => ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_WINE))), $response->getContent());
     }
     public function testCreateRatingErrorWrongRate()
     {

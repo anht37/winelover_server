@@ -258,28 +258,28 @@ class User extends Eloquent
         return array("code" => $error_code, "data" => $data);
     }
 
-    // public static function followFriendFb()
-    // {
-    //     $user_id = Session::get('user_id');
-    //     $error_code = ApiResponse::OK;
-    //     $data = $input;
-    //     if(!empty($input)) {
-    //         foreach ($input as $fb_id) {
-    //             $user = User::where('fb_id', $fb_id)->first();
-    //             if($user && $user->user_id != $user_id) {
-    //                 $follow = Follow::where('from_id', $user_id)->where('to_id', $user->user_id)->first();
-    //                 if($follow == null) {
-    //                         $user_follow = new Follow;
-    //                         $from_id = $user_id;
-    //                         $to_id = $user->user_id;
-    //                         $user_follow->save();
-    //                 }
-    //             }
-    //         }
-    //         $data = "All user are followed !";
-    //     } else {
-    //         $error_code = ApiResponse::MISSING_PARAMS;
-    //     }
-    //     return array("code" => $error_code, "data" => $data);
-    // }
+    public static function followFriendFb($input)
+    {
+        $user_id = Session::get('user_id');
+        $error_code = ApiResponse::OK;
+        $data = $input;
+        if(!empty($input)) {
+            foreach ($input as $fb_id) {
+                $user = User::where('fb_id', $fb_id)->first();
+                if($user && $user->user_id != $user_id) {
+                    $follow = Follow::where('from_id', $user_id)->where('to_id', $user->user_id)->first();
+                    if($follow == null) {
+                            $user_follow = new Follow;
+                            $from_id = $user_id;
+                            $to_id = $user->user_id;
+                            $user_follow->save();
+                    }
+                }
+            }
+            $data = "All user are followed !";
+        } else {
+            $error_code = ApiResponse::MISSING_PARAMS;
+        }
+        return array("code" => $error_code, "data" => $data);
+    }
 }

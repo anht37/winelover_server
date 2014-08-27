@@ -150,7 +150,7 @@ class WineTest extends ApiTestCase
         $response = $this->call('GET', 'api/wine/1');
         $wine_infor = Wine::where('wine_id', 1)->with('winery')->first();
         $country_name = Country::where('id',$wine_infor->winery->country_id)->first()->country_name;
-
+        $wine_infor->total_like = 0;
         $wine_note = Winenote::where('wine_unique_id', $wine_infor->wine_unique_id)->where('user_id',$this->_user_id)->first();
 
         $wine_infor->winenote = $wine_note->note;
@@ -190,6 +190,7 @@ class WineTest extends ApiTestCase
         if ($rating_user->profile->image != null) {
                 $rating_user->profile->image = URL::asset($rating_user->profile->image);   
             }
+        $wine_infor->total_like = $wine_infor->total_like + $rating_user->like_count;
         $rating = Rating::where('wine_unique_id', $wine_infor->wine_unique_id)->whereNotIn('user_id',[$this->_user_id])->with('profile')->get();
         if(count($rating) == 0) {
             $rating = array();
@@ -204,6 +205,7 @@ class WineTest extends ApiTestCase
                 } else {
                     $ratings->is_follow = false;
                 }
+                $wine_infor->total_like = $wine_infor->total_like + $ratings->like_count;
             }
         }
         if($wine_infor->image_url != null) {
@@ -229,7 +231,7 @@ class WineTest extends ApiTestCase
         $response = $this->call('GET', 'api/wine/1');
         //dd($response);
         $wine_infor = Wine::where('wine_id', 1)->with('winery')->first();
-
+        $wine_infor->total_like = 0;
         $country_name = Country::where('id',$wine_infor->winery->country_id)->first()->country_name;
 
         $wine_note = Winenote::where('wine_unique_id', $wine_infor->wine_unique_id)->where('user_id',$this->_user_id)->first();
@@ -266,7 +268,6 @@ class WineTest extends ApiTestCase
             $wine_infor->winery->average_rate_winery = $wine_infor->average_rate;
         }
 
-        $rating_user = Rating::where('wine_unique_id', $wine_infor->wine_unique_id)->where('user_id',$this->_user_id)->with('profile')->get();
         $rating = Rating::where('wine_unique_id', $wine_infor->wine_unique_id)->whereNotIn('user_id',[$this->_user_id])->with('profile')->get();
         if(count($rating) == 0) {
             $rating = "";
@@ -281,6 +282,7 @@ class WineTest extends ApiTestCase
                 } else {
                     $ratings->is_follow = false;
                 }
+                $wine_infor->total_like = $wine_infor->total_like + $ratings->like_count;
             }
         }
         if($wine_infor->image_url != null) {
@@ -289,7 +291,7 @@ class WineTest extends ApiTestCase
         if($wine_infor->wine_flag != null) {
             $wine_infor->wine_flag = URL::asset($wine_infor->wine_flag);
         } 
-        $data = array('wine' => $wine_infor->toArray(),'rate_user' => array() ,'rate' => $rating->toArray(), 'wine_related' => $all_wines_winery->toArray());
+        $data = array('wine' => $wine_infor->toArray(),'rate_user' => null,'rate' => $rating->toArray(), 'wine_related' => $all_wines_winery->toArray());
         //dd($data);
         $this->assertEquals(array("code" => ApiResponse::OK, "data" => $data)
         , json_decode($response->getContent(), true));
@@ -343,6 +345,7 @@ class WineTest extends ApiTestCase
         }
 
         $rating_user = Rating::where('wine_unique_id', $wine_infor->wine_unique_id)->where('user_id',$this->_user_id)->with('profile')->first();
+        $wine_infor->total_like = $rating_user->like_count;
         if ($rating_user->profile->image != null) {
                 $rating_user->profile->image = URL::asset($rating_user->profile->image);   
             }
@@ -371,7 +374,7 @@ class WineTest extends ApiTestCase
         $wine_note = Winenote::destroy(1);
         $response = $this->call('GET', 'api/wine/1');
         $wine_infor = Wine::where('wine_id', 1)->with('winery')->first();
-
+        $wine_infor->total_like = 0;
         $country_name = Country::where('id',$wine_infor->winery->country_id)->first()->country_name;
 
         $wine_infor->winenote = null;
@@ -411,6 +414,7 @@ class WineTest extends ApiTestCase
         if ($rating_user->profile->image != null) {
                $rating_user->profile->image = URL::asset($rating_user->profile->image);   
             }
+        $wine_infor->total_like = $wine_infor->total_like + $rating_user->like_count;
         $rating = Rating::where('wine_unique_id', $wine_infor->wine_unique_id)->whereNotIn('user_id',[$this->_user_id])->with('profile')->get();
         if(count($rating) == 0) {
             $rating = array();
@@ -425,6 +429,7 @@ class WineTest extends ApiTestCase
                 } else {
                     $ratings->is_follow = false;
                 }
+                $wine_infor->total_like = $wine_infor->total_like + $ratings->like_count;
             }
         }
         if($wine_infor->image_url != null) {
