@@ -151,6 +151,7 @@ class Rating extends Eloquent {
 
     public static function createNewRating($input)
     {
+        
         $rating = new Rating;
         $error_code = ApiResponse::OK;
         $rating->user_id = Session::get('user_id');

@@ -182,12 +182,12 @@ class User extends Eloquent
                 if($user && $user->user_id != $user_id) {
                     $follow = Follow::where('from_id', $user_id)->where('to_id', $user->user_id)->first();
                     if($follow) {
-                            $users->is_follow = true;
+                            $user->is_follow = true;
                         } else {
-                            $users->is_follow = false;
+                            $user->is_follow = false;
                         }
-                    if($users->image != null) {
-                        $users->image = URL::asset($users->image);
+                    if($user->image != null) {
+                        $user->image = URL::asset($users->image);
                     }
                     $data[] = $user->toArray();
                 }
