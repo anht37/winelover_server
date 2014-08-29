@@ -145,6 +145,7 @@ class User extends Eloquent
         }
         return array("code" => $error_code, "data" => $data);
     }
+
     public function profile()
     {
         return $this->belongsTo('Profile','user_id', 'user_id');
@@ -176,6 +177,7 @@ class User extends Eloquent
         $user_id = Session::get('user_id');
         $error_code = ApiResponse::OK;
         $data = array();
+        //return json_encode(array('abc','bca','cab'));
         if(!empty($input)) {
             foreach ($input as $fb_id) {
                 $user = User::where('fb_id', $fb_id)->with('profile')->first();
@@ -198,29 +200,34 @@ class User extends Eloquent
         return array("code" => $error_code, "data" => $data);
     }
 
-    public static function searchUserFromUserName($text)
+    public static function searchUserFromUserName($input)
     {   
         $error_code = ApiResponse::OK;
         $data = array();
         $user_id = Session::get('user_id');
-        
-        $user = Profile::where('first_name','LIKE','%'.$text.'%')->orWhere('last_name', 'LIKE', '%'.$text.'%')->get();
-        if($user) {
-            foreach ($user as $users) {
-                $follow = Follow::where('from_id', $user_id)->where('to_id', $users->user_id)->first();
-                if($follow) {
-                        $users->is_follow = true;
-                    } else {
-                        $users->is_follow = false;
+        if(!empty($input['text'])) {
+            $text = $input['text'];
+            $user = Profile::where('first_name','LIKE','%'.$text.'%')->orWhere('last_name', 'LIKE', '%'.$text.'%')->get();
+            if($user) {
+                foreach ($user as $users) {
+                    $follow = Follow::where('from_id', $user_id)->where('to_id', $users->user_id)->first();
+                    if($follow) {
+                            $users->is_follow = true;
+                        } else {
+                            $users->is_follow = false;
+                        }
+                    if($users->image != null) {
+                        $users->image = URL::asset($users->image);
                     }
-                if($users->image != null) {
-                    $users->image = URL::asset($users->image);
+                    if($users->user_id != $user_id) {
+                        $data[] = $users->toArray();
+                    }
                 }
-                if($users->user_id != $user_id) {
-                    $data[] = $users->toArray();
-                }
-            }
-        } 
+            } 
+        } else {
+            $error_code = ApiResponse::MISSING_PARAMS;
+            $data = $input;
+        }
         return array("code" => $error_code, "data" => $data);
     }
 

@@ -89,7 +89,7 @@ class UserController extends ApiController {
     }
     public function message_push_notification() 
     {
-    	$input = Input::get("data");
+    	$input = $this->_getInput();
     	$device_token = "150F5252DBAF4FFA2F6FE07D84A14B0EA840C7C1FE595536B2787C724AF7EE4A";
         $result = Device::message_push_notification(strtolower($device_token));
         return Response::json($result);
@@ -113,12 +113,14 @@ class UserController extends ApiController {
         $result = User::forgot_password($this->_getInput());
         return Response::json($result);
     }
+
     public function timeline() 
     {
     	$user_id = Session::get('user_id');
     	$result = Rating::timeline($user_id);
         return Response::json($result);
     }
+
     public function feature_users() 
     {
 
@@ -126,27 +128,28 @@ class UserController extends ApiController {
     	$result = User::feature_users($user_id);
         return Response::json($result);
     }
+
     public function get_friend_fb() 
-    {
-    	$input = $this->_getInput();
-    	$result = User::getFriendFB($input);
+    { 
+    	$result = User::getFriendFB($this->_getInput());
         return Response::json($result);
     }
+
     public function search_user_from_name() 
     {
-    	$input = $this->_getInput();
-    	if($input['text']) {
-    		$result = User::searchUserFromUserName($input['text']);
-        	return Response::json($result);
-    	} else {
-			$error_code = ApiResponse::MISSING_PARAMS;
-		    $data = $input;
-		    return Response::json(array("code" => $error_code, "data" => $data));
-		}
+    	$result = User::searchUserFromUserName($this->_getInput());
+        return Response::json($result);
     }
+
     public function get_ranking() 
     {
         $result = User::ranking();
+        return Response::json($result);
+    }
+
+    public function follow_friend_fb() 
+    { 
+    	$result = User::followFriendFb($this->_getInput());
         return Response::json($result);
     }
 

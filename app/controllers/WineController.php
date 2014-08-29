@@ -113,14 +113,7 @@ class WineController extends ApiController {
     
     public function search()
 	{
-		$input = $this->_getInput();
-		if (!empty($input['text'])) { 
-		  	$result = Wine::searchWinefromMywine($input['text']);
-		  	return Response::json($result);
-		} else {
-			$error_code = ApiResponse::MISSING_PARAMS;
-		    $data = $input;
-		    return Response::json(array("code" => $error_code, "data" => $data));
-		}
+		$result = Wine::searchWinefromMywine($this->_getInput());
+		return Response::json($result);
 	}
 }
