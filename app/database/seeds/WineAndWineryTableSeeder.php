@@ -10,7 +10,7 @@ class WineAndWineryTableSeeder extends Seeder {
     public function run() {
         DB::table('wines')->truncate();
         DB::table('wineries')->truncate();
-
+        DB::connection()->disableQueryLog();
         set_time_limit (3600);
         $c = 0;
         $i = 1;
@@ -23,6 +23,7 @@ class WineAndWineryTableSeeder extends Seeder {
             // dd ($parser);
             foreach ($parser as $column_wine) {
             // handles each record
+
                 echo $c++ . "\n";                
                 if(count($column_wine) == 29) {
                     if($column_wine[5] == 'NA' && $column_wine[6] !== 'NA') {
@@ -81,7 +82,7 @@ class WineAndWineryTableSeeder extends Seeder {
                     $file_error = app_path() . "/error.txt";
                     file_put_contents($file_error, $error."\n", FILE_APPEND | LOCK_EX);
                 }
-
+               
             }
         } catch (Exception $e) {
             echo 'Caught exception: ',  $e->getMessage(), "\n";
