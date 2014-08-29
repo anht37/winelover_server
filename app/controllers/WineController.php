@@ -104,8 +104,10 @@ class WineController extends ApiController {
             if($result > 0) 
             {
             	$wine = Wine::where('wine_id', $result)->first();
+                if($wine != null) {
             	$input = $wine->toArray();
             	$rating = Rating::createNewRating($input);
+                }
             }
         }
         return Response::json(array("result" => $result));

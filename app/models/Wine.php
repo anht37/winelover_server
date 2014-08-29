@@ -13,7 +13,16 @@ class Wine extends Eloquent {
 
 	public static function scan($file_path) {
         $connection = new TcpConnetion();
-        return $connection->sendRequest($file_path,"PRED");
+        $result = $connection->sendRequest($file_path,"PRED");
+        if($result == -2) {
+            return $result;
+        }
+        $wine = Wine::where("rakuten_id", $result)->first();
+        if($wine) {
+           return $wine->id;
+        }else {
+           return -2;
+        }
     }
     public function winery()
 	{
