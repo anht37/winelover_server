@@ -101,7 +101,7 @@ class WineController extends ApiController {
         $uploadSuccess = $file->move($destinationPath,$file_name);
         if($uploadSuccess) {
             $result = Wine::scan($destinationPath.$file_name);
-            if($result > 0) 
+            if($result != -2) 
             {
             	$wine = Wine::where('wine_id', $result)->first();
                 if($wine != null) {

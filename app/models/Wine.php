@@ -19,7 +19,7 @@ class Wine extends Eloquent {
         }
         $wine = Wine::where("rakuten_id", $result)->first();
         if($wine) {
-           return $wine->id;
+           return $wine->wine_id;
         }else {
            return -2;
         }
