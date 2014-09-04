@@ -87,6 +87,13 @@ class RatingController extends ApiController {
 		$result = Rating::deleteRating($id);
         return Response::json($result);
 	}
+
+
+    public function timeline() 
+    {
+    	$result = Rating::timeline();
+        return Response::json($result);
+    }
 	
 	public function remove($id)
 	{

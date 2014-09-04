@@ -60,8 +60,9 @@ class Rating extends Eloquent {
         }
         
     }
-    public static function timeline($user_id) 
+    public static function timeline() 
     {
+        $user_id = Session::get('user_id');
         $error_code = ApiResponse::OK;
         $user_timeline = array();
         $user_timeline[] = $user_id;
@@ -151,7 +152,7 @@ class Rating extends Eloquent {
 
     public static function createNewRating($input)
     {
-        
+
         $rating = new Rating;
         $error_code = ApiResponse::OK;
         $rating->user_id = Session::get('user_id');

@@ -114,18 +114,9 @@ class UserController extends ApiController {
         return Response::json($result);
     }
 
-    public function timeline() 
-    {
-    	$user_id = Session::get('user_id');
-    	$result = Rating::timeline($user_id);
-        return Response::json($result);
-    }
-
     public function feature_users() 
     {
-
-    	$user_id = Session::get('user_id');
-    	$result = User::feature_users($user_id);
+    	$result = User::getFeatureUsers();
         return Response::json($result);
     }
 
@@ -147,10 +138,10 @@ class UserController extends ApiController {
         return Response::json($result);
     }
 
-    public function follow_friend_fb() 
-    { 
-    	$result = User::followFriendFb($this->_getInput());
-        return Response::json($result);
-    }
+    // public function follow_friend_fb() 
+    // { 
+    // 	$result = User::followFriendFb($this->_getInput());
+    //     return Response::json($result);
+    // }
 
 }

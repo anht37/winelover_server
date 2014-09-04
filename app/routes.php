@@ -54,11 +54,12 @@ Route::group(array('prefix' => 'api'), function()
         Route::get('profile/top_rate/{user_id}', 'ProfileController@getProfile_Top_rate');
         Route::get('profile/last_rate/{user_id}', 'ProfileController@getProfile_Last_rate');
         
-        Route::get('timeline', 'UserController@timeline');
+        Route::get('timeline', 'RatingController@timeline');
         Route::get('feature_users', 'UserController@feature_users');
         Route::post('message_push_notification', 'UserController@message_push_notification');
         Route::post('user/friend_fb','UserController@get_friend_fb');
         Route::post('user/search','UserController@search_user_from_name');
+        //Route::post('user/follow_fb','UserController@follow_friend_fb');
         Route::get('ranking','UserController@get_ranking');
 
     });

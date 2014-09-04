@@ -13,21 +13,30 @@ class Wine extends Eloquent {
 
 	public static function scan($file_path) {
         $connection = new TcpConnetion();
-        $result = $connection->sendRequest($file_path,"PRED");
-        if($result == -2) {
-            return $result;
-        }
-        $wine = Wine::where("rakuten_id", $result)->first();
-        if($wine) {
-           return $wine->wine_id;
-        }else {
-           return -2;
-        }
+        return $connection->sendRequest($file_path,"PRED");
     }
     public function winery()
 	{
     	return $this->belongsTo('Winery','winery_id');
 	}
+
+    public static function getWineType($input)
+    {
+        if($input == 1) {
+            $wine_type = '赤ワイン';
+        } elseif($input == 2) {
+            $wine_type = '白ワイン';
+        } elseif($input == 3) {
+            $wine_type = 'ロゼワイン';
+        } elseif($input == 4) {
+            $wine_type = '発泡系・シャンパン';
+        } elseif($input == 5) {
+            $wine_type = 'ワインセット';
+        } else {
+            $wine_type = 'その他';
+        }
+        return $wine_type;
+    }
 
     public static function getListWine()
     {
@@ -109,6 +118,9 @@ class Wine extends Eloquent {
         $wine = Wine::where('wine_id', $wine_id)->with('winery')->first();
         $error_code = ApiResponse::OK;
         if($wine) {
+            if($wine->wine_type != null) {
+                $wine->wine_type = Wine::getWineType($wine->wine_type);
+            }
             $country = Country::where('id',$wine->winery->country_id)->first();
             if($country) {
                 $wine->winery->country_id = $country->country_name;

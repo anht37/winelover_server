@@ -65,7 +65,8 @@ class User extends Eloquent
         return array("code" => $error_code, "data" => $data);
     }
 
-    public static function login($input) {
+    public static function login($input) 
+    {
         $error_code = ApiResponse::OK;
         $new_user = false;
         $user = null;
@@ -121,7 +122,8 @@ class User extends Eloquent
         return array("code" => $error_code, "data" => $data);
     }
 
-    public static function forgot_password($input) {
+    public static function forgot_password($input) 
+    {
         $error_code = ApiResponse::OK;
         $validator = Validator::make(
             $input,
@@ -151,8 +153,9 @@ class User extends Eloquent
         return $this->belongsTo('Profile','user_id', 'user_id');
     }
 
-    public static function feature_users($user_id)
+    public static function getFeatureUsers()
     {
+        $user_id = Session::get('user_id');
         $error_code = ApiResponse::OK;
         $user = User::whereNotIn('user_id', [$user_id])->orderBy(DB::raw("RAND()"))->with('profile')->take(10)->get();
         if($user) {
@@ -203,7 +206,7 @@ class User extends Eloquent
     public static function searchUserFromUserName($input)
     {   
         $error_code = ApiResponse::OK;
-        $data = array();
+        $data = $input;
         $user_id = Session::get('user_id');
         if(!empty($input['text'])) {
             $text = $input['text'];
@@ -226,7 +229,6 @@ class User extends Eloquent
             } 
         } else {
             $error_code = ApiResponse::MISSING_PARAMS;
-            $data = $input;
         }
         return array("code" => $error_code, "data" => $data);
     }
@@ -265,28 +267,30 @@ class User extends Eloquent
         return array("code" => $error_code, "data" => $data);
     }
 
-    public static function followFriendFb($input)
-    {
-        $user_id = Session::get('user_id');
-        $error_code = ApiResponse::OK;
-        $data = $input;
-        if(!empty($input)) {
-            foreach ($input as $fb_id) {
-                $user = User::where('fb_id', $fb_id)->first();
-                if($user && $user->user_id != $user_id) {
-                    $follow = Follow::where('from_id', $user_id)->where('to_id', $user->user_id)->first();
-                    if($follow == null) {
-                            $user_follow = new Follow;
-                            $from_id = $user_id;
-                            $to_id = $user->user_id;
-                            $user_follow->save();
-                    }
-                }
-            }
-            $data = "All user are followed !";
-        } else {
-            $error_code = ApiResponse::MISSING_PARAMS;
-        }
-        return array("code" => $error_code, "data" => $data);
-    }
+    // public static function followFriendFb($input)
+    // {
+    //     $user_id = Session::get('user_id');
+    //     $error_code = ApiResponse::OK;
+    //     $data = $input;
+    //     $i = 0;
+    //     if(!empty($input)) {
+    //         foreach ($input as $fb_id) {
+    //             $user = User::where('fb_id', $fb_id)->first();
+    //             if($user && $user->user_id != $user_id) {
+    //                 $follow = Follow::where('from_id', $user_id)->where('to_id', $user->user_id)->first();
+    //                 if($follow == null) {
+    //                         $user_follow = new Follow;
+    //                         $from_id = $user_id;
+    //                         $to_id = $user->user_id;
+    //                         $user_follow->save();
+    //                         $i ++;
+    //                 }
+    //             }
+    //         }
+    //         $data = $i .' '. 'friend followed !'; 
+    //     } else {
+    //         $error_code = ApiResponse::MISSING_PARAMS;
+    //     }
+    //     return array("code" => $error_code, "data" => $data);
+    // }
 }
