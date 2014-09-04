@@ -152,7 +152,9 @@ class WineTest extends ApiTestCase
         $country_name = Country::where('id',$wine_infor->winery->country_id)->first()->country_name;
         $wine_infor->total_like = 0;
         $wine_note = Winenote::where('wine_unique_id', $wine_infor->wine_unique_id)->where('user_id',$this->_user_id)->first();
-
+        if($wine_infor->wine_type != null) {
+            $wine_infor->wine_type = Wine::getWineType($wine_infor->wine_type);
+        }
         $wine_infor->winenote = $wine_note->note;
         $wine_infor->winery->country_id = $country_name;
 
@@ -236,7 +238,9 @@ class WineTest extends ApiTestCase
 
         $wine_note = Winenote::where('wine_unique_id', $wine_infor->wine_unique_id)->where('user_id',$this->_user_id)->first();
         $wine_infor->winenote = $wine_note->note;
-        
+        if($wine_infor->wine_type != null) {
+            $wine_infor->wine_type = Wine::getWineType($wine_infor->wine_type);
+        }
         $wishlist = Wishlist::where('user_id', $this->_user_id)->where('wine_unique_id', $wine_infor->wine_unique_id)->first();
         if($wishlist) {
             $wine_infor->is_wishlist = true;
@@ -310,7 +314,9 @@ class WineTest extends ApiTestCase
         $country_name = Country::where('id',$wine_infor->winery->country_id)->first()->country_name;
 
         $wine_note = Winenote::where('wine_unique_id', $wine_infor->wine_unique_id)->where('user_id',$this->_user_id)->first();
-
+        if($wine_infor->wine_type != null) {
+            $wine_infor->wine_type = Wine::getWineType($wine_infor->wine_type);
+        }
         $wine_infor->winenote = $wine_note->note;
         $wine_infor->winery->country_id = $country_name;
 
@@ -379,7 +385,9 @@ class WineTest extends ApiTestCase
 
         $wine_infor->winenote = null;
         $wine_infor->winery->country_id = $country_name;
-        
+        if($wine_infor->wine_type != null) {
+            $wine_infor->wine_type = Wine::getWineType($wine_infor->wine_type);
+        }
         $wishlist = Wishlist::where('user_id', $this->_user_id)->where('wine_unique_id', $wine_infor->wine_unique_id)->first();
         if($wishlist) {
             $wine_infor->is_wishlist = true;

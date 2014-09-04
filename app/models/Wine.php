@@ -274,11 +274,24 @@ class Wine extends Eloquent {
     public static function searchWinefromMywine($input)
     {   
         $error_code = ApiResponse::OK;
+        $wine_unique_id = array();
         $data = array();
         $user_id = Session::get('user_id');
         if(!empty($input['text'])) {
             $text = $input['text'];
-            $wine = Wine::where('name','LIKE','%'.$text.'%')->with('winery')->get();
+            $rating = Rating::where('user_id', $user_id)->where('is_my_wine', 1)->get();
+            if($rating) {
+                foreach ($rating as $ratings) {
+                    $wine_unique_id[] = $ratings->wine_unique_id;
+                }                
+                $wishlist = Wishlist::where('user_id', $user_id)->whereNotIn('wine_unique_id', $wine_unique_id)->get();
+                if ($wishlist) {
+                    foreach ($wishlist as $wishlists) {
+                        $wine_unique_id[] = $wishlists->wine_unique_id;
+                    }  
+                }
+            }
+            $wine = Wine::where('name','LIKE','%'.$text.'%')->whereIn('wine_unique_id', $wine_unique_id)->with('winery')->get();
             if($wine) {
                 foreach ($wine as $wines) {
                     if($wines->image_url != null) {
@@ -287,17 +300,8 @@ class Wine extends Eloquent {
 
                     if($wines->wine_flag != null) {
                         $wines->wine_flag = URL::asset($wines->wine_flag);
-                    } 
-
-                    $ratings = Rating::where('user_id', $user_id)->where('wine_unique_id',$wines->wine_unique_id)->where('is_my_wine', 1)->first();
-                    if($ratings) {
-                        $data[] = $wines;
-                    } else {
-                        $wishlist = Wishlist::where('user_id', $user_id)->where('wine_unique_id',$wines->wine_unique_id)->first();
-                        if ($wishlist) {
-                            $data[] = $wines;
-                        }
                     }
+                    $data[] = $wines;    
                 }
             }
         } else {
@@ -308,5 +312,4 @@ class Wine extends Eloquent {
         return array("code" => $error_code, "data" => $data);
     }
 
-    
 }
