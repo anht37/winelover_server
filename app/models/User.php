@@ -210,7 +210,7 @@ class User extends Eloquent
         $user_id = Session::get('user_id');
         if(!empty($input['text'])) {
             $text = $input['text'];
-            $user = Profile::where('first_name','LIKE','%'.$text.'%')->orWhere('last_name', 'LIKE', '%'.$text.'%')->get();
+            $user = Profile::where('first_name','LIKE','%'.$text.'%')->orWhere('last_name', 'LIKE', '%'.$text.'%')->whereNotIn('user_id',[$user_id])->get();
             if($user) {
                 foreach ($user as $users) {
                     $follow = Follow::where('from_id', $user_id)->where('to_id', $users->user_id)->first();
@@ -222,10 +222,8 @@ class User extends Eloquent
                     if($users->image != null) {
                         $users->image = URL::asset($users->image);
                     }
-                    if($users->user_id != $user_id) {
-                        $data[] = $users->toArray();
-                    }
                 }
+                $data = $user->toArray();
             } 
         } else {
             $error_code = ApiResponse::MISSING_PARAMS;
