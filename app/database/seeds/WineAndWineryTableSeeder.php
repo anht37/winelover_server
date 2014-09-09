@@ -14,7 +14,7 @@ class WineAndWineryTableSeeder extends Seeder {
         set_time_limit (3600);
         $c = 0;
         $i = 1;
-
+        $winery_id = 1;
         try{
 
             $file = app_path() . '/rakuten_wine_data.csv';
@@ -37,10 +37,31 @@ class WineAndWineryTableSeeder extends Seeder {
                     if($column_wine[4] == '') {
                         $column_wine[4] = $column_wine[2]; 
                     }
+                    $winery = Winery::where('brand_name',$column_wine[12])->first();
+
+                    if($winery == null) {
+                        $winery_data = array(
+                            'id' => $winery_id,
+                            'brand_name' => $column_wine[12],
+                            'country_id' => '',
+                            'country_name' => $column_wine[6],
+                            'year' => $column_wine[10],
+                            'winery_url' => $column_wine[14],
+                            'region' => $column_wine[7],
+                            'description' => '',
+                        );
+
+                        Winery::create($winery_data);
+                        $winery = $winery_id;
+                        $winery_id ++;
+                    } else {
+                        $winery = $winery->id;
+                    }
+
                     $wine = array(
                         'name' => $column_wine[4],
                         'year' => $column_wine[9],
-                        'winery_id' => $i,
+                        'winery_id' => $winery,
                         'rakuten_id' => $column_wine[0],
                         'original_name' => $column_wine[1],
                         'original_name_2' => $column_wine[2],
@@ -63,16 +84,7 @@ class WineAndWineryTableSeeder extends Seeder {
                     }
                     Wine::create($wine);
 
-                    $winery_data = array(
-                        'brand_name' => $column_wine[12],
-                        'country_id' => '',
-                        'country_name' => $column_wine[6],
-                        'year' => $column_wine[10],
-                        'winery_url' => $column_wine[14],
-                        'region' => $column_wine[7],
-                        'description' => '',
-                    );
-                    Winery::create($winery_data);
+                    
                     $i++;
                 } else {
                     $error = implode(",", $column_wine);
