@@ -157,21 +157,21 @@ class User extends Eloquent
     {
         $user_id = Session::get('user_id');
         $error_code = ApiResponse::OK;
-        $user = User::whereNotIn('user_id', [$user_id])->orderBy(DB::raw("RAND()"))->with('profile')->take(10)->get();
-        if($user) {
-            foreach ($user as $users) {
-                if ($users->profile->image != null) {
-                        $users->profile->image = URL::asset($users->profile->image);   
+        $users = User::whereNotIn('user_id', [$user_id])->orderBy(DB::raw("RAND()"))->with('profile')->take(10)->get();
+        if($users) {
+            foreach ($users as $user) {
+                if ($user->profile->image != null) {
+                        $user->profile->image = URL::asset($user->profile->image);   
                     }
-                $follow = Follow::where('from_id', $user_id)->where('to_id', $users->user_id)->first();
+                $follow = Follow::where('from_id', $user_id)->where('to_id', $user->user_id)->first();
                 if($follow) {
-                        $users->is_follow = true;
+                        $user->is_follow = true;
                     } else {
-                        $users->is_follow = false;
+                        $user->is_follow = false;
                     }
             }  
         }
-        $data = $user;
+        $data = $users->toArray();
         return array("code" => $error_code, "data" => $data);
     }    
 
@@ -192,7 +192,7 @@ class User extends Eloquent
                             $user->is_follow = false;
                         }
                     if($user->image != null) {
-                        $user->image = URL::asset($users->image);
+                        $user->image = URL::asset($user->image);
                     }
                     $data[] = $user->toArray();
                 }
@@ -210,20 +210,20 @@ class User extends Eloquent
         $user_id = Session::get('user_id');
         if(!empty($input['text'])) {
             $text = $input['text'];
-            $user = Profile::where('first_name','LIKE','%'.$text.'%')->orWhere('last_name', 'LIKE', '%'.$text.'%')->whereNotIn('user_id',[$user_id])->get();
-            if($user) {
-                foreach ($user as $users) {
-                    $follow = Follow::where('from_id', $user_id)->where('to_id', $users->user_id)->first();
+            $users = Profile::where('first_name','LIKE','%'.$text.'%')->orWhere('last_name', 'LIKE', '%'.$text.'%')->whereNotIn('user_id',[$user_id])->get();
+            if($users) {
+                foreach ($users as $user) {
+                    $follow = Follow::where('from_id', $user_id)->where('to_id', $user->user_id)->first();
                     if($follow) {
-                            $users->is_follow = true;
+                            $user->is_follow = true;
                         } else {
-                            $users->is_follow = false;
+                            $user->is_follow = false;
                         }
-                    if($users->image != null) {
-                        $users->image = URL::asset($users->image);
+                    if($user->image != null) {
+                        $user->image = URL::asset($user->image);
                     }
                 }
-                $data = $user->toArray();
+                $data = $users->toArray();
             } 
         } else {
             $error_code = ApiResponse::MISSING_PARAMS;
@@ -243,24 +243,24 @@ class User extends Eloquent
         if($pagination == false) {
             return array("code" => ApiResponse::URL_NOT_EXIST, "data" => ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST));
         }
-        $user = Profile::orderBy('rate_count', 'desc')->forPage($page, $limit)->get();
+        $users = Profile::orderBy('rate_count', 'desc')->forPage($page, $limit)->get();
 
-        if(count($user) != 0) {
-            foreach ($user as $users) {
-                $follow = Follow::where('from_id', $user_id)->where('to_id', $users->user_id)->first();
+        if(count($users) != 0) {
+            foreach ($users as $user) {
+                $follow = Follow::where('from_id', $user_id)->where('to_id', $user->user_id)->first();
                 if($follow) {
-                        $users->is_follow = true;
+                        $user->is_follow = true;
                     } else {
-                        if($users->user_id != $user_id) {
-                            $users->is_follow = false;
+                        if($user->user_id != $user_id) {
+                            $user->is_follow = false;
                         }
                     }
-                if($users->image != null) {
-                    $users->image = URL::asset($users->image);
+                if($user->image != null) {
+                    $user->image = URL::asset($user->image);
                 }
             }
 
-            $data = $user->toArray();
+            $data = $users->toArray();
         } 
         return array("code" => $error_code, "data" => $data);
     }

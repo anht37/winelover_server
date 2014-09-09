@@ -13,19 +13,19 @@ class Comment extends Eloquent {
 		$check_rating = Rating::check_rating($rating_id);
 		if ($check_rating !== false) {
 
-		 	$comment = Comment::where('rating_id', $rating_id)->get();
-		 	if(count($comment) > 0){
-		 		foreach ($comment as $comments) {
-		 			$profile = Profile::where('user_id', $comments->user_id)->first();
+		 	$comments = Comment::where('rating_id', $rating_id)->get();
+		 	if(count($comments) > 0){
+		 		foreach ($comments as $comment) {
+		 			$profile = Profile::where('user_id', $comment->user_id)->first();
 		 			if($profile->image != null) {
-		 				$comments->avatar_user = URL::asset($profile->image);
+		 				$comment->avatar_user = URL::asset($profile->image);
 		 			} else {
-		 				$comments->avatar_user = $profile->image;
+		 				$comment->avatar_user = $profile->image;
 		 			}
-		 			$comments->first_name = $profile->first_name;
-		 			$comments->last_name = $profile->last_name;
+		 			$comment->first_name = $profile->first_name;
+		 			$comment->last_name = $profile->last_name;
 		 		}
-		 		$data = $comment->toArray();
+		 		$data = $comments->toArray();
 		 	} else {
 		        $data = array();
 		 	}

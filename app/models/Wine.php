@@ -57,20 +57,20 @@ class Wine extends Eloquent {
         }
         $page = $pagination['page'];
         $limit = $pagination['limit'];
-        $wine = Wine::with('winery')->forPage($page, $limit)->get();
-        if(count($wine) == 0) {
+        $wines = Wine::with('winery')->forPage($page, $limit)->get();
+        if(count($wines) == 0) {
                 $data = array();
         } else {
-            foreach ($wine as $wines) {
-                $wines->winery_id = $wines->winery->brand_name;
-                if($wines->image_url != null) {
-                    $wines->image_url = URL::asset($wines->image_url);
+            foreach ($wines as $wine) {
+                $wine->winery_id = $wine->winery->brand_name;
+                if($wine->image_url != null) {
+                    $wine->image_url = URL::asset($wine->image_url);
                 }   
-                if($wines->wine_flag != null) {
-                    $wines->wine_flag = URL::asset($wines->wine_flag);
+                if($wine->wine_flag != null) {
+                    $wine->wine_flag = URL::asset($wine->wine_flag);
                 } 
             }
-            $data = $wine->toArray();
+            $data = $wines->toArray();
         }
 
         return array("code" => $error_code, "data" => $data);
@@ -186,21 +186,21 @@ class Wine extends Eloquent {
                 }
                 $wine->total_like = $wine->total_like + $rating_user->like_count;
             }
-            $rating = Rating::where('wine_unique_id', $wine->wine_unique_id)->whereNotIn('user_id',[$user_id])->with('profile')->get();
-            if(count($rating) == 0) {
-                $rating = array();
+            $ratings = Rating::where('wine_unique_id', $wine->wine_unique_id)->whereNotIn('user_id',[$user_id])->with('profile')->get();
+            if(count($ratings) == 0) {
+                $ratings = array();
             } else {
-                foreach ($rating as $ratings) {
-                    if ($ratings->profile->image != null) {
-                        $ratings->profile->image = URL::asset($ratings->profile->image);   
+                foreach ($ratings as $rating) {
+                    if ($rating->profile->image != null) {
+                        $rating->profile->image = URL::asset($rating->profile->image);   
                     }
-                    $follow = Follow::where('from_id', $user_id)->where('to_id', $ratings->user_id)->first();
+                    $follow = Follow::where('from_id', $user_id)->where('to_id', $rating->user_id)->first();
                     if($follow) {
-                        $ratings->is_follow = true;
+                        $rating->is_follow = true;
                     } else {
-                        $ratings->is_follow = false;
+                        $rating->is_follow = false;
                     }
-                    $wine->total_like = $wine->total_like + $ratings->like_count;
+                    $wine->total_like = $wine->total_like + $rating->like_count;
                 }
             }
             if($wine->image_url != null) {
@@ -210,7 +210,7 @@ class Wine extends Eloquent {
                 $wine->wine_flag = URL::asset($wine->wine_flag);
             } 
 
-            $data = array('wine' => $wine,'rate_user' => $rating_user ,'rate' => $rating ,'wine_related' => $all_wines_winery);
+            $data = array('wine' => $wine,'rate_user' => $rating_user ,'rate' => $ratings ,'wine_related' => $all_wines_winery);
         } else {
             $error_code = ApiResponse::UNAVAILABLE_WINE;
             $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_WINE);
@@ -289,34 +289,34 @@ class Wine extends Eloquent {
         $user_id = Session::get('user_id');
         if(!empty($input['text'])) {
             $text = $input['text'];
-            $rating = Rating::where('user_id', $user_id)->where('is_my_wine', 1)->get();
-            if($rating) {
-                foreach ($rating as $ratings) {
-                    $wine_unique_id[] = $ratings->wine_unique_id;
+            $ratings = Rating::where('user_id', $user_id)->where('is_my_wine', 1)->get();
+            if($ratings) {
+                foreach ($ratings as $rating) {
+                    $wine_unique_id[] = $rating->wine_unique_id;
                 }
                 if($wine_unique_id != null) {
-                    $wishlist = Wishlist::where('user_id', $user_id)->whereNotIn('wine_unique_id', $wine_unique_id)->get();
+                    $wishlists = Wishlist::where('user_id', $user_id)->whereNotIn('wine_unique_id', $wine_unique_id)->get();
                 } else {
-                    $wishlist = Wishlist::where('user_id', $user_id)->get();
+                    $wishlists = Wishlist::where('user_id', $user_id)->get();
                 }                     
-                if ($wishlist) {
-                    foreach ($wishlist as $wishlists) {
-                        $wine_unique_id[] = $wishlists->wine_unique_id;
+                if ($wishlists) {
+                    foreach ($wishlists as $wishlist) {
+                        $wine_unique_id[] = $wishlist->wine_unique_id;
                     }  
                 }
             }
             if($wine_unique_id != null) {
-                $wine = Wine::where('name','LIKE','%'.$text.'%')->whereIn('wine_unique_id', $wine_unique_id)->with('winery')->get();
-                if($wine) {
-                    foreach ($wine as $wines) {
-                        if($wines->image_url != null) {
-                            $wines->image_url = URL::asset($wines->image_url);
+                $wines = Wine::where('name','LIKE','%'.$text.'%')->whereIn('wine_unique_id', $wine_unique_id)->with('winery')->get();
+                if($wines) {
+                    foreach ($wines as $wine) {
+                        if($wine->image_url != null) {
+                            $wine->image_url = URL::asset($wine->image_url);
                         }
 
-                        if($wines->wine_flag != null) {
-                            $wines->wine_flag = URL::asset($wines->wine_flag);
+                        if($wine->wine_flag != null) {
+                            $wine->wine_flag = URL::asset($wine->wine_flag);
                         }
-                        $data[] = $wines;    
+                        $data[] = $wine;    
                     }
                 }
             }
