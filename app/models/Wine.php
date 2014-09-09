@@ -283,25 +283,31 @@ class Wine extends Eloquent {
             if($rating) {
                 foreach ($rating as $ratings) {
                     $wine_unique_id[] = $ratings->wine_unique_id;
-                }                
-                $wishlist = Wishlist::where('user_id', $user_id)->whereNotIn('wine_unique_id', $wine_unique_id)->get();
+                }
+                if($wine_unique_id != null) {
+                    $wishlist = Wishlist::where('user_id', $user_id)->whereNotIn('wine_unique_id', $wine_unique_id)->get();
+                } else {
+                    $wishlist = Wishlist::where('user_id', $user_id)->get();
+                }                     
                 if ($wishlist) {
                     foreach ($wishlist as $wishlists) {
                         $wine_unique_id[] = $wishlists->wine_unique_id;
                     }  
                 }
             }
-            $wine = Wine::where('name','LIKE','%'.$text.'%')->whereIn('wine_unique_id', $wine_unique_id)->with('winery')->get();
-            if($wine) {
-                foreach ($wine as $wines) {
-                    if($wines->image_url != null) {
-                        $wines->image_url = URL::asset($wines->image_url);
-                    }
+            if($wine_unique_id != null) {
+                $wine = Wine::where('name','LIKE','%'.$text.'%')->whereIn('wine_unique_id', $wine_unique_id)->with('winery')->get();
+                if($wine) {
+                    foreach ($wine as $wines) {
+                        if($wines->image_url != null) {
+                            $wines->image_url = URL::asset($wines->image_url);
+                        }
 
-                    if($wines->wine_flag != null) {
-                        $wines->wine_flag = URL::asset($wines->wine_flag);
+                        if($wines->wine_flag != null) {
+                            $wines->wine_flag = URL::asset($wines->wine_flag);
+                        }
+                        $data[] = $wines;    
                     }
-                    $data[] = $wines;    
                 }
             }
         } else {
