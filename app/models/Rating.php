@@ -75,48 +75,50 @@ class Rating extends Eloquent {
         }
         $pagination = ApiResponse::pagination();
         if($pagination == false) {
-            return array("code" => ApiResponse::URL_NOT_EXIST, "data" => ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST));
-        }
-        $page = $pagination['page'];
-        $limit = $pagination['limit'];
-
-        $ratings = Rating::whereIn('user_id', $user_timeline)->whereNotNull('wine_unique_id')->with('profile')->with('wine')->orderBy('updated_at', 'desc')->forPage($page, $limit)->get();
-        if (count($ratings) == 0) {
-                $data = array();
-            
+            $error_code = ApiResponse::URL_NOT_EXIST;
+            $data = ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST);
         } else {
-            foreach ($ratings as $rating) {   
-                $winery = Winery::where('id', $rating->wine->winery_id)->first();
-                $rating->winery = $winery;
-                $country = Country::where('id', $rating->winery->country_id)->first();
-                if($country) {
-                    $rating->winery->country_name = $country->country_name; 
-                } else {
-                    $rating->winery->country_name = null;
+            $page = $pagination['page'];
+            $limit = $pagination['limit'];
+
+            $ratings = Rating::whereIn('user_id', $user_timeline)->whereNotNull('wine_unique_id')->with('profile')->with('wine')->orderBy('updated_at', 'desc')->forPage($page, $limit)->get();
+            if (count($ratings) == 0) {
+                    $data = array();
+                
+            } else {
+                foreach ($ratings as $rating) {   
+                    $winery = Winery::where('id', $rating->wine->winery_id)->first();
+                    $rating->winery = $winery;
+                    $country = Country::where('id', $rating->winery->country_id)->first();
+                    if($country) {
+                        $rating->winery->country_name = $country->country_name; 
+                    } else {
+                        $rating->winery->country_name = null;
+                    }
+                    $like = Like::where('user_id',$user_id)->where('rating_id', $rating->id)->first();
+                    if($like) {
+                        $rating->liked = true;
+                    } else {
+                        $rating->liked = false;
+                    }
+                    $wishlist = Wishlist::where('user_id',$user_id)->where('wine_unique_id',$rating->wine_unique_id)->first();
+                    if($wishlist) {
+                        $rating->wishlist = true;
+                    } else {
+                        $rating->wishlist = false;
+                    }
+                    if ($rating->wine->image_url != null) {
+                        $rating->wine->image_url = URL::asset($rating->wine->image_url);
+                    }
+                    if ($rating->wine->wine_flag != null) {
+                        $rating->wine->wine_flag = URL::asset($rating->wine->wine_flag);
+                    }
+                    if ($rating->profile->image != null) {
+                        $rating->profile->image = URL::asset($rating->profile->image);   
+                    }
                 }
-                $like = Like::where('user_id',$user_id)->where('rating_id', $rating->id)->first();
-                if($like) {
-                    $rating->liked = true;
-                } else {
-                    $rating->liked = false;
-                }
-                $wishlist = Wishlist::where('user_id',$user_id)->where('wine_unique_id',$rating->wine_unique_id)->first();
-                if($wishlist) {
-                    $rating->wishlist = true;
-                } else {
-                    $rating->wishlist = false;
-                }
-                if ($rating->wine->image_url != null) {
-                    $rating->wine->image_url = URL::asset($rating->wine->image_url);
-                }
-                if ($rating->wine->wine_flag != null) {
-                    $rating->wine->wine_flag = URL::asset($rating->wine->wine_flag);
-                }
-                if ($rating->profile->image != null) {
-                    $rating->profile->image = URL::asset($rating->profile->image);   
-                }
+                $data = $ratings->toArray();
             }
-            $data = $ratings->toArray();
         }
         return array("code" => $error_code, "data" => $data);
     }
@@ -126,26 +128,28 @@ class Rating extends Eloquent {
         $user_id = Session::get('user_id');
         $pagination = ApiResponse::pagination();
         if($pagination == false) {
-            return array("code" => ApiResponse::URL_NOT_EXIST, "data" => ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST));
-        }
-        $page = $pagination['page'];
-        $limit = $pagination['limit'];
-        $rating = Rating::where('user_id', $user_id)->where('is_my_wine', 1)->with('wine')->orderBy('updated_at', 'desc')->forPage($page, $limit)->get();
-        $error_code = ApiResponse::OK;
-        if(count($rating) == 0 ) {
-                $data = array();
+            $error_code = ApiResponse::URL_NOT_EXIST;
+            $data = ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST);
         } else {
-            foreach ($rating as $ratings) {
-                $ratings->winery = Winery::where('id',$ratings->wine->winery_id)->first();
-                if($ratings->wine->image_url != null) {
-                    $ratings->wine->image_url = URL::asset($ratings->wine->image_url);
-                }
+            $page = $pagination['page'];
+            $limit = $pagination['limit'];
+            $ratings = Rating::where('user_id', $user_id)->where('is_my_wine', 1)->with('wine')->orderBy('updated_at', 'desc')->forPage($page, $limit)->get();
+            $error_code = ApiResponse::OK;
+            if(count($ratings) == 0 ) {
+                    $data = array();
+            } else {
+                foreach ($ratings as $rating) {
+                    $rating->winery = Winery::where('id',$rating->wine->winery_id)->first();
+                    if($rating->wine->image_url != null) {
+                        $rating->wine->image_url = URL::asset($rating->wine->image_url);
+                    }
 
-                if($ratings->wine->wine_flag != null) {
-                    $ratings->wine->wine_flag = URL::asset($ratings->wine->wine_flag);
-                } 
+                    if($rating->wine->wine_flag != null) {
+                        $rating->wine->wine_flag = URL::asset($rating->wine->wine_flag);
+                    } 
+                }
+                $data = $ratings->toArray();
             }
-            $data = $rating->toArray();
         }
         return array("code" => $error_code, "data" => $data);
     }

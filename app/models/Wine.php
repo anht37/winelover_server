@@ -53,26 +53,27 @@ class Wine extends Eloquent {
         $error_code = ApiResponse::OK;
         $pagination = ApiResponse::pagination();
         if($pagination == false) {
-            return array("code" => ApiResponse::URL_NOT_EXIST, "data" => ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST));
-        }
-        $page = $pagination['page'];
-        $limit = $pagination['limit'];
-        $wines = Wine::with('winery')->forPage($page, $limit)->get();
-        if(count($wines) == 0) {
-                $data = array();
+            $error_code = ApiResponse::URL_NOT_EXIST;
+            $data = ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST);
         } else {
-            foreach ($wines as $wine) {
-                $wine->winery_id = $wine->winery->brand_name;
-                if($wine->image_url != null) {
-                    $wine->image_url = URL::asset($wine->image_url);
-                }   
-                if($wine->wine_flag != null) {
-                    $wine->wine_flag = URL::asset($wine->wine_flag);
-                } 
+            $page = $pagination['page'];
+            $limit = $pagination['limit'];
+            $wines = Wine::with('winery')->forPage($page, $limit)->get();
+            if(count($wines) == 0) {
+                    $data = array();
+            } else {
+                foreach ($wines as $wine) {
+                    $wine->winery_id = $wine->winery->brand_name;
+                    if($wine->image_url != null) {
+                        $wine->image_url = URL::asset($wine->image_url);
+                    }   
+                    if($wine->wine_flag != null) {
+                        $wine->wine_flag = URL::asset($wine->wine_flag);
+                    } 
+                }
+                $data = $wines->toArray();
             }
-            $data = $wines->toArray();
         }
-
         return array("code" => $error_code, "data" => $data);
     }
 
@@ -152,7 +153,7 @@ class Wine extends Eloquent {
                 $wine->is_wishlist = false;
             }
 
-            $all_wines_winery = Wine::where('winery_id', $wine->winery_id)->whereNotIn('wine_id', [$wine_id])->get();
+            $all_wines_winery = Wine::where('winery_id', $wine->winery_id)->whereNotIn('wine_id', [$wine_id])->take(10)->get();
             $wine->winery->count_wine = count($all_wines_winery) + 1 ;
             $rate_winery = $wine->rate_count;
             if(count($all_wines_winery) !== 0) {

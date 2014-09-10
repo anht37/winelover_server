@@ -241,26 +241,28 @@ class User extends Eloquent
         $page = $pagination['page'];
         $limit = $pagination['limit'];
         if($pagination == false) {
-            return array("code" => ApiResponse::URL_NOT_EXIST, "data" => ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST));
-        }
-        $users = Profile::orderBy('rate_count', 'desc')->forPage($page, $limit)->get();
+            $error_code = ApiResponse::URL_NOT_EXIST;
+            $data = ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST);
+        } else {
+            $users = Profile::orderBy('rate_count', 'desc')->forPage($page, $limit)->get();
 
-        if(count($users) != 0) {
-            foreach ($users as $user) {
-                $follow = Follow::where('from_id', $user_id)->where('to_id', $user->user_id)->first();
-                if($follow) {
-                        $user->is_follow = true;
-                    } else {
-                        if($user->user_id != $user_id) {
-                            $user->is_follow = false;
+            if(count($users) != 0) {
+                foreach ($users as $user) {
+                    $follow = Follow::where('from_id', $user_id)->where('to_id', $user->user_id)->first();
+                    if($follow) {
+                            $user->is_follow = true;
+                        } else {
+                            if($user->user_id != $user_id) {
+                                $user->is_follow = false;
+                            }
                         }
+                    if($user->image != null) {
+                        $user->image = URL::asset($user->image);
                     }
-                if($user->image != null) {
-                    $user->image = URL::asset($user->image);
                 }
-            }
 
-            $data = $users->toArray();
+                $data = $users->toArray();
+            }
         } 
         return array("code" => $error_code, "data" => $data);
     }

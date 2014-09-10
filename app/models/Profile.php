@@ -109,9 +109,9 @@ class Profile extends Eloquent {
 	            $profile->country_flag = URL::asset($country->flag_url);   
 	        }
 
-	        $wishlist = Wishlist::where('user_id', $user_id)->get();
-	        if($wishlist){
-	            $profile->wishlist_count = count($wishlist);
+	        $wishlists = Wishlist::where('user_id', $user_id)->get();
+	        if($wishlists){
+	            $profile->wishlist_count = count($wishlists);
 	        } else {
 	            $profile->wishlist_count = 0;
 	        }
@@ -136,40 +136,41 @@ class Profile extends Eloquent {
     	$error_code = ApiResponse::OK;
 		$pagination = ApiResponse::pagination();
 		if($pagination == false) {
-			return array("code" => ApiResponse::URL_NOT_EXIST, "data" => ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST));
-		}
-		$page = $pagination['page'];
-		$limit = $pagination['limit'];
-		
-		if(User::where('user_id',$user_id)->first()){
-			$profile = Profile::where('user_id', $user_id)->first();
+			$error_code = ApiResponse::URL_NOT_EXIST;
+			$data = ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST);
+		} else {
+			$page = $pagination['page'];
+			$limit = $pagination['limit'];
 			
-			if ($profile->image != null) {
-	            $profile->image = URL::asset($profile->image);   
-	        }
-			$wishlist = Wishlist::where('user_id', $user_id)->with('wine')->forPage($page, $limit)->get();
-			if (count($wishlist) == 0) {
-					$data = array();
-			} else {	
-			    foreach ($wishlist as $wishlists) {
-					$wishlists->winery = Winery::where('id', $wishlists->wine->winery_id)->first();
-
-					if($wishlists->wine->image_url != null) {
-	            		$wishlists->wine->image_url = URL::asset($wishlists->wine->image_url);
-		            }
-
-		            if($wishlists->wine->wine_flag != null) {
-		            	$wishlists->wine->wine_flag = URL::asset($wishlists->wine->wine_flag);
-		            } 
-				}
+			if(User::where('user_id',$user_id)->first()){
+				$profile = Profile::where('user_id', $user_id)->first();
 				
-				$data = $wishlist->toArray();
-			}
-		} else { 
-			$error_code = ApiResponse::UNAVAILABLE_USER;
-		    $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_USER);
-		}
+				if ($profile->image != null) {
+		            $profile->image = URL::asset($profile->image);   
+		        }
+				$wishlists = Wishlist::where('user_id', $user_id)->with('wine')->forPage($page, $limit)->get();
+				if (count($wishlists) == 0) {
+						$data = array();
+				} else {	
+				    foreach ($wishlists as $wishlist) {
+						$wishlist->winery = Winery::where('id', $wishlist->wine->winery_id)->first();
 
+						if($wishlist->wine->image_url != null) {
+		            		$wishlist->wine->image_url = URL::asset($wishlist->wine->image_url);
+			            }
+
+			            if($wishlist->wine->wine_flag != null) {
+			            	$wishlist->wine->wine_flag = URL::asset($wishlist->wine->wine_flag);
+			            } 
+					}
+					
+					$data = $wishlists->toArray();
+				}
+			} else { 
+				$error_code = ApiResponse::UNAVAILABLE_USER;
+			    $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_USER);
+			}
+		}
 		return array("code" => $error_code, "data" => $data);
     }
 
@@ -178,27 +179,31 @@ class Profile extends Eloquent {
     	$error_code = ApiResponse::OK;
 		$pagination = ApiResponse::pagination();
 		if($pagination == false) {
-			return array("code" => ApiResponse::URL_NOT_EXIST, "data" => ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST));
-		}
-		$page = $pagination['page'];
-		$limit = $pagination['limit'];
-
-		if(User::where('user_id',$user_id)->first()) {
-			$top_rate = Rating::where('user_id',$user_id)->orderBy('rate', 'desc')->with('wine')->forPage($page, $limit)->get();
-			foreach ($top_rate as $top_rates) {
-				$top_rates->winery = Winery::where('id',$top_rates->wine->winery_id)->first();
-				if($top_rates->wine->image_url != null) {
-		            $top_rates->wine->image_url = URL::asset($top_rates->wine->image_url);
-			    }
-
-			    if($top_rates->wine->wine_flag != null) {
-			        $top_rates->wine->wine_flag = URL::asset($top_rates->wine->wine_flag);
-			    } 
-			}
-			$data = $top_rate->toArray();
+			$error_code = ApiResponse::URL_NOT_EXIST;
+			$data = ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST);
 		} else {
-			$error_code = ApiResponse::UNAVAILABLE_USER;
-	        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_USER);
+			$page = $pagination['page'];
+			$limit = $pagination['limit'];
+
+			if(User::where('user_id',$user_id)->first()) {
+				$top_rates = Rating::where('user_id',$user_id)->orderBy('rate', 'desc')->with('wine')->forPage($page, $limit)->get();
+				foreach ($top_rates as $top_rate) {
+					if(Winery::where('id',$top_rate->wine->winery_id)->first()) {
+						$top_rate->winery = Winery::where('id',$top_rate->wine->winery_id)->first();
+					}
+					if($top_rate->wine->image_url != null) {
+			            $top_rate->wine->image_url = URL::asset($top_rate->wine->image_url);
+				    }
+
+				    if($top_rate->wine->wine_flag != null) {
+				        $top_rate->wine->wine_flag = URL::asset($top_rate->wine->wine_flag);
+				    } 
+				}
+				$data = $top_rates->toArray();
+			} else {
+				$error_code = ApiResponse::UNAVAILABLE_USER;
+		        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_USER);
+			}
 		}
 		return array("code" => $error_code, "data" => $data);
     }
@@ -208,27 +213,29 @@ class Profile extends Eloquent {
     	$error_code = ApiResponse::OK;
 		$pagination = ApiResponse::pagination();
 		if($pagination == false) {
-			return array("code" => ApiResponse::URL_NOT_EXIST, "data" => ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST));
-		}
-		$page = $pagination['page'];
-		$limit = $pagination['limit'];
-
-		if(User::where('user_id',$user_id)->first()) {
-			$last_rate = Rating::where('user_id',$user_id)->orderBy('updated_at', 'desc')->with('wine')->forPage($page, $limit)->get();
-			foreach ($last_rate as $last_rates) {
-				$last_rates->winery = Winery::where('id',$last_rates->wine->winery_id)->first();
-				if($last_rates->wine->image_url != null) {
-		            $last_rates->wine->image_url = URL::asset($last_rates->wine->image_url);
-			    }
-
-			    if($last_rates->wine->wine_flag != null) {
-			        $last_rates->wine->wine_flag = URL::asset($last_rates->wine->wine_flag);
-			    } 
-			}
-			$data = $last_rate->toArray();
+			$error_code = ApiResponse::URL_NOT_EXIST;
+			$data = ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST);
 		} else {
-			$error_code = ApiResponse::UNAVAILABLE_USER;
-	        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_USER);
+			$page = $pagination['page'];
+			$limit = $pagination['limit'];
+
+			if(User::where('user_id',$user_id)->first()) {
+				$last_rates = Rating::where('user_id',$user_id)->orderBy('updated_at', 'desc')->with('wine')->forPage($page, $limit)->get();
+				foreach ($last_rates as $last_rate) {
+					$last_rate->winery = Winery::where('id',$last_rate->wine->winery_id)->first();
+					if($last_rate->wine->image_url != null) {
+			            $last_rate->wine->image_url = URL::asset($last_rate->wine->image_url);
+				    }
+
+				    if($last_rate->wine->wine_flag != null) {
+				        $last_rate->wine->wine_flag = URL::asset($last_rate->wine->wine_flag);
+				    } 
+				}
+				$data = $last_rates->toArray();
+			} else {
+				$error_code = ApiResponse::UNAVAILABLE_USER;
+		        $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_USER);
+			}
 		}
 		return array("code" => $error_code, "data" => $data);
     }

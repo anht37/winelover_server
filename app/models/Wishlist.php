@@ -18,30 +18,31 @@ class Wishlist extends Eloquent {
 		$error_code = ApiResponse::OK;
 		$pagination = ApiResponse::pagination();
 		if($pagination == false) {
-			return array("code" => ApiResponse::URL_NOT_EXIST, "data" => ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST));
-		}
-		$page = $pagination['page'];
-		$limit = $pagination['limit'];
-		
-		$wishlist = Wishlist::where('user_id', $user_id)->with('wine')->forPage($page, $limit)->get();
-			if (count($wishlist) == 0) {
-					$data = array();
-			} else {	
-				foreach ($wishlist as $wishlists) {
-					$wishlists->winery = Winery::where('id', $wishlists->wine->winery_id)->first();
+			$error_code = ApiResponse::URL_NOT_EXIST;
+			$data = ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST);
+		} else {
+			$page = $pagination['page'];
+			$limit = $pagination['limit'];
+			
+			$wishlists = Wishlist::where('user_id', $user_id)->with('wine')->forPage($page, $limit)->get();
+				if (count($wishlists) == 0) {
+						$data = array();
+				} else {	
+					foreach ($wishlists as $wishlist) {
+						$wishlist->winery = Winery::where('id', $wishlist->wine->winery_id)->first();
 
-					if($wishlists->wine->image_url != null) {
-			            $wishlists->wine->image_url = URL::asset($wishlists->wine->image_url);
-				    }
+						if($wishlist->wine->image_url != null) {
+				            $wishlist->wine->image_url = URL::asset($wishlist->wine->image_url);
+					    }
 
-				   	if($wishlists->wine->wine_flag != null) {
-				       	 $wishlists->wine->wine_flag = URL::asset($wishlists->wine->wine_flag);
-				   	} 
-				}
-						
-			$data = $wishlist->toArray();
+					   	if($wishlist->wine->wine_flag != null) {
+					       	 $wishlist->wine->wine_flag = URL::asset($wishlist->wine->wine_flag);
+					   	} 
+					}
+							
+				$data = $wishlists->toArray();
 			}
-
+		}
 		return array("code" => $error_code, "data" => $data);
 	}
 
