@@ -165,7 +165,7 @@ class WineTest extends ApiTestCase
             $wine_infor->is_wishlist = false;
         }
 
-        $all_wines_winery = Wine::where('winery_id', $wine_infor->winery_id)->whereNotIn('wine_id', [1])->get();
+        $all_wines_winery = Wine::where('winery_id', $wine_infor->winery_id)->whereNotIn('wine_id', [1])->take(10)->get();
         $wine_infor->winery->count_wine = count($all_wines_winery) + 1 ;
         $rate_winery = $wine_infor->rate_count;
         if(count($all_wines_winery) !== 0) {
@@ -249,7 +249,7 @@ class WineTest extends ApiTestCase
         }
 
         $wine_infor->winery->country_id = $country_name;
-        $all_wines_winery = Wine::where('winery_id', $wine_infor->winery_id)->whereNotIn('wine_id', [1])->get();
+        $all_wines_winery = Wine::where('winery_id', $wine_infor->winery_id)->whereNotIn('wine_id', [1])->take(10)->get();
         $wine_infor->winery->count_wine = count($all_wines_winery) + 1 ;
         $rate_winery = $wine_infor->rate_count;
         if(count($all_wines_winery) !== 0) {
@@ -327,7 +327,7 @@ class WineTest extends ApiTestCase
             $wine_infor->is_wishlist = false;
         }
 
-        $all_wines_winery = Wine::where('winery_id', $wine_infor->winery_id)->whereNotIn('wine_id', [1])->get();
+        $all_wines_winery = Wine::where('winery_id', $wine_infor->winery_id)->whereNotIn('wine_id', [1])->take(10)->get();
         $wine_infor->winery->count_wine = count($all_wines_winery) + 1 ;
         $rate_winery = $wine_infor->rate_count;
         if(count($all_wines_winery) !== 0) {
@@ -395,7 +395,7 @@ class WineTest extends ApiTestCase
             $wine_infor->is_wishlist = false;
         }
         
-        $all_wines_winery = Wine::where('winery_id', $wine_infor->winery_id)->whereNotIn('wine_id', [1])->get();
+        $all_wines_winery = Wine::where('winery_id', $wine_infor->winery_id)->whereNotIn('wine_id', [1])->take(10)->get();
         $wine_infor->winery->count_wine = count($all_wines_winery) + 1 ;
         $rate_winery = $wine_infor->rate_count;
         if(count($all_wines_winery) !== 0) {

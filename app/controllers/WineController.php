@@ -118,4 +118,10 @@ class WineController extends ApiController {
 		$result = Wine::searchWinefromMywine($this->_getInput());
 		return Response::json($result);
 	}
+
+	public function get_wine_related()
+	{
+		$result = Wine::getWineRelated($this->_getInput());
+		return Response::json($result);
+	}
 }

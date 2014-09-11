@@ -98,4 +98,44 @@ class Follow extends Eloquent {
 	    return array("code" => $error_code, "data" => $data);
     }
 
+    public static function getListFollower()
+    {
+    	$error_code = ApiResponse::OK;
+        $user_id = Session::get('user_id');
+       	$data = array();
+        $users_followers = Follow::where('to_id', $user_id)->get();
+        if($users_followers) {
+            foreach ($users_followers as $user_follower) {
+            	$user = Profile::where('user_id', $user_follower->from_id)->first();
+                if($user) {
+	                if($user->image != null) {
+	                    $user->image = URL::asset($user->image);
+	                }
+	                $data[] = $user->toArray();
+	            }
+            }
+        } 
+        return array("code" => $error_code, "data" => $data);
+    }
+
+    public static function getListFollowing()
+    {
+    	$error_code = ApiResponse::OK;
+        $user_id = Session::get('user_id');
+       	$data = array();
+        $users_followings = Follow::where('from_id', $user_id)->get();
+        if($users_followings) {
+            foreach ($users_followings as $users_following) {
+            	$user = Profile::where('user_id', $users_following->to_id)->first();
+                if($user) {
+	                if($user->image != null) {
+	                    $user->image = URL::asset($user->image);
+	                }
+	                $data[] = $user->toArray();
+	            }
+            }
+        } 
+        return array("code" => $error_code, "data" => $data);
+    }
+
 }

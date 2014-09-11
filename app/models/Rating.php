@@ -350,4 +350,21 @@ class Rating extends Eloquent {
         } 
             return array("code" => $error_code, "data" => $data);
     }
+
+    public static function getTotalRateOfNumberRate()
+    {
+        $error_code = ApiResponse::OK;
+        $user_id = Session::get('user_id');
+        $data = array();
+        $rate = array();
+        $number_rate = 5;
+        for($i = 0; $i < 11; $i++) {
+            $ratings = Rating::where('user_id', $user_id)->where('rate', $number_rate)->get();
+            $rate['rate'] = $number_rate;
+            $rate['total_rate'] = count($ratings);
+            $data[] = $rate;
+            $number_rate = $number_rate - 0.5;
+        }
+        return array("code" => $error_code, "data" => $data);
+    }
 }

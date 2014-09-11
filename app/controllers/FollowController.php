@@ -94,5 +94,16 @@ class FollowController extends ApiController {
         return Response::json($result); 	   
 	}
 
+	public function get_list_follower()
+	{
+		$result = Follow::getListFollower();
+        return Response::json($result); 	   
+	}
+
+	public function get_list_following()
+	{
+		$result = Follow::getListFollowing();
+        return Response::json($result); 	   
+	}
 
 }

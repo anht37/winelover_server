@@ -329,4 +329,32 @@ class Wine extends Eloquent {
         return array("code" => $error_code, "data" => $data);
     }
 
+    public static function getWineRelated($input)
+    {
+        $error_code = ApiResponse::OK;
+        $pagination = ApiResponse::pagination();
+        if($pagination == false) {
+            $error_code = ApiResponse::URL_NOT_EXIST;
+            $data = ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST);
+        } else {
+            $page = $pagination['page'];
+            $limit = $pagination['limit'];
+            if(!empty($input['wine_id'])) {
+                $wine_id = $input['wine_id'];
+                $wine = Wine::where('wine_id',$wine_id)->first();
+                if($wine) {
+                    $wine_related = Wine::where('winery_id',$wine->winery_id)->whereNotIn('wine_id', [$wine_id])->forPage($page, $limit)->get();
+                    $data = $wine_related->toArray();
+                } else {
+                    $error_code = ApiResponse::UNAVAILABLE_WINE;
+                    $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_WINE);
+                }
+            } else {
+                $error_code = ApiResponse::MISSING_PARAMS;
+                $data = $input;
+            }
+        }
+        return array("code" => $error_code, "data" => $data);
+    }
+
 }

@@ -66,7 +66,7 @@ class UserTest extends ApiTestCase
         $response = $this->_getAuth($_params);
         $text = $_params['text'];
         //get created login information
-        $user = Profile::where('first_name','LIKE','%'.$text.'%')->orWhere('last_name', 'LIKE', '%'.$text.'%')->get();
+        $user = Profile::where('first_name','LIKE','%'.$text.'%')->orWhere('last_name', 'LIKE', '%'.$text.'%')->whereNotIn('user_id',[$user_id])->get();
         if($user) {
             foreach ($user as $users) {
                 $follow = Follow::where('from_id', $user_id)->where('to_id', $users->user_id)->first();
@@ -78,10 +78,8 @@ class UserTest extends ApiTestCase
                 if($users->image != null) {
                     $users->image = URL::asset($users->image);
                 }
-                if($users->user_id != $user_id) {
-                    $data[] = $users->toArray();
-                }
             }
+            $data = $user->toArray();
         }
 
         $this->assertNotNull($data);

@@ -100,4 +100,10 @@ class RatingController extends ApiController {
 		$result = Rating::removeWineFromMyWine($id);
         return Response::json($result);
 	}
+
+	public function get_total_rate_of_number_rate() 
+	{
+		$result = Rating::getTotalRateOfNumberRate();
+        return Response::json($result);
+	}
 }
