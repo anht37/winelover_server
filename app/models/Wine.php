@@ -12,18 +12,22 @@ class Wine extends Eloquent {
 	);	 
 
 	public static function scan($file_path) {
-        $connection = new TcpConnetion();
-        $result =  $connection->sendRequest($file_path,"PRED");
-        if($result === -2) {
-            return $result;
+             //$connection = new TcpConnetion();
+        //$result =  $connection->sendRequest($file_path,"PRED");
+        //if($result === -2) {
+        //    return $result;
+        //}
+        //$wine = Wine::where("rakuten_id", $result)->first();
+        //if($wine) {
+        //   return $wine->wine_id;
+        //}else {
+        //   return -2;
+        // }
+        $wine_id = rand(0,10000);
+        if($wine_id == 0){
+            $wine_id = -2;
         }
-        $wine = Wine::where("rakuten_id", $result)->first();
-        if($wine) {
-           return $wine->wine_id;
-        }else {
-           return -2;
-        }
-
+        return $wine_id;
     }
     public function winery()
 	{
