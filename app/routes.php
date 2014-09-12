@@ -42,6 +42,7 @@ Route::group(array('prefix' => 'api'), function()
         
         Route::post('wine/search', 'WineController@search');
         Route::resource('like', 'LikeController');
+        Route::post('list_wines','WineController@get_list_wine_from_rakuten_id');
 
         Route::get('comment/{rating_id}', 'CommentController@index');
         Route::post('comment/{rating_id}', 'CommentController@store');

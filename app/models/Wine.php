@@ -361,4 +361,34 @@ class Wine extends Eloquent {
         return array("code" => $error_code, "data" => $data);
     }
 
+    public static function getListWineFromRakutenId($input)
+    {
+        $error_code = ApiResponse::OK;
+        $data = array();
+        if(!empty($input)) {
+            $i = 0;
+            foreach ($input as $wine_app) {
+                $wine_app_id = explode( '_', $wine_app);
+                $rakuten_id = 'rakuten_' . $wine_app_id[1] . '_' . $wine_app_id[2];
+                $wine = Wine::where('rakuten_id', $rakuten_id)->get(array('rakuten_id', 'name', 'image_url', 'wine_unique_id'))->first();
+                if($wine) {
+                    if($wine->image_url != null) {
+                        $wine->image_url = URL::asset($wine->image_url);
+                    }
+                    $data[] = $wine->toArray();
+                } else {
+                    $error_code = ApiResponse::UNAVAILABLE_WINE;
+                    $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_WINE);
+                }
+                $i ++;
+            }
+            
+        } else {
+            $error_code = ApiResponse::MISSING_PARAMS;
+            $data = $input;
+        }
+   
+        return array("code" => $error_code, "data" => $data);
+    }
+
 }
