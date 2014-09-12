@@ -98,43 +98,69 @@ class Follow extends Eloquent {
 	    return array("code" => $error_code, "data" => $data);
     }
 
-    public static function getListFollower()
+    public static function getListFollower($user_id)
     {
     	$error_code = ApiResponse::OK;
-        $user_id = Session::get('user_id');
-       	$data = array();
-        $users_followers = Follow::where('to_id', $user_id)->get();
-        if($users_followers) {
-            foreach ($users_followers as $user_follower) {
-            	$user = Profile::where('user_id', $user_follower->from_id)->first();
-                if($user) {
-	                if($user->image != null) {
-	                    $user->image = URL::asset($user->image);
-	                }
-	                $data[] = $user->toArray();
-	            }
-            }
-        } 
+    	$data = array();
+        if(User::where('user_id', $user_id)) {
+        	$pagination = ApiResponse::pagination();
+	        if($pagination == false) {
+	            $error_code = ApiResponse::URL_NOT_EXIST;
+	            $data = ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST);
+	        } else {
+	            $page = $pagination['page'];
+	            $limit = $pagination['limit'];
+		        $users_followers = Follow::where('to_id', $user_id)->forPage($page, $limit)->get();
+		        if($users_followers) {
+		            foreach ($users_followers as $user_follower) {
+		            	$user = Profile::where('user_id', $user_follower->from_id)->first();
+		                if($user) {
+			                if($user->image != null) {
+			                    $user->image = URL::asset($user->image);
+			                }
+			                $user_follower = $user;
+			                $data[] = $user_follower;
+			            }
+		            }
+		        }
+		    }
+	    } else {
+			$error_code = ApiResponse::UNAVAILABLE_USER;
+		    $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_USER);
+		}
         return array("code" => $error_code, "data" => $data);
     }
 
-    public static function getListFollowing()
+    public static function getListFollowing($user_id)
     {
     	$error_code = ApiResponse::OK;
-        $user_id = Session::get('user_id');
-       	$data = array();
-        $users_followings = Follow::where('from_id', $user_id)->get();
-        if($users_followings) {
-            foreach ($users_followings as $users_following) {
-            	$user = Profile::where('user_id', $users_following->to_id)->first();
-                if($user) {
-	                if($user->image != null) {
-	                    $user->image = URL::asset($user->image);
-	                }
-	                $data[] = $user->toArray();
-	            }
-            }
-        } 
+    	$data = array();
+        if(User::where('user_id', $user_id)) {
+        	$pagination = ApiResponse::pagination();
+	        if($pagination == false) {
+	            $error_code = ApiResponse::URL_NOT_EXIST;
+	            $data = ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST);
+	        } else {
+	            $page = $pagination['page'];
+	            $limit = $pagination['limit'];
+		        $users_followers = Follow::where('from_id', $user_id)->forPage($page, $limit)->get();
+		        if($users_followers) {
+		            foreach ($users_followers as $user_follower) {
+		            	$user = Profile::where('user_id', $user_follower->to_id)->first();
+		                if($user) {
+			                if($user->image != null) {
+			                    $user->image = URL::asset($user->image);
+			                }
+			                $user_follower = $user;
+			                $data[] = $user_follower;
+			            }
+		            }
+		        }
+		    }
+	    } else {
+			$error_code = ApiResponse::UNAVAILABLE_USER;
+		    $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_USER);
+		}
         return array("code" => $error_code, "data" => $data);
     }
 
