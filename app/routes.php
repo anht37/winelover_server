@@ -31,11 +31,15 @@ Route::group(array('prefix' => 'api'), function()
     {
 
         Route::resource('wine', 'WineController');
+        //Route::post('wine/wine_related', 'WineController@get_wine_related');
         Route::post('scan', 'WineController@scan');
         Route::resource('winenote', 'WinenoteController');
         Route::resource('winery', 'WineryController');
+        
         Route::resource('rating', 'RatingController');
         Route::delete('mywine/{rating_id}', 'RatingController@remove');
+        Route::get('total_rate/{user_id}','RatingController@get_total_rate_of_number_rate');
+        
         Route::post('wine/search', 'WineController@search');
         Route::resource('like', 'LikeController');
 
@@ -46,6 +50,9 @@ Route::group(array('prefix' => 'api'), function()
         Route::delete('comment/{rating_id}/{id}', 'CommentController@destroy');
 
         Route::resource('follow', 'FollowController');
+        Route::get('list_followers/{user_id}', 'FollowController@get_list_follower');
+        Route::get('list_followings/{user_id}', 'FollowController@get_list_following');
+
         Route::resource('wishlist', 'WishlistController');
         Route::resource('profile', 'ProfileController');
         Route::post('profile/{user_id}', 'ProfileController@uploadImage');

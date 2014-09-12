@@ -101,9 +101,9 @@ class RatingController extends ApiController {
         return Response::json($result);
 	}
 
-	public function get_total_rate_of_number_rate() 
+	public function get_total_rate_of_number_rate($user_id) 
 	{
-		$result = Rating::getTotalRateOfNumberRate();
+		$result = Rating::getTotalRateOfNumberRate($user_id);
         return Response::json($result);
 	}
 }
