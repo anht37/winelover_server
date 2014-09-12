@@ -369,17 +369,21 @@ class Wine extends Eloquent {
             $i = 0;
             foreach ($input as $wine_app) {
                 $wine_app_id = explode( '_', $wine_app);
-                $rakuten_id = 'rakuten_' . $wine_app_id[1] . '_' . $wine_app_id[2];
+                if(count($wine_app_id) == 4) {
+                    $rakuten_id = 'rakuten_' . $wine_app_id[1] . '_' . $wine_app_id[2];
+                } elseif(count($wine_app_id) == 3) {
+                    $rakuten_id = 'rakuten_' . $wine_app_id[0] . '_' . $wine_app_id[1];
+                } else {
+                    $rakuten_id = null;
+                }
+                
                 $wine = Wine::where('rakuten_id', $rakuten_id)->get(array('rakuten_id', 'name', 'image_url', 'wine_unique_id'))->first();
                 if($wine) {
                     if($wine->image_url != null) {
                         $wine->image_url = URL::asset($wine->image_url);
                     }
                     $data[] = $wine->toArray();
-                } else {
-                    $error_code = ApiResponse::UNAVAILABLE_WINE;
-                    $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_WINE);
-                }
+                } 
                 $i ++;
             }
             
