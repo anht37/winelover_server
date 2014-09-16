@@ -71,7 +71,7 @@ class ProfileController extends ApiController {
         return Response::json($result);
 	}
 
-	public function uploadImage($user_id)
+	public function upload_image($user_id)
 	{
 		$result = Profile::uploadImage($user_id);
         return Response::json($result);
@@ -88,25 +88,25 @@ class ProfileController extends ApiController {
 		//
 	}
 
-	public function getProfile_basic_user($user_id)
+	public function get_profile_basic_user($user_id)
 	{
 		$result = Profile::getProfileBasicUser($user_id);
         return Response::json($result);
 	}
 
-	public function getProfile_wishlist_user($user_id)
+	public function get_profile_wishlist_user($user_id)
 	{
 		$result = Profile::getProfileWishlistUser($user_id);
         return Response::json($result);
 	}
 
-	public function getProfile_Top_rate($user_id)
+	public function get_profile_Top_rate($user_id)
 	{	
 		$result = Profile::getProfieTopRate($user_id);
         return Response::json($result);
 	}
 
-	public function getProfile_Last_rate($user_id)
+	public function get_profile_Last_rate($user_id)
 	{	
 		$result = Profile::getProfieLastRate($user_id);
         return Response::json($result);

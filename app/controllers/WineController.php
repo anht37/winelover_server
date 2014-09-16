@@ -105,8 +105,8 @@ class WineController extends ApiController {
             {
             	$wine = Wine::where('wine_id', $result)->first();
                 if($wine != null) {
-            	$input = $wine->toArray();
-            	$rating = Rating::createNewRating($input);
+            		$input = $wine->toArray();
+            		$rating = Rating::createNewRating($input);
                 }
             }
         }
@@ -128,6 +128,12 @@ class WineController extends ApiController {
 	public function get_list_wine_from_rakuten_id()
 	{
 		$result = Wine::getListWineFromRakutenId($this->_getInput());
+		return Response::json($result);
+	}
+
+	public function create_rating_from_wine_selected()
+	{
+		$result = Wine::createRatingFromWineSelected($this->_getInput());
 		return Response::json($result);
 	}
 }

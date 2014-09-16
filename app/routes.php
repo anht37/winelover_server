@@ -39,10 +39,12 @@ Route::group(array('prefix' => 'api'), function()
         Route::resource('rating', 'RatingController');
         Route::delete('mywine/{rating_id}', 'RatingController@remove');
         Route::get('total_rate/{user_id}','RatingController@get_total_rate_of_number_rate');
-        
+
         Route::post('wine/search', 'WineController@search');
-        Route::resource('like', 'LikeController');
         Route::post('list_wines','WineController@get_list_wine_from_rakuten_id');
+        Route::post('rating_wine','WineController@create_rating_from_wine_selected');
+
+        Route::resource('like', 'LikeController');
 
         Route::get('comment/{rating_id}', 'CommentController@index');
         Route::post('comment/{rating_id}', 'CommentController@store');
@@ -56,11 +58,11 @@ Route::group(array('prefix' => 'api'), function()
 
         Route::resource('wishlist', 'WishlistController');
         Route::resource('profile', 'ProfileController');
-        Route::post('profile/{user_id}', 'ProfileController@uploadImage');
-        Route::get('profile/basic/{user_id}', 'ProfileController@getProfile_basic_user');
-        Route::get('profile/wishlist/{user_id}', 'ProfileController@getProfile_wishlist_user');
-        Route::get('profile/top_rate/{user_id}', 'ProfileController@getProfile_Top_rate');
-        Route::get('profile/last_rate/{user_id}', 'ProfileController@getProfile_Last_rate');
+        Route::post('profile/{user_id}', 'ProfileController@upload_image');
+        Route::get('profile/basic/{user_id}', 'ProfileController@get_profile_basic_user');
+        Route::get('profile/wishlist/{user_id}', 'ProfileController@get_profile_wishlist_user');
+        Route::get('profile/top_rate/{user_id}', 'ProfileController@get_profile_Top_rate');
+        Route::get('profile/last_rate/{user_id}', 'ProfileController@get_profile_Last_rate');
         
         Route::get('timeline', 'RatingController@timeline');
         Route::get('feature_users', 'UserController@feature_users');

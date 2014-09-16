@@ -98,8 +98,19 @@ class Profile extends Eloquent {
 		$user_login = Session::get('user_id');
 
 		if(User::where('user_id',$user_id)->first()){
+		$users = Profile::orderBy('rate_count', 'desc')->get();
+		$i = 0;
+		if ($users) {
+			foreach ($users as $key) {
+				$i ++;
+				if($key['user_id'] == $user_id) {
+					break;
+				}
+			}
+		}
+
 		$profile = Profile::where('user_id', $user_id)->first();
-	
+		
 			if ($profile->image != null) {
 	            $profile->image = URL::asset($profile->image);   
 	        }
@@ -123,6 +134,7 @@ class Profile extends Eloquent {
 		            $profile->is_follow = false;
 		        }
 	        }
+	        $profile->user_ranking = $i;
 			$data = $profile->toArray();
 		} else {
 			$error_code = ApiResponse::UNAVAILABLE_USER;

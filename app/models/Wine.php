@@ -369,12 +369,11 @@ class Wine extends Eloquent {
             $i = 0;
             foreach ($input as $wine_app) {
                 $wine_app_id = explode( '_', $wine_app);
-                if(count($wine_app_id) == 4) {
+
+                if($wine_app_id[0] == 'app1') {
                     $rakuten_id = 'rakuten_' . $wine_app_id[1] . '_' . $wine_app_id[2];
-                } elseif(count($wine_app_id) == 3) {
-                    $rakuten_id = 'rakuten_' . $wine_app_id[0] . '_' . $wine_app_id[1];
                 } else {
-                    $rakuten_id = null;
+                    $rakuten_id = 'rakuten_' . $wine_app_id[0] . '_' . $wine_app_id[1];
                 }
                 
                 $wine = Wine::where('rakuten_id', $rakuten_id)->get(array('rakuten_id', 'name', 'image_url', 'wine_unique_id'))->first();
@@ -395,4 +394,18 @@ class Wine extends Eloquent {
         return array("code" => $error_code, "data" => $data);
     }
 
+    public static function createRatingFromWineSelected($input)
+    {
+        $error_code = ApiResponse::OK;
+        if(!empty($input['wine_id'])) {
+            $wine = Wine::where('wine_id', $input['wine_id'])->first();
+            if($wine != null) {
+                $wine_data = $wine->toArray();
+                $rating = Rating::createNewRating($wine_data);
+            }
+        } else {
+            $error_code = ApiResponse::MISSING_PARAMS;
+        }
+        return array("code" => $error_code);
+    }
 }
