@@ -2,6 +2,12 @@
 
 class WineController extends ApiController {
 
+	// protected $wine;
+
+	// public function __construct(Wine $wine){
+	// 	$this->wine = $wine;
+	// }
+
 	/**
 	 * Display a listing of the resource.
 	 *
@@ -130,10 +136,15 @@ class WineController extends ApiController {
 		$result = Wine::getListWineFromRakutenId($this->_getInput());
 		return Response::json($result);
 	}
-
-	public function create_rating_from_wine_selected()
+	public function upload_image_wine_scan($wine_id)
 	{
-		$result = Wine::createRatingFromWineSelected($this->_getInput());
+		$result = Wine::uploadImageWineScan($wine_id);
 		return Response::json($result);
 	}
+
+	// public function create_rating_from_wine_selected()
+	// {
+	// 	$result = Wine::createRatingFromWineSelected($this->_getInput());
+	// 	return Response::json($result);
+	// }
 }

@@ -54,10 +54,23 @@ class ProfileTest extends ApiTestCase
     {
         
         $user_id = $this->_user_id;
-        $response = $this->action('GET', 'ProfileController@getProfile_basic_user', array('user_id' => $user_id));
+        $response = $this->action('GET', 'ProfileController@get_profile_basic_user', array('user_id' => $user_id));
 
         $profile = Profile::where('user_id', $user_id)->first();
-        
+
+        if(User::where('user_id',$user_id)->first()){
+            $users = Profile::orderBy('rate_count', 'desc')->get();
+            $i = 0;
+            if ($users) {
+                foreach ($users as $key) {
+                    $i ++;
+                    if($key['user_id'] == $user_id) {
+                        break;
+                    }
+                }
+            }
+        }
+        $profile->user_ranking = $i;
         if ($profile->image != null) {
             $profile->image = URL::asset($profile->image);   
         }
@@ -76,10 +89,23 @@ class ProfileTest extends ApiTestCase
     {
         $user_id = $this->_user_id;
         $other_user = User::where('email','test_1@gmail.com')->first()->user_id;
-        $response = $this->action('GET', 'ProfileController@getProfile_basic_user', array('user_id' => $other_user));
+        $response = $this->action('GET', 'ProfileController@get_profile_basic_user', array('user_id' => $other_user));
         
         $profile = Profile::where('user_id', $other_user)->first();
         
+        if(User::where('user_id',$other_user)->first()){
+            $users = Profile::orderBy('rate_count', 'desc')->get();
+            $i = 0;
+            if ($users) {
+                foreach ($users as $key) {
+                    $i ++;
+                    if($key['user_id'] == $other_user) {
+                        break;
+                    }
+                }
+            }
+        }
+        $profile->user_ranking = $i;
         if ($profile->image != null) {
             $profile->image = URL::asset($profile->image);   
         }
@@ -100,7 +126,7 @@ class ProfileTest extends ApiTestCase
     public function testGetProfileBasicErrorWrongUser()
     {
         $user_id = "wrong_user_id";
-        $response = $this->action('GET', 'ProfileController@getProfile_basic_user', array('user_id' => $user_id));
+        $response = $this->action('GET', 'ProfileController@get_profile_basic_user', array('user_id' => $user_id));
 
         $this->assertEquals(array("code" => ApiResponse::UNAVAILABLE_USER, "data" => ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_USER))
         , json_decode($response->getContent(), true));
@@ -110,7 +136,7 @@ class ProfileTest extends ApiTestCase
     {
         $this->setUpWishlist();
         $user_id = $this->_user_id;
-        $response = $this->action('GET', 'ProfileController@getProfile_wishlist_user', array('user_id' => $user_id));
+        $response = $this->action('GET', 'ProfileController@get_profile_wishlist_user', array('user_id' => $user_id));
 
 
         $page = 1;
@@ -144,7 +170,7 @@ class ProfileTest extends ApiTestCase
     public function testGetProfileWishlishErrorWrongUser()
     {
         $user_id = "wrong_user_id";
-        $response = $this->action('GET', 'ProfileController@getProfile_wishlist_user', array('user_id' => $user_id));
+        $response = $this->action('GET', 'ProfileController@get_profile_wishlist_user', array('user_id' => $user_id));
 
         $this->assertEquals(array("code" => ApiResponse::UNAVAILABLE_USER, "data" => ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_USER))
         , json_decode($response->getContent(), true));
@@ -153,7 +179,7 @@ class ProfileTest extends ApiTestCase
     public function testGetProfileWishlishNoWishlist()
     {
         $user_id = $this->_user_id;
-        $response = $this->action('GET', 'ProfileController@getProfile_wishlist_user', array('user_id' => $user_id));
+        $response = $this->action('GET', 'ProfileController@get_profile_wishlist_user', array('user_id' => $user_id));
 
         $wishlist = Wishlist::where('user_id', $user_id)->with('wine')->get();
         $this->assertEquals(array("code" => ApiResponse::OK, "data" => $wishlist->toArray())
@@ -166,7 +192,7 @@ class ProfileTest extends ApiTestCase
         $user_id = $this->_user_id;
         $per_page = 10;
         $page = 1;
-        $response = $this->action('GET', 'ProfileController@getProfile_Top_rate', array('user_id' => $user_id));
+        $response = $this->action('GET', 'ProfileController@get_profile_Top_rate', array('user_id' => $user_id));
 
         $top_rate = Rating::where('user_id',$user_id)->orderBy('rate', 'desc')->with('wine')->forPage($page, $per_page)->get();
         foreach ($top_rate as $top_rates) {
@@ -191,7 +217,7 @@ class ProfileTest extends ApiTestCase
         $user_id = "wrong_user_id";
         $per_page = 10;
         $page = 1;
-        $response = $this->action('GET', 'ProfileController@getProfile_Top_rate', array('user_id' => $user_id));
+        $response = $this->action('GET', 'ProfileController@get_profile_Top_rate', array('user_id' => $user_id));
 
         $this->assertEquals(array("code" => ApiResponse::UNAVAILABLE_USER, "data" => ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_USER))
         , json_decode($response->getContent(), true));
@@ -203,7 +229,7 @@ class ProfileTest extends ApiTestCase
         $user_id = $this->_user_id;
         $per_page = 10;
         $page = 1;
-        $response = $this->action('GET', 'ProfileController@getProfile_Last_rate', array('user_id' => $user_id));
+        $response = $this->action('GET', 'ProfileController@get_profile_Last_rate', array('user_id' => $user_id));
 
         $last_rate = Rating::where('user_id',$user_id)->orderBy('updated_at', 'desc')->with('wine')->forPage($page, $per_page)->get();
         foreach ($last_rate as $last_rates) {
@@ -228,7 +254,7 @@ class ProfileTest extends ApiTestCase
         $user_id = "wrong_user_id";
         $per_page = 10;
         $page = 1;
-        $response = $this->action('GET', 'ProfileController@getProfile_Last_rate', array('user_id' => $user_id));
+        $response = $this->action('GET', 'ProfileController@get_profile_Last_rate', array('user_id' => $user_id));
 
         $this->assertEquals(array("code" => ApiResponse::UNAVAILABLE_USER, "data" => ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_USER))
         , json_decode($response->getContent(), true));

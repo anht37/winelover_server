@@ -136,19 +136,36 @@ class Wine extends Eloquent {
             if($wine->wine_type != null) {
                 $wine->wine_type = Wine::getWineType($wine->wine_type);
             }
+            
+            $destinationPath = public_path() . '/images/' . $user_id . '/wine/' . $wine_id;
+            if (File::isDirectory($destinationPath))
+            {
+                $image = File::files($destinationPath);
+                $wine->image_url = $image[0];
+            } else {
+                if($wine->image_url != null) {
+                    $wine->image_url = URL::asset($wine->image_url);
+                }
+            }
+
+            if($wine->wine_flag != null) {
+                $wine->wine_flag = URL::asset($wine->wine_flag);
+            } 
+            
+
             $country = Country::where('id',$wine->winery->country_id)->first();
             if($country) {
                 $wine->winery->country_id = $country->country_name;
             } else {
                 $wine->winery->country_id = null;
             }
+            
             $wine_note = Winenote::where('wine_unique_id', $wine->wine_unique_id)->where('user_id',$user_id)->first();
             if($wine_note) {
                 $wine->winenote = $wine_note->note;
             } else {
                 $wine->winenote = null;
             }
-            
             
             $wishlist = Wishlist::where('user_id', $user_id)->where('wine_unique_id', $wine->wine_unique_id)->first();
             if($wishlist) {
@@ -208,13 +225,6 @@ class Wine extends Eloquent {
                     $wine->total_like = $wine->total_like + $rating->like_count;
                 }
             }
-            if($wine->image_url != null) {
-                $wine->image_url = URL::asset($wine->image_url);
-            }   
-            if($wine->wine_flag != null) {
-                $wine->wine_flag = URL::asset($wine->wine_flag);
-            } 
-
             $data = array('wine' => $wine,'rate_user' => $rating_user ,'rate' => $ratings ,'wine_related' => $all_wines_winery);
         } else {
             $error_code = ApiResponse::UNAVAILABLE_WINE;
@@ -394,18 +404,52 @@ class Wine extends Eloquent {
         return array("code" => $error_code, "data" => $data);
     }
 
-    public static function createRatingFromWineSelected($input)
+    public static function uploadImageWineScan($wine_id)
     {
         $error_code = ApiResponse::OK;
-        if(!empty($input['wine_id'])) {
-            $wine = Wine::where('wine_id', $input['wine_id'])->first();
-            if($wine != null) {
-                $wine_data = $wine->toArray();
-                $rating = Rating::createNewRating($wine_data);
+        $user_id = Session::get('user_id');
+        $wine = Wine::where('wine_id', $wine_id)->first();
+        if($wine) {
+            if (Input::hasFile('file')) {
+
+                $file = Input::file('file');
+                $destinationPath = public_path() . '/images/' . $user_id . '/wine/' . $wine_id;
+                $filename = date('YmdHis').'_'.$file->getClientOriginalName();
+                $extension = $file->getClientOriginalExtension();
+
+                if (!File::isDirectory($destinationPath))
+                {
+                    File::makeDirectory($destinationPath, $mode = 0777, true, true);    
+                } else {
+                    File::cleanDirectory($destinationPath);
+                }
+                $upload_success     = $file->move($destinationPath, $filename);
+                //$profile->image = 'images/'. $user_id . '/wine/' . $filename;
+                
+                $data = URL::asset('images/'. $user_id . '/wine/' . $filename);
+            } else {
+                $error_code = ApiResponse::MISSING_PARAMS;
+                $data = $input;
             }
         } else {
-            $error_code = ApiResponse::MISSING_PARAMS;
+            $error_code = ApiResponse::UNAVAILABLE_WINE;
+            $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_WINE);
         }
-        return array("code" => $error_code);
+        return array("code" => $error_code, "data" => $data);
     }
+
+    // public static function createRatingFromWineSelected($input)
+    // {
+    //     $error_code = ApiResponse::OK;
+    //     if(!empty($input['wine_id'])) {
+    //         $wine = Wine::where('wine_id', $input['wine_id'])->first();
+    //         if($wine != null) {
+    //             $wine_data = $wine->toArray();
+    //             $rating = Rating::createNewRating($wine_data);
+    //         }
+    //     } else {
+    //         $error_code = ApiResponse::MISSING_PARAMS;
+    //     }
+    //     return array("code" => $error_code);
+    // }
 }

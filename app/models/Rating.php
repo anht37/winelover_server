@@ -107,8 +107,15 @@ class Rating extends Eloquent {
                     } else {
                         $rating->wishlist = false;
                     }
-                    if ($rating->wine->image_url != null) {
-                        $rating->wine->image_url = URL::asset($rating->wine->image_url);
+                    $destinationPath = public_path() . '/images/' . $user_id . '/wine/' . $wine_id;
+                    if (File::isDirectory($destinationPath))
+                    {
+                        $image = File::files($destinationPath);
+                        $rating->$wine->image_url = $image[0];
+                    } else {
+                        if($rating->$wine->image_url != null) {
+                            $rating->$wine->image_url = URL::asset($rating->$wine->image_url);
+                        }
                     }
                     if ($rating->wine->wine_flag != null) {
                         $rating->wine->wine_flag = URL::asset($rating->wine->wine_flag);
@@ -140,8 +147,15 @@ class Rating extends Eloquent {
             } else {
                 foreach ($ratings as $rating) {
                     $rating->winery = Winery::where('id',$rating->wine->winery_id)->first();
-                    if($rating->wine->image_url != null) {
-                        $rating->wine->image_url = URL::asset($rating->wine->image_url);
+                    $destinationPath = public_path() . '/images/' . $user_id . '/wine/' . $wine_id;
+                    if (File::isDirectory($destinationPath))
+                    {
+                        $image = File::files($destinationPath);
+                        $rating->$wine->image_url = $image[0];
+                    } else {
+                        if($rating->$wine->image_url != null) {
+                            $rating->$wine->image_url = URL::asset($rating->$wine->image_url);
+                        }
                     }
 
                     if($rating->wine->wine_flag != null) {
@@ -162,9 +176,10 @@ class Rating extends Eloquent {
         $rating->user_id = Session::get('user_id');
         if(!empty($input['wine_unique_id'])) {
             if(Wine::where('wine_unique_id', $input['wine_unique_id'])->first()) {
-                if(Rating::where('wine_unique_id', $input['wine_unique_id'])->where('user_id',$rating->user_id)->first()) {
-                    $error_code = ApiResponse::DUPLICATED_RATING;
-                    $data = ApiResponse::getErrorContent(ApiResponse::DUPLICATED_RATING);
+                $rating_old = Rating::where('wine_unique_id', $input['wine_unique_id'])->where('user_id',$rating->user_id)->first();
+                if($rating_old) {
+                    $result = Rating::updateRatingDetail($rating_old->id, $input);
+                    return $result;
                 } else {
                     $rating->wine_unique_id = $input['wine_unique_id'];
                 

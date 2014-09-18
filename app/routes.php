@@ -41,8 +41,9 @@ Route::group(array('prefix' => 'api'), function()
         Route::get('total_rate/{user_id}','RatingController@get_total_rate_of_number_rate');
 
         Route::post('wine/search', 'WineController@search');
+        Route::post('wine/{wine_id}', 'WineController@upload_image_wine_scan');
         Route::post('list_wines','WineController@get_list_wine_from_rakuten_id');
-        Route::post('rating_wine','WineController@create_rating_from_wine_selected');
+        //Route::post('rating_wine','WineController@create_rating_from_wine_selected');
 
         Route::resource('like', 'LikeController');
 
@@ -65,11 +66,13 @@ Route::group(array('prefix' => 'api'), function()
         Route::get('profile/last_rate/{user_id}', 'ProfileController@get_profile_Last_rate');
         
         Route::get('timeline', 'RatingController@timeline');
+        
         Route::get('feature_users', 'UserController@feature_users');
         Route::post('message_push_notification', 'UserController@message_push_notification');
         Route::post('user/friend_fb','UserController@get_friend_fb');
         Route::post('user/search','UserController@search_user_from_name');
-        //Route::post('user/follow_fb','UserController@follow_friend_fb');
+        Route::post('user/friend_tw','UserController@get_friend_tw');
+        
         Route::get('ranking','UserController@get_ranking');
 
     });
