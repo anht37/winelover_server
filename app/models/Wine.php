@@ -137,16 +137,7 @@ class Wine extends Eloquent {
                 $wine->wine_type = Wine::getWineType($wine->wine_type);
             }
             
-            $destinationPath = public_path() . '/images/' . $user_id . '/wine/' . $wine_id;
-            if (File::isDirectory($destinationPath))
-            {
-                $image = File::files($destinationPath);
-                $wine->image_url = $image[0];
-            } else {
-                if($wine->image_url != null) {
-                    $wine->image_url = URL::asset($wine->image_url);
-                }
-            }
+            $wine->image_url = Wine::getImageWineFromServer($user_id, $wine_id, $wine->image_url);
 
             if($wine->wine_flag != null) {
                 $wine->wine_flag = URL::asset($wine->wine_flag);
@@ -182,7 +173,7 @@ class Wine extends Eloquent {
                 $sum_rate_winery = $wine->average_rate;
                 foreach ($all_wines_winery as $wine_winery) {
                     $wine_on_winery = Wine::where('wine_id', $wine_winery->wine_id)->first();
-                    
+                    $wine_on_winery->image_url = Wine::getImageWineFromServer($user_id, $wine_id, $wine_on_winery->image_url);
                     $rate_count = $wine_on_winery->rate_count;
                     $rate_winery = $rate_winery + $rate_count;
                     
@@ -438,6 +429,21 @@ class Wine extends Eloquent {
         return array("code" => $error_code, "data" => $data);
     }
 
+    public static function getImageWineFromServer($user_id, $wine_id, $image_url)
+    {
+        $destinationPath = public_path() . '/images/' . $user_id . '/wine/' . $wine_id;
+        if (File::isDirectory($destinationPath))
+        {
+            $file = File::files($destinationPath);
+            $image = explode('public', $file[0]);
+            $image_url = URL::asset($image[1]);
+        } else {
+            if($image_url != null) {
+                $image_url = URL::asset($image_url);
+            } 
+        }
+        return $image_url;
+    }
     // public static function createRatingFromWineSelected($input)
     // {
     //     $error_code = ApiResponse::OK;
