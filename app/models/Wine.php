@@ -374,21 +374,23 @@ class Wine extends Eloquent {
             $i = 0;
             foreach ($input as $wine_app) {
                 $wine_app_id = explode( '_', $wine_app);
-
-                if($wine_app_id[0] == 'app1') {
-                    $rakuten_id = 'rakuten_' . $wine_app_id[1] . '_' . $wine_app_id[2];
-                } else {
-                    $rakuten_id = 'rakuten_' . $wine_app_id[0] . '_' . $wine_app_id[1];
-                }
-                
-                $wine = Wine::where('rakuten_id', $rakuten_id)->get(array('rakuten_id', 'name', 'image_url', 'wine_unique_id'))->first();
-                if($wine) {
-                    if($wine->image_url != null) {
-                        $wine->image_url = URL::asset($wine->image_url);
+                //print_r($wine_app_id);
+                if(count($wine_app_id) > 2 ) {
+                    if($wine_app_id[0] == 'app1') {
+                        $rakuten_id = 'rakuten_' . $wine_app_id[1] . '_' . $wine_app_id[2];
+                    } else {
+                        $rakuten_id = 'rakuten_' . $wine_app_id[0] . '_' . $wine_app_id[1];
                     }
-                    $data[] = $wine->toArray();
-                } 
-                $i ++;
+                    
+                    $wine = Wine::where('rakuten_id', $rakuten_id)->get(array('rakuten_id', 'name', 'image_url', 'wine_unique_id'))->first();
+                    if($wine) {
+                        if($wine->image_url != null) {
+                            $wine->image_url = URL::asset($wine->image_url);
+                        }
+                        $data[] = $wine->toArray();
+                    } 
+                    $i ++;
+                }
             }
             
         } else {

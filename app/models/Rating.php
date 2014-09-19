@@ -139,17 +139,7 @@ class Rating extends Eloquent {
                 foreach ($ratings as $rating) {
                     $rating->winery = Winery::where('id',$rating->wine->winery_id)->first();
 
-                    $destinationPath = public_path() . '/images/' . $user_id . '/wine/' . $rating->wine->wine_id;
-                    if (File::isDirectory($destinationPath))
-                    {
-                        $file = File::files($destinationPath);
-                        $image = explode( '.', $file,-1);
-                        $rating->wine->image_url = $image[0];
-                    } else {
-                        if($rating->wine->image_url != null) {
-                            $rating->wine->image_url = URL::asset($rating->wine->image_url);
-                        }
-                    }
+                    $rating->wine->image_url = Wine::getImageWineFromServer($user_id, $rating->wine->wine_unique_id, $rating->wine->image_url);
 
                     if($rating->wine->wine_flag != null) {
                         $rating->wine->wine_flag = URL::asset($rating->wine->wine_flag);
