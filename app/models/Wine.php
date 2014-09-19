@@ -440,8 +440,10 @@ class Wine extends Eloquent {
         if (File::isDirectory($destinationPath))
         {
             $file = File::files($destinationPath);
-            $image = explode('public', $file[0]);
-            $image_url = URL::asset($image[1]);
+
+            $image_paths = explode('/', $file[0]);
+            $image_name = $image_paths[count($image_paths) -1];
+            $image_url = URL::asset('/images/' . $user_id . '/wine/' . $wine_unique_id . '/' . $image_name);
         } else {
             if($image_url != null) {
                 $image_url = URL::asset($image_url);
