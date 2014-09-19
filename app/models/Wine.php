@@ -69,7 +69,7 @@ class Wine extends Eloquent {
             } else {
                 foreach ($wines as $wine) {
                     $wine->winery_id = $wine->winery->brand_name;
-                    $wine->image_url = Wine::getImageWineFromServer($user_id, $wine->wine_id, $wine->image_url);  
+                    $wine->image_url = Wine::getImageWineFromServer($user_id, $wine->wine_unique_id, $wine->image_url);  
                     if($wine->wine_flag != null) {
                         $wine->wine_flag = URL::asset($wine->wine_flag);
                     } 
@@ -136,7 +136,7 @@ class Wine extends Eloquent {
                 $wine->wine_type = Wine::getWineType($wine->wine_type);
             }
             
-            $wine->image_url = Wine::getImageWineFromServer($user_id, $wine_id, $wine->image_url);
+            $wine->image_url = Wine::getImageWineFromServer($user_id, $wine->wine_unique_id, $wine->image_url);
 
             if($wine->wine_flag != null) {
                 $wine->wine_flag = URL::asset($wine->wine_flag);
@@ -177,7 +177,7 @@ class Wine extends Eloquent {
                 $sum_rate_winery = $wine->average_rate;
                 foreach ($all_wines_winery as $wine_winery) {
                     $wine_on_winery = Wine::where('wine_id', $wine_winery->wine_id)->first();
-                    $wine_on_winery->image_url = Wine::getImageWineFromServer($user_id, $wine_id, $wine_on_winery->image_url);
+                    $wine_on_winery->image_url = Wine::getImageWineFromServer($user_id, $wine_on_winery->wine_unique_id, $wine_on_winery->image_url);
                     $rate_count = $wine_on_winery->rate_count;
                     $rate_winery = $rate_winery + $rate_count;
                     
@@ -399,16 +399,16 @@ class Wine extends Eloquent {
         return array("code" => $error_code, "data" => $data);
     }
 
-    public static function uploadImageWineScan($wine_id)
+    public static function uploadImageWineScan($wine_unique_id)
     {
         $error_code = ApiResponse::OK;
         $user_id = Session::get('user_id');
-        $wine = Wine::where('wine_id', $wine_id)->first();
+        $wine = Wine::where('wine_unique_id', $wine_unique_id)->first();
         if($wine) {
             if (Input::hasFile('file')) {
 
                 $file = Input::file('file');
-                $destinationPath = public_path() . '/images/' . $user_id . '/wine/' . $wine_id;
+                $destinationPath = public_path() . '/images/' . $user_id . '/wine/' . $wine->wine_unique_id;
                 $filename = date('YmdHis').'_'.$file->getClientOriginalName();
                 $extension = $file->getClientOriginalExtension();
 
@@ -420,7 +420,7 @@ class Wine extends Eloquent {
                 }
                 $upload_success     = $file->move($destinationPath, $filename);
                 
-                $data = URL::asset('images/'. $user_id . '/wine/' . $wine_id . '/' . $filename);
+                $data = URL::asset('images/'. $user_id . '/wine/' . $wine_unique_id . '/' . $filename);
             } else {
                 $error_code = ApiResponse::MISSING_PARAMS;
                 $data = null;
@@ -432,9 +432,9 @@ class Wine extends Eloquent {
         return array("code" => $error_code, "data" => $data);
     }
 
-    public static function getImageWineFromServer($user_id, $wine_id, $image_url)
+    public static function getImageWineFromServer($user_id, $wine_unique_id, $image_url)
     {
-        $destinationPath = public_path() . '/images/' . $user_id . '/wine/' . $wine_id;
+        $destinationPath = public_path() . '/images/' . $user_id . '/wine/' . $wine_unique_id;
         if (File::isDirectory($destinationPath))
         {
             $file = File::files($destinationPath);

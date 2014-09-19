@@ -41,7 +41,7 @@ Route::group(array('prefix' => 'api'), function()
         Route::get('total_rate/{user_id}','RatingController@get_total_rate_of_number_rate');
 
         Route::post('wine/search', 'WineController@search');
-        Route::post('wine/{wine_id}', 'WineController@upload_image_wine_scan');
+        Route::post('wine/{wine_unique_id}', 'WineController@upload_image_wine_scan');
         Route::post('list_wines','WineController@get_list_wine_from_rakuten_id');
         //Route::post('rating_wine','WineController@create_rating_from_wine_selected');
 

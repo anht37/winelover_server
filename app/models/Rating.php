@@ -107,7 +107,7 @@ class Rating extends Eloquent {
                     } else {
                         $rating->wishlist = false;
                     }
-                    $rating->wine->image_url = Wine::getImageWineFromServer($user_id, $rating->wine->wine_id, $rating->wine->image_url);
+                    $rating->wine->image_url = Wine::getImageWineFromServer($user_id, $rating->wine->wine_unique_id, $rating->wine->image_url);
                     if ($rating->wine->wine_flag != null) {
                         $rating->wine->wine_flag = URL::asset($rating->wine->wine_flag);
                     }
