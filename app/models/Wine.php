@@ -54,6 +54,7 @@ class Wine extends Eloquent {
 
     public static function getListWine()
     {
+        $user_id = Session::get('user_id');
         $error_code = ApiResponse::OK;
         $pagination = ApiResponse::pagination();
         if($pagination == false) {
@@ -68,9 +69,7 @@ class Wine extends Eloquent {
             } else {
                 foreach ($wines as $wine) {
                     $wine->winery_id = $wine->winery->brand_name;
-                    if($wine->image_url != null) {
-                        $wine->image_url = URL::asset($wine->image_url);
-                    }   
+                    $wine->image_url = Wine::getImageWineFromServer($user_id, $wine->wine_id, $wine->image_url);  
                     if($wine->wine_flag != null) {
                         $wine->wine_flag = URL::asset($wine->wine_flag);
                     } 
@@ -165,7 +164,12 @@ class Wine extends Eloquent {
                 $wine->is_wishlist = false;
             }
 
-            $all_wines_winery = Wine::where('winery_id', $wine->winery_id)->whereNotIn('wine_id', [$wine_id])->take(10)->get();
+            $all_wines_winery = Wine::where('winery_id', $wine->winery_id)
+                                    ->whereNotIn('wine_id', [$wine_id])
+                                    ->where('year','>',0)
+                                    ->where('average_rate','>',0)
+                                    ->orderBy('year', 'desc')
+                                    ->take(10)->get();
             $wine->winery->count_wine = count($all_wines_winery) + 1 ;
             $rate_winery = $wine->rate_count;
             if(count($all_wines_winery) !== 0) {
@@ -415,7 +419,6 @@ class Wine extends Eloquent {
                     File::cleanDirectory($destinationPath);
                 }
                 $upload_success     = $file->move($destinationPath, $filename);
-                //$profile->image = 'images/'. $user_id . '/wine/' . $filename;
                 
                 $data = URL::asset('images/'. $user_id . '/wine/' . $filename);
             } else {
