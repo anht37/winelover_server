@@ -423,7 +423,7 @@ class Wine extends Eloquent {
                 $data = URL::asset('images/'. $user_id . '/wine/' . $filename);
             } else {
                 $error_code = ApiResponse::MISSING_PARAMS;
-                $data = $input;
+                $data = null;
             }
         } else {
             $error_code = ApiResponse::UNAVAILABLE_WINE;
