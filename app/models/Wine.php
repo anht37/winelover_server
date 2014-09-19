@@ -420,7 +420,7 @@ class Wine extends Eloquent {
                 }
                 $upload_success     = $file->move($destinationPath, $filename);
                 
-                $data = URL::asset('images/'. $user_id . '/wine/' . $filename);
+                $data = URL::asset('images/'. $user_id . '/wine/' . $wine_id . '/' . $filename);
             } else {
                 $error_code = ApiResponse::MISSING_PARAMS;
                 $data = null;
