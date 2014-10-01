@@ -7,4 +7,5 @@ class Country extends Eloquent {
  
     protected $table = 'mst_countries';
     protected $primaryKey = 'id';
+    protected $guarded = array();
 }
