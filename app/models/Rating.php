@@ -15,6 +15,18 @@ class Rating extends Eloquent {
         return $this->belongsTo('Profile','user_id', 'user_id');
     }
 
+    public function like() {
+        return $this->hasMany('Like', 'id', 'rating_id');
+    }
+
+    public function comment() {
+        return $this->hasMany('Comment', 'id', 'rating_id');
+    }
+
+    public function wishlist() {
+        return $this->hasMany('Wishlist', 'wine_unique_id', 'wine_unique_id');
+    }
+
     public static function check_validator($input)
     {	   	
 
@@ -363,6 +375,77 @@ class Rating extends Eloquent {
             $number_rate = $number_rate - 0.5;
         }
         return array("code" => $error_code, "data" => $data);
+    }
+
+    public static function orderBy($data, $field)
+    {
+        $code = "return strnatcmp(\$a['$field'], \$b['$field']);";
+        usort($data, create_function('$b,$a', $code));
+        return $data;
+    }
+
+    public static function getProfile($user_id, $title, $id, $rating_id, $updated_at)
+    {
+        $profile = Profile::where('user_id', $user_id)->first();
+        $data = array(
+            'first_name' => $profile->first_name,
+            'last_name' => $profile->last_name,
+            'avatar' => URL::asset($profile->image),
+            'title' => $title,
+            'id' => $id,
+            'rating_id' =>$rating_id,
+            'updated_at' => $updated_at,
+        );
+        return $data;
+    }
+
+    public static function getActivity()
+    {
+        $user_id = Session::get('user_id');
+        $error_code = ApiResponse::OK;
+        $act = array();
+
+        $ratings = Rating::where('user_id', $user_id)->get();
+        foreach ($ratings as $rating) {
+            $likes = Like::where('rating_id', $rating->id)->whereNotIn('user_id', [$user_id])->get();
+            if($likes) {
+                $title = 'like';
+                foreach ($likes as $like) {
+                    $act[] = Rating::getProfile($like->user_id, $title, $like->id, $rating->id, $like->updated_at);
+                }
+            }
+
+            $comments = Comment::where('rating_id', $rating->id)->whereNotIn('user_id', [$user_id])->get();
+            if($comments) {
+                $title = 'comment';
+                foreach ($comments as $comment) {
+                    $act[] = Rating::getProfile($comment->user_id, $title, $comment->id, $rating->id, $comment->updated_at);
+                    
+                }
+            }
+
+            $wishlists = Wishlist::where('wine_unique_id', $rating->wine_unique_id)->whereNotIn('user_id', [$user_id])->get();
+            if($wishlists) {
+                $title = 'wishlist';
+                foreach ($wishlists as $wishlist) {
+                    $act[] = Rating::getProfile($wishlist->user_id, $title, $wishlist->id, $rating->id, $wishlist->updated_at);
+                    
+                }
+            }
+        }
+        $user_follow = Follow::where('to_id', $user_id)->get();
+        if($user_follow) {
+            $title = 'follow';
+            foreach ($user_follow as $user) {
+                $act[] = Rating::getProfile($user->from_id, $title, $user->id, null, $user->updated_at);
+                
+            }
+        }
+        $data = Rating::orderBy($act, 'updated_at');
+        
+        return array("code" => $error_code, "data" => $data);
+
+        //$data = arsort($data());
     }
 
     // public static function getListRateOfNumberRate($number_rate)
