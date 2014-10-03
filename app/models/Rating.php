@@ -384,7 +384,7 @@ class Rating extends Eloquent {
         return $data;
     }
 
-    public static function getProfile($user_id, $title, $id, $updated_at)
+    public static function getProfile($user_id, $title, $id, $rating_id, $updated_at)
     {
         $profile = Profile::where('user_id', $user_id)->first();
         $data = array(
@@ -393,6 +393,7 @@ class Rating extends Eloquent {
             'avatar' => URL::asset($profile->image),
             'title' => $title,
             'id' => $id,
+            'rating_id' =>$rating_id,
             'updated_at' => $updated_at,
         );
         return $data;
@@ -410,7 +411,7 @@ class Rating extends Eloquent {
             if($likes) {
                 $title = 'like';
                 foreach ($likes as $like) {
-                    $act[] = Rating::getProfile($like->user_id, $title, $like->id, $like->updated_at);
+                    $act[] = Rating::getProfile($like->user_id, $title, $like->id, $rating->id, $like->updated_at);
                 }
             }
 
@@ -418,7 +419,7 @@ class Rating extends Eloquent {
             if($comments) {
                 $title = 'comment';
                 foreach ($comments as $comment) {
-                    $act[] = Rating::getProfile($comment->user_id, $title, $comment->id, $comment->updated_at);
+                    $act[] = Rating::getProfile($comment->user_id, $title, $comment->id, $rating->id, $comment->updated_at);
                     
                 }
             }
@@ -427,7 +428,7 @@ class Rating extends Eloquent {
             if($wishlists) {
                 $title = 'wishlist';
                 foreach ($wishlists as $wishlist) {
-                    $act[] = Rating::getProfile($wishlist->user_id, $title, $wishlist->id, $wishlist->updated_at);
+                    $act[] = Rating::getProfile($wishlist->user_id, $title, $wishlist->id, $rating->id, $wishlist->updated_at);
                     
                 }
             }
@@ -436,7 +437,7 @@ class Rating extends Eloquent {
         if($user_follow) {
             $title = 'follow';
             foreach ($user_follow as $user) {
-                $act[] = Rating::getProfile($user->from_id, $title, $user->id, $user->updated_at);
+                $act[] = Rating::getProfile($user->from_id, $title, $user->id, null, $user->updated_at);
                 
             }
         }
