@@ -106,4 +106,10 @@ class RatingController extends ApiController {
 		$result = Rating::getTotalRateOfNumberRate($user_id);
         return Response::json($result);
 	}
+
+	public function get_activity() 
+    {
+    	$result = Rating::getActivity();
+        return Response::json($result);
+    }
 }

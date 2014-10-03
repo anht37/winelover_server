@@ -15,6 +15,18 @@ class Rating extends Eloquent {
         return $this->belongsTo('Profile','user_id', 'user_id');
     }
 
+    public function like() {
+        return $this->hasMany('Like', 'id', 'rating_id');
+    }
+
+    public function comment() {
+        return $this->hasMany('Comment', 'id', 'rating_id');
+    }
+
+    public function wishlist() {
+        return $this->hasMany('Wishlist', 'wine_unique_id', 'wine_unique_id');
+    }
+
     public static function check_validator($input)
     {	   	
 
@@ -51,7 +63,7 @@ class Rating extends Eloquent {
     public static function check_rating($rating_id)
     {   
 
-        $rating = Rating::where('id', $rating_id)->first();
+        $rating = self::where('id', $rating_id)->first();
         
         if ($rating) {
             return $rating_id;
@@ -81,7 +93,7 @@ class Rating extends Eloquent {
             $page = $pagination['page'];
             $limit = $pagination['limit'];
 
-            $ratings = Rating::whereIn('user_id', $user_timeline)->whereNotNull('wine_unique_id')->with('profile')->with('wine')->orderBy('updated_at', 'desc')->forPage($page, $limit)->get();
+            $ratings = self::whereIn('user_id', $user_timeline)->whereNotNull('wine_unique_id')->with('profile')->with('wine')->orderBy('updated_at', 'desc')->forPage($page, $limit)->get();
             if (count($ratings) == 0) {
                     $data = array();
                 
@@ -121,7 +133,7 @@ class Rating extends Eloquent {
         return array("code" => $error_code, "data" => $data);
     }
 
-    public static function getListRatingMyWine()
+    public static function getListselfMyWine()
     {
         $user_id = Session::get('user_id');
         $pagination = ApiResponse::pagination();
@@ -131,7 +143,7 @@ class Rating extends Eloquent {
         } else {
             $page = $pagination['page'];
             $limit = $pagination['limit'];
-            $ratings = Rating::where('user_id', $user_id)->where('is_my_wine', 1)->with('wine')->orderBy('updated_at', 'desc')->forPage($page, $limit)->get();
+            $ratings = self::where('user_id', $user_id)->where('is_my_wine', 1)->with('wine')->orderBy('updated_at', 'desc')->forPage($page, $limit)->get();
             $error_code = ApiResponse::OK;
             if(count($ratings) == 0 ) {
                     $data = array();
@@ -151,17 +163,17 @@ class Rating extends Eloquent {
         return array("code" => $error_code, "data" => $data);
     }
 
-    public static function createNewRating($input)
+    public static function createNewself($input)
     {
 
-        $rating = new Rating;
+        $rating = new self;
         $error_code = ApiResponse::OK;
         $rating->user_id = Session::get('user_id');
         if(!empty($input['wine_unique_id'])) {
             if(Wine::where('wine_unique_id', $input['wine_unique_id'])->first()) {
-                $rating_old = Rating::where('wine_unique_id', $input['wine_unique_id'])->where('user_id',$rating->user_id)->first();
+                $rating_old = self::where('wine_unique_id', $input['wine_unique_id'])->where('user_id',$rating->user_id)->first();
                 if($rating_old) {
-                    $result = Rating::updateRatingDetail($rating_old->id, $input);
+                    $result = self::updateselfDetail($rating_old->id, $input);
                     return $result;
                 } else {
                     $rating->wine_unique_id = $input['wine_unique_id'];
@@ -184,7 +196,7 @@ class Rating extends Eloquent {
                     
                     // Validation and Filtering is sorely needed!!
                     // Seriously, I'm a bad person for leaving that out.
-                    $check = Rating::check_validator($input);
+                    $check = self::check_validator($input);
                     if($check !== false) {
 
                         $rating_profile = Profile::where('user_id',$rating->user_id)->first();
@@ -223,9 +235,9 @@ class Rating extends Eloquent {
         return array("code" => $error_code, "data" => $data);
     }
 
-    public static function updateRatingDetail($id, $input)
+    public static function updateselfDetail($id, $input)
     {
-        $rating = Rating::where('id', $id)->first();
+        $rating = self::where('id', $id)->first();
         $error_code = ApiResponse::OK;
         if($rating) {
             $rating_rate_old = $rating->rate;
@@ -246,7 +258,7 @@ class Rating extends Eloquent {
                     $rating->is_my_wine = $input['is_my_wine'];
                 }
                 
-                $check = Rating::check_validator($input);
+                $check = self::check_validator($input);
                 if($check !== false) {
                     if($rating->rate > 0) {
                         $rating_wine = Wine::where('wine_unique_id',$rating->wine_unique_id)->first();
@@ -286,9 +298,9 @@ class Rating extends Eloquent {
         return array("code" => $error_code, "data" => $data);
     }
 
-    public static function showRatingDetail($id)
+    public static function showselfDetail($id)
     {
-        $rating = Rating::where('id', $id)->with('wine')->first();
+        $rating = self::where('id', $id)->with('wine')->first();
         $error_code = ApiResponse::OK;
         if($rating) {
             
@@ -301,9 +313,9 @@ class Rating extends Eloquent {
         return array("code" => $error_code, "data" => $data);
     }
 
-    public static function deleteRating($id)
+    public static function deleteself($id)
     {
-        $rating = Rating::where('id', $id)->first();
+        $rating = self::where('id', $id)->first();
         $error_code = ApiResponse::OK;
         if($rating) {
             $rating_profile = Profile::where('user_id',$rating->user_id)->first();
@@ -325,7 +337,7 @@ class Rating extends Eloquent {
 
             $rating->delete();
             
-            $data = 'Rating Deleted';
+            $data = 'self Deleted';
         } else {
             $error_code = ApiResponse::UNAVAILABLE_RATING;
             $data = ApiResponse::getErrorContent(ApiResponse::UNAVAILABLE_RATING);
@@ -335,7 +347,7 @@ class Rating extends Eloquent {
     
     public static function removeWineFromMyWine($id)
     {
-        $rating = Rating::where('id', $id)->first();
+        $rating = self::where('id', $id)->first();
         $error_code = ApiResponse::OK;
         if($rating) {
             $rating->is_my_wine = 0;
@@ -356,7 +368,7 @@ class Rating extends Eloquent {
         $rate = array();
         $number_rate = 5;
         for($i = 0; $i < 11; $i++) {
-            $ratings = Rating::where('user_id', $user_id)->where('rate', $number_rate)->get();
+            $ratings = self::where('user_id', $user_id)->where('rate', $number_rate)->get();
             $rate['rate'] = $number_rate;
             $rate['total_rate'] = count($ratings);
             $data[] = $rate;
@@ -365,13 +377,83 @@ class Rating extends Eloquent {
         return array("code" => $error_code, "data" => $data);
     }
 
+    public static function orderBy($data, $field)
+    {
+        $code = "return strnatcmp(\$a['$field'], \$b['$field']);";
+        usort($data, create_function('$b,$a', $code));
+        return $data;
+    }
+
+    public static function getProfile($user_id, $title, $id, $updated_at)
+    {
+        $profile = Profile::where('user_id', $user_id)->first();
+        $data = array(
+            'first_name' => $profile->first_name,
+            'last_name' => $profile->last_name,
+            'avatar' => URL::asset($profile->image),
+            'title' => $title,
+            'id' => $id,
+            'updated_at' => $updated_at,
+        );
+        return $data;
+    }
+
+    public static function getActivity()
+    {
+        $user_id = Session::get('user_id');
+        $error_code = ApiResponse::OK;
+        $act = array();
+
+        $ratings = self::where('user_id', $user_id)->get();
+        foreach ($ratings as $rating) {
+            $likes = Like::where('rating_id', $rating->id)->whereNotIn('user_id', [$user_id])->get();
+            if($likes) {
+                $title = 'like';
+                foreach ($likes as $like) {
+                    $act[] = self::getProfile($like->user_id, $title, $like->id, $like->updated_at);
+                }
+            }
+
+            $comments = Comment::where('rating_id', $rating->id)->whereNotIn('user_id', [$user_id])->get();
+            if($comments) {
+                $title = 'comment';
+                foreach ($comments as $comment) {
+                    $act[] = self::getProfile($comment->user_id, $title, $comment->id, $comment->updated_at);
+                    
+                }
+            }
+
+            $wishlists = Wishlist::where('wine_unique_id', $rating->wine_unique_id)->whereNotIn('user_id', [$user_id])->get();
+            if($wishlists) {
+                $title = 'wishlist';
+                foreach ($wishlists as $wishlist) {
+                    $act[] = self::getProfile($wishlist->user_id, $title, $wishlist->id, $wishlist->updated_at);
+                    
+                }
+            }
+        }
+        $user_follow = Follow::where('to_id', $user_id)->get();
+        if($user_follow) {
+            $title = 'follow';
+            foreach ($user_follow as $user) {
+                $act[] = self::getProfile($user->from_id, $title, $user->id, $user->updated_at);
+                
+            }
+        }
+        $data = self::orderBy($act, 'updated_at');
+        
+        return array("code" => $error_code, "data" => $data);
+
+        //$data = arsort($data());
+    }
+
     // public static function getListRateOfNumberRate($number_rate)
     // {
     //     $error_code = ApiResponse::OK;
     //     $user_id = Session::get('user_id');
-    //     $check_rate = Rating::check_validator($input);
+    //     $check_rate = self::check_validator($input);
     //     if()
-    //         $ratings = Rating::where('user_id', $user_id)->where('rate', $number_rate)->get();
+    //         $ratings = self::where('user_id', $user_id)->where('rate', $number_rate)->get();
     //         $data = $ratings->toArray();
     //     return array("code" => $error_code, "data" => $data);
     // }
