@@ -180,7 +180,7 @@ class User extends Eloquent
         $user_id = Session::get('user_id');
         $error_code = ApiResponse::OK;
         $data = array();
-        //return json_encode(array('abc','bca','cab'));
+        
         if(!empty($input)) {
             foreach ($input as $fb_id) {
                 $user = User::where('fb_id', $fb_id)->with('profile')->first();
@@ -231,6 +231,65 @@ class User extends Eloquent
         return array("code" => $error_code, "data" => $data);
     }
 
+    public static function getFriendTw($input)
+    {
+        $user_id = Session::get('user_id');
+        $error_code = ApiResponse::OK;
+        $list_friend = array();
+        
+        if(!empty($input)) {
+            if(!empty($input['my_tw_id']))
+            {
+                $my_tw_id = $input['my_tw_id'];
+                $user = User::where('user_id', $user_id)->first();
+                if($user->tw_id == null) {
+                    $user->tw_id = $my_tw_id;
+                    $user->save();
+                }
+            }
+            if(!empty($input['friend_tw_id'])) {
+                $friend_tw_id = $input['friend_tw_id'];
+                
+                foreach ($friend_tw_id as $tw_id) {
+                    
+                    $user = User::where('tw_id', $tw_id)->with('profile')->first();
+                    
+                    if($user && $user->user_id != $user_id) {
+                        $follow = Follow::where('from_id', $user_id)->where('to_id', $user->user_id)->first();
+                        if($follow) {
+                                $user->is_follow = true;
+                            } else {
+                                $user->is_follow = false;
+                            }
+                        if($user->image != null) {
+                            $user->image = URL::asset($user->image);
+                        }
+                        $list_friend[] = $user->toArray();
+                    }
+                }
+
+                // $pagination = ApiResponse::pagination();
+                
+                // if($pagination == false) {
+                //     $error_code = ApiResponse::URL_NOT_EXIST;
+                //     $data = ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST);
+                // } else {
+                //     $page = $pagination['page'] - 1;
+                //     $limit = $pagination['limit'];
+                //     $pagedData = array_slice($list_friend, $page * $limit, $limit);
+                //     $list_friend = Paginator::make($pagedData, count($list_friend), $limit);
+                // }
+                // $data = $list_friend->getItems();
+                    $data = $list_friend;
+            } else {
+                $error_code = ApiResponse::MISSING_PARAMS;
+            }
+        } else {
+            $error_code = ApiResponse::MISSING_PARAMS;
+        }
+        return array("code" => $error_code, 'data' => $data);
+    }
+
     public static function ranking()
     {
 
@@ -238,12 +297,13 @@ class User extends Eloquent
         $error_code = ApiResponse::OK;
         $data = array();
         $pagination = ApiResponse::pagination();
-        $page = $pagination['page'];
-        $limit = $pagination['limit'];
+        
         if($pagination == false) {
             $error_code = ApiResponse::URL_NOT_EXIST;
             $data = ApiResponse::getErrorContent(ApiResponse::URL_NOT_EXIST);
         } else {
+            $page = $pagination['page'];
+            $limit = $pagination['limit'];
             $users = Profile::orderBy('rate_count', 'desc')->forPage($page, $limit)->get();
 
             if(count($users) != 0) {
@@ -267,30 +327,5 @@ class User extends Eloquent
         return array("code" => $error_code, "data" => $data);
     }
 
-    // public static function followFriendFb($input)
-    // {
-    //     $user_id = Session::get('user_id');
-    //     $error_code = ApiResponse::OK;
-    //     $data = $input;
-    //     $i = 0;
-    //     if(!empty($input)) {
-    //         foreach ($input as $fb_id) {
-    //             $user = User::where('fb_id', $fb_id)->first();
-    //             if($user && $user->user_id != $user_id) {
-    //                 $follow = Follow::where('from_id', $user_id)->where('to_id', $user->user_id)->first();
-    //                 if($follow == null) {
-    //                         $user_follow = new Follow;
-    //                         $from_id = $user_id;
-    //                         $to_id = $user->user_id;
-    //                         $user_follow->save();
-    //                         $i ++;
-    //                 }
-    //             }
-    //         }
-    //         $data = $i .' '. 'friend followed !'; 
-    //     } else {
-    //         $error_code = ApiResponse::MISSING_PARAMS;
-    //     }
-    //     return array("code" => $error_code, "data" => $data);
-    // }
+    
 }

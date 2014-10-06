@@ -449,20 +449,7 @@ class Wine extends Eloquent {
                 $image_url = URL::asset($image_url);
             } 
         }
+        
         return $image_url;
     }
-    // public static function createRatingFromWineSelected($input)
-    // {
-    //     $error_code = ApiResponse::OK;
-    //     if(!empty($input['wine_id'])) {
-    //         $wine = Wine::where('wine_id', $input['wine_id'])->first();
-    //         if($wine != null) {
-    //             $wine_data = $wine->toArray();
-    //             $rating = Rating::createNewRating($wine_data);
-    //         }
-    //     } else {
-    //         $error_code = ApiResponse::MISSING_PARAMS;
-    //     }
-    //     return array("code" => $error_code);
-    // }
 }

@@ -65,12 +65,12 @@ class ApiResponse {
         "122" => "Already Rating",
     );
 
-    public static function createResponse($response) {
-        return Response::json(array(
-            "code" => $response["code"],
-            "data" => $response["data"],
-        ));
-    }
+    // public static function createResponse($response) {
+    //     return Response::json(array(
+    //         "code" => $response["code"],
+    //         "data" => $response["data"],
+    //     ));
+    // }
 
     public static function getErrorContent($error_code) {
         return self::$ERROR_LIST[$error_code];

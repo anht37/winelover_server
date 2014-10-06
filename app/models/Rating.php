@@ -445,7 +445,6 @@ class Rating extends Eloquent {
         
         return array("code" => $error_code, "data" => $data);
 
-        //$data = arsort($data());
     }
 
     // public static function getListRateOfNumberRate($number_rate)
