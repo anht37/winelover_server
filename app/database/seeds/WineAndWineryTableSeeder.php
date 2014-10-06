@@ -41,82 +41,93 @@ class WineAndWineryTableSeeder extends Seeder {
                 echo $c++ . "\n";
 
                 if(count($column_wine) == 33) {
-                    if($column_wine[13] == 'NA' && $column_wine[14] !== 'NA') {
-                        $column_wine[13] = $column_wine[14];
-                    }
-                    if($column_wine[9] == 'NA' && $column_wine[10] !== 'NA') {
-                        $column_wine[9] = $column_wine[10];
-                    }
-                    for ($j = 0; $j < 33 ; $j++) { 
-                        if($column_wine[$j] == 'NA') {
-                            $column_wine[$j] = '';
-                        }
-                    }
-                    if($column_wine[3] == '') {
-                        $column_wine[3] = $column_wine[1]; 
-                    }
 
-                    if($column_wine[9] != null) {
-                        $in_string = preg_match($re_country_name, $column_wine[9], $matches);
-                        if($in_string == true) {
-                            //$country = explode('・', $country_name->country_name, -1);
-                            $country = Country::where('country_name_ja', $matches[0])->first();
-                            if($country) {
-                                $flag = $country->flag_url;
-                            } else {
-                                $flag = null;
+                    $validator = Validator::make(
+                        array('rakuten_id' => $column_wine[0]),
+                        array(
+                            'rakuten_id' => 'exists:wines2,rakuten_id',
+                        )
+                    );
+
+                    if($validator->passes()) {
+
+                        if($column_wine[13] == 'NA' && $column_wine[14] !== 'NA') {
+                            $column_wine[13] = $column_wine[14];
+                        }
+                        if($column_wine[9] == 'NA' && $column_wine[10] !== 'NA') {
+                            $column_wine[9] = $column_wine[10];
+                        }
+                        for ($j = 0; $j < 33 ; $j++) { 
+                            if($column_wine[$j] == 'NA') {
+                                $column_wine[$j] = '';
                             }
                         }
-                    } 
+                        if($column_wine[3] == '') {
+                            $column_wine[3] = $column_wine[1]; 
+                        }
+                        if($column_wine[9] != null) {
+                            $in_string = preg_match($re_country_name, $column_wine[9], $matches);
+                            if($in_string == true) {
+                                //$country = explode('・', $country_name->country_name, -1);
+                                $country = Country::where('country_name_ja', $matches[0])->first();
+                                if($country) {
+                                    $flag = $country->flag_url;
+                                } else {
+                                    $flag = null;
+                                }
+                            }
+                        } 
 
-                    $winery = Winery::where('brand_name',$column_wine[16])->first();
+                        $winery = Winery::where('brand_name',$column_wine[16])->first();
 
-                    if($winery == null) {
-                        $winery_data = array(
-                            'id' => $winery_id,
-                            'brand_name' => $column_wine[16],
-                            'country_id' => '',
-                            'country_name' => $column_wine[10],
-                            'year' => $column_wine[14],
-                            'winery_url' => $column_wine[18],
-                            'region' => $column_wine[11],
-                            'description' => '',
+                        if($winery == null) {
+                            $winery_data = array(
+                                'id' => $winery_id,
+                                'brand_name' => $column_wine[16],
+                                'country_id' => '',
+                                'country_name' => $column_wine[10],
+                                'year' => $column_wine[14],
+                                'winery_url' => $column_wine[18],
+                                'region' => $column_wine[11],
+                                'description' => '',
+                            );
+
+                            Winery::create($winery_data);
+                            $winery = $winery_id;
+                            $winery_id ++;
+                        } else {
+                            $winery = $winery->id;
+                        }
+
+                        $wine = array(
+                            'name' => $column_wine[3],
+                            'name_en' => $column_wine[4],
+                            'sub_name' => $column_wine[5],
+                            'sub_name_en' => $column_wine[6],
+                            'year' => $column_wine[13],
+                            'winery_id' => $winery,
+                            'rakuten_id' => $column_wine[0],
+                            'original_name' => $column_wine[1],
+                            'original_name_2' => $column_wine[2],
+                            'country_name' => $column_wine[9],
+                            'image_url' => $column_wine[27],
+                            'wine_flag' => $flag,
+                            'imformation_image' => $column_wine[21] . ','. $column_wine[22] . ',' .  $column_wine[23]. ',' .  $column_wine[24]. ',' . $column_wine[25] . ',' . $column_wine[26],
+                            'rakuten_url' => $column_wine[17],
+                            'wine_unique_id' => $i . '_' . $column_wine[13],
+                            'color' => $column_wine[12],
+                            'average_price' => $column_wine[15],
+                            'average_rate' => 0,
+                            'rate_count' => 0,
+                            'wine_type' => $column_wine[7],
+                            'folder_code' => $column_wine[20],
                         );
-
-                        Winery::create($winery_data);
-                        $winery = $winery_id;
-                        $winery_id ++;
-                    } else {
-                        $winery = $winery->id;
+                        if ($wine['year'] == '' || $wine['year'] == 0) {
+                            $wine['wine_unique_id'] = $i . '_' . $i;
+                        }
+                        Wine::create($wine);
+                        $i++;
                     }
-
-                    $wine = array(
-                        'name' => $column_wine[3],
-                        'year' => $column_wine[13],
-                        'winery_id' => $winery,
-                        'rakuten_id' => $column_wine[0],
-                        'original_name' => $column_wine[1],
-                        'original_name_2' => $column_wine[2],
-                        'country_name' => $column_wine[9],
-                        'image_url' => $column_wine[27],
-                        'wine_flag' => $flag,
-                        'imformation_image' => $column_wine[21] . ','. $column_wine[22] . ',' .  $column_wine[23]. ',' .  $column_wine[24]. ',' . $column_wine[25] . ',' . $column_wine[26],
-                        'rakuten_url' => $column_wine[17],
-                        'wine_unique_id' => $i . '_' . $column_wine[13],
-                        'color' => $column_wine[12],
-                        'average_price' => $column_wine[15],
-                        'average_rate' => 0,
-                        'rate_count' => 0,
-                        'wine_type' => $column_wine[7],
-                        'folder_code' => $column_wine[20],
-                    );
-                    if ($wine['year'] == '' || $wine['year'] == 0) {
-                        $wine['wine_unique_id'] = $i . '_' . $i;
-                    }
-                    Wine::create($wine);
-
-                    
-                    $i++;
                 } else {
                     $error = implode(",", $column_wine);
                     $file_error = app_path() . "/error.txt";

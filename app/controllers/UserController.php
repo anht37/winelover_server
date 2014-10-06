@@ -138,10 +138,10 @@ class UserController extends ApiController {
         return Response::json($result);
     }
 
-    // public function follow_friend_fb() 
-    // { 
-    // 	$result = User::followFriendFb($this->_getInput());
-    //     return Response::json($result);
-    // }
+    public function get_friend_tw() 
+    { 
+    	$result = User::getFriendTw($this->_getInput());
+        return Response::json($result);
+    }
 
 }

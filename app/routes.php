@@ -27,34 +27,6 @@ Route::group(array('prefix' => 'api'), function()
     Route::post('push_notification', 'UserController@push_notification');
     Route::resource('user', 'UserController');
     
-    Route::get('test','WineController@create_rating_from_wine_selected');
-
-    // Route::get('read', function()
-    //     {
-    //         DB::table('wines2')->truncate();
-    //         $file_list = array();
-    //         $file_folder = app_path() . "/wine_name.txt";
-    //         $myfile = fopen($file_folder, "r") or die("Unable to open file!");
-    //         $read_file = fread($myfile,filesize($file_folder));
-    //         $change_file = str_replace(".PNG",".png",$read_file);
-    //         $wine_names = explode('.png'. "\n", $change_file);
-
-    //         foreach ($wine_names as $wine_name) {
-    //             if(strlen($wine_name) > 10) {
-    //                  $rakuten_wine = explode( '_', $wine_name);
-                
-    //                 $file_list[] = array(
-    //                     "rakuten_id" => "rakuten_" . $rakuten_wine[0] . "_" . $rakuten_wine[1],
-    //                 );
-    //                 //$file_list[] = $rakuten_wine;
-    //             } 
-    //         }
-    //         dd($file_list);
-    //         // foreach ($file_list as $file) {
-    //         //     Wine2::create($file);
-    //         // }
-    //     });
-
     Route::group(array('before' => 'session'), function()
     {
 
@@ -72,7 +44,6 @@ Route::group(array('prefix' => 'api'), function()
         Route::post('wine/search', 'WineController@search');
         Route::post('wine/{wine_unique_id}', 'WineController@upload_image_wine_scan');
         Route::post('list_wines','WineController@get_list_wine_from_rakuten_id');
-        //Route::post('rating_wine','WineController@create_rating_from_wine_selected');
 
         Route::resource('like', 'LikeController');
 

@@ -136,15 +136,10 @@ class WineController extends ApiController {
 		$result = Wine::getListWineFromRakutenId($this->_getInput());
 		return Response::json($result);
 	}
+
 	public function upload_image_wine_scan($wine_unique_id)
 	{
 		$result = Wine::uploadImageWineScan($wine_unique_id);
 		return Response::json($result);
 	}
-
-	// public function create_rating_from_wine_selected()
-	// {
-	// 	$result = Wine::createRatingFromWineSelected($this->_getInput());
-	// 	return Response::json($result);
-	// }
 }
